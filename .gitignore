@@ -1,0 +1,19 @@
+# Visual Studio files
+/.vs
+*.sln
+*.vcxproj
+
+# Intermediaries
+**/obj
+**/bin
+
+*.obj
+!SpaceSim/Resources/*.obj
+*.idb
+*.pdb
+
+# Engine binaries
+Engine.*.lib
+
+# Static assimp binaries
+lib/assimps*.lib

@@ -1,0 +1,21 @@
+[submodule "lib/src/bgfx"]
+	path = lib/src/bgfx
+	url = https://github.com/bkaradzic/bgfx.git
+[submodule "lib/src/bimg"]
+	path = lib/src/bimg
+	url = git@github.com:bkaradzic/bimg.git
+[submodule "lib/src/bx"]
+	path = lib/src/bx
+	url = git@github.com:bkaradzic/bx.git
+[submodule "lib/src/glfw"]
+	path = lib/src/glfw
+	url = git@github.com:glfw/glfw.git
+[submodule "lib/src/glm"]
+	path = lib/src/glm
+	url = git@github.com:g-truc/glm.git
+[submodule "lib/src/assimp"]
+	path = lib/src/assimp
+	url = git@github.com:assimp/assimp.git
+[submodule "lib/src/flecs"]
+	path = lib/src/flecs
+	url = git@github.com:SanderMertens/flecs.git
