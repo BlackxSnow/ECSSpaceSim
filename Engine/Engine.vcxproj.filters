@@ -19,16 +19,36 @@
       <Filter>Data</Filter>
     </ClInclude>
     <ClInclude Include="Engine.h" />
+    <ClInclude Include="utility\CCXCommon.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="utility\CCXShader.h">
+      <Filter>utility</Filter>
+    </ClInclude>
     <ClInclude Include="utility\ConsoleLogging.h">
       <Filter>utility</Filter>
     </ClInclude>
     <ClInclude Include="utility\Conversion.h">
       <Filter>utility</Filter>
     </ClInclude>
+    <ClInclude Include="utility\CCXFile.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="utility\CCXEvent.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine.cpp" />
+    <ClCompile Include="utility\CCXCommon.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="utility\CCXShader.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
     <ClCompile Include="utility\ConsoleLogging.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Data\Mesh.cpp" />
+    <ClCompile Include="utility\CCXFile.cpp">
       <Filter>utility</Filter>
     </ClCompile>
   </ItemGroup>

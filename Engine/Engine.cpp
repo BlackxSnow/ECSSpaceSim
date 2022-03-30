@@ -1,3 +1,5 @@
+#include "Engine.h"
+
 #include <bx/bx.h>
 #include <bgfx/bgfx.h>
 #include <bgfx/platform.h>
@@ -15,15 +17,20 @@
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
-#include <memory>
+#include <chrono>
 
 #include "utility/ConsoleLogging.h"
 #include "Data/Mesh.h"
 #include "utility/Conversion.h"
-#include "Engine.h"
 
-int WindowWidth = 1024;
-int WindowHeight = 768;
+int ecse::WindowWidth = 1024;
+int ecse::WindowHeight = 768;
+
+CCX::Event<double> ecse::OnUpdate;
+CCX::Event<> ecse::OnDraw;
+
+GLFWwindow* Window;
+const bgfx::ViewId kClearView = 0;
 
 static void glfw_error(int error, const char* description)
 {
@@ -42,7 +49,7 @@ static GLFWwindow* InitialiseGLFW()
 	{
 		LogError("Unable to initialise GLFW", true);
 	}
-	GLFWwindow* window = glfwCreateWindow(WindowWidth, WindowHeight, "SpaceSim", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(ecse::WindowWidth, ecse::WindowHeight, "SpaceSim", nullptr, nullptr);
 	if (!window)
 	{
 		LogError("Unable to create GLFW Window", true);
@@ -53,7 +60,6 @@ static GLFWwindow* InitialiseGLFW()
 
 static void InitialiseBGFX(GLFWwindow* window)
 {
-	bgfx::renderFrame();
 	bgfx::Init init;
 
 #if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
@@ -65,8 +71,8 @@ static void InitialiseBGFX(GLFWwindow* window)
 	init.platformData.nwh = glfwGetWin32Window(window);
 #endif
 
-	init.resolution.width = (uint32_t)WindowWidth;
-	init.resolution.height = (uint32_t)WindowHeight;
+	init.resolution.width = (uint32_t)ecse::WindowWidth;
+	init.resolution.height = (uint32_t)ecse::WindowHeight;
 	init.resolution.reset = BGFX_RESET_VSYNC;
 	if (!bgfx::init(init))
 	{
@@ -76,12 +82,12 @@ static void InitialiseBGFX(GLFWwindow* window)
 
 static void HandleWindowResize(GLFWwindow* window, const bgfx::ViewId& clearView)
 {
-	int oldWidth = WindowWidth, oldHeight = WindowHeight;
-	glfwGetWindowSize(window, &WindowWidth, &WindowHeight);
+	int oldWidth = ecse::WindowWidth, oldHeight = ecse::WindowHeight;
+	glfwGetWindowSize(window, &ecse::WindowWidth, &ecse::WindowHeight);
 
-	if (oldWidth != WindowWidth || oldHeight != WindowHeight)
+	if (oldWidth != ecse::WindowWidth || oldHeight != ecse::WindowHeight)
 	{
-		bgfx::reset((uint32_t)WindowWidth, (uint32_t)WindowHeight, BGFX_RESET_VSYNC);
+		bgfx::reset((uint32_t)ecse::WindowWidth, (uint32_t)ecse::WindowHeight, BGFX_RESET_VSYNC);
 		bgfx::setViewRect(clearView, 0, 0, bgfx::BackbufferRatio::Equal);
 	}
 }
@@ -91,10 +97,10 @@ static void HandleWindowResize(GLFWwindow* window, const bgfx::ViewId& clearView
 /// </summary>
 /// <param name="path"></param>
 /// <returns></returns>
-static std::shared_ptr<MeshData> LoadMesh(const std::string& path)
+std::shared_ptr<MeshData> ecse::LoadMesh(const std::string& path)
 {
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
+	const aiScene* scene = importer.ReadFile(path, aiProcessPreset_TargetRealtime_Quality);
 
 	if (scene == nullptr)
 	{
@@ -106,20 +112,22 @@ static std::shared_ptr<MeshData> LoadMesh(const std::string& path)
 	
 
 	std::shared_ptr<MeshData> data = std::make_shared<MeshData>();
-	data->Vertices.resize(mesh->mNumVertices);
+	data->Vertices.reserve(mesh->mNumVertices);
 	for (int i = 0; i < mesh->mNumVertices; i++)
 	{
-		//Vertex vert = Vertex(ToGLM(mesh->mVertices[i]),
-		//	ToGLM(mesh->mNormals[i]),
-		//	glm::dvec2(ToGLM(mesh->mTextureCoords[0][i])));
-
 		data->Vertices.emplace_back(
-			ToGLM(mesh->mVertices[i]),
-			ToGLM(mesh->mNormals[i]),
-			glm::dvec2(ToGLM(mesh->mTextureCoords[0][i])));
+			glm::vec3(ToGLM(mesh->mVertices[i])),
+			glm::vec3(ToGLM(mesh->mNormals[i])),
+			glm::vec2(ToGLM(mesh->mTextureCoords[0][i])));
 	}
 
-	data->Indices.resize(mesh->mNumFaces * static_cast<size_t>(3));
+	size_t indexCount = mesh->mNumFaces * static_cast<size_t>(3);
+	if (indexCount > MAXUINT16)
+	{
+		LogWarning("Unable to load mesh - index count exceeds uint16 limit!")
+	}
+
+	data->Indices.reserve(mesh->mNumFaces * static_cast<size_t>(3));
 
 	for (int i = 0; i < mesh->mNumFaces; i++)
 	{
@@ -132,24 +140,38 @@ static std::shared_ptr<MeshData> LoadMesh(const std::string& path)
 	return data;
 }
 
-int Loop(int argc, char** argv)
+void ecse::Init()
 {
-	GLFWwindow* window = InitialiseGLFW();
-	InitialiseBGFX(window);
+	Window = InitialiseGLFW();
+	InitialiseBGFX(Window);
+	Vertex::Init();
 	
-	const bgfx::ViewId kClearView = 0;
-	bgfx::setViewClear(kClearView, BGFX_CLEAR_COLOR);
-	bgfx::setViewRect(kClearView, 0, 0, bgfx::BackbufferRatio::Equal);
+	bgfx::setViewClear(kClearView, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH);
+}
 
-	// Test
-	auto cubeMesh = LoadMesh("Resources/Cube.obj");
+double GetDelta(std::chrono::system_clock::time_point& last)
+{
+	auto now = std::chrono::system_clock::now();
+	double delta = std::chrono::duration_cast<std::chrono::duration<double, std::ratio<1,1>>>(now - last).count();
+	last = now;
+	return delta;
+}
 
-	while (!glfwWindowShouldClose(window)) 
+int ecse::Loop(int argc, char** argv)
+{
+	auto lastTime = std::chrono::system_clock::now();
+	double delta = 0;
+	while (!glfwWindowShouldClose(Window)) 
 	{
 		glfwPollEvents();
-		HandleWindowResize(window, kClearView);
+		HandleWindowResize(Window, kClearView);
+
+		delta = GetDelta(lastTime);
+		OnUpdate.Invoke(delta);
 
 		bgfx::touch(kClearView);
+
+		OnDraw.Invoke();
 
 		bgfx::frame();
 	}

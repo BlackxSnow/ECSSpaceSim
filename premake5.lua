@@ -1,7 +1,12 @@
-local BUILD_DIR = path.join("build", _ACTION)
-if _OPTIONS["cc"] ~= nil then
-	BUILD_DIR = BUILD_DIR .. "_" .. _OPTIONS["cc"]
-end
+newoption
+{
+	trigger = "regen-bgfx",
+	description = "Regenerate bgfx project files"
+}
+
+-- if not os.isdir(path.join(BGFX_DIR, ".build/projects")) or _OPTIONS["regen-bgfx"] then
+-- 	os.execute("bgfxGenie.bat " .. _ACTION)
+-- end
 
 local libDir = "lib/src"
 
@@ -72,11 +77,14 @@ project "SpaceSim"
     exceptionhandling "Off"
     rtti "Off"
     files { "SpaceSim/**.h", "SpaceSim/**.cpp"}
+	dependson { "Engine"}
+	staticruntime "off"
     includedirs
 	{
 		path.join(BGFX_DIR, "include"),
 		path.join(BX_DIR, "include"),
 		path.join(GLFW_DIR, "include"),
+		path.join(BIMG_DIR, "include"),
         GLM_DIR,
         path.join(ASSIMP_DIR, "include"),
         path.join(ASSIMP_DIR, "build/x64/include/assimp"),
@@ -88,21 +96,19 @@ project "SpaceSim"
         flecsLibName = "flecs-debug"
         engineLibName = "Engine.Debug"
         linkDLLs({assimpLibName, flecsLibName})
-        links {engineLibName}
     filter "configurations:Release"
         assimpLibName = "assimp-vc142-mt"
         flecsLibName = "flecs-release"
         engineLibName = "Engine.Release"
         linkDLLs( {assimpLibName, flecsLibName})
-        links {engineLibName}
     filter "*"
-    links { "bgfx", "bimg", "bx", "glfw" }
+    links { "bgfx", "bimg", "bx", "glfw", "Engine" }
     postbuildcommands
     {
         "{COPYDIR} \"%{prj.location}/Resources\" \"%{cfg.buildtarget.directory}/Resources\""
     }
     filter "system:windows"
-    links { "gdi32", "kernel32", "psapi" }
+    	links { "gdi32", "kernel32", "psapi" }
     filter "system:linux"
         links { "dl", "GL", "pthread", "X11" }
     filter "system:macosx"
@@ -118,11 +124,13 @@ project "Engine"
 	rtti "Off"
     targetname("%{prj.name}.%{cfg.buildcfg}");
 	files { "Engine/**.h", "Engine/**.cpp" }
+	staticruntime "off"
 	includedirs
 	{
 		path.join(BGFX_DIR, "include"),
 		path.join(BX_DIR, "include"),
 		path.join(GLFW_DIR, "include"),
+		path.join(BIMG_DIR, "include"),
         GLM_DIR,
         path.join(ASSIMP_DIR, "include"),
         path.join(ASSIMP_DIR, "build/x64/include/assimp")
@@ -138,12 +146,10 @@ project "Engine"
         links {assimpLibName, flecsLibName}
     filter "*"
     links { "bgfx", "bimg", "bx", "glfw"}
-    postbuildcommands 
-    { 
-        -- "{COPYFILE} \"" .. "%{cfg.buildtarget.directory}/%{cfg.buildtarget.name}\" " .. "%{wks.location}" .. "/lib/dll/" .. "%{cfg.buildtarget.name}" .. "\"",
-        -- "{COPYFILE} \"" .. "%{cfg.buildtarget.directory}/%{cfg.buildtarget.basename}.lib\" " .. "%{wks.location}" .. "/lib/" .. "%{cfg.buildtarget.basename}.lib\""
-        "{COPYFILE} \"" .. "%{cfg.buildtarget.directory}/%{cfg.buildtarget.name}\" " .. "%{wks.location}" .. "/lib/" .. "%{cfg.buildtarget.name}\""
-    }
+    -- postbuildcommands 
+    -- { 
+    --     "{COPYFILE} \"" .. "%{cfg.buildtarget.directory}/%{cfg.buildtarget.name}\" " .. "%{wks.location}" .. "/lib/" .. "%{cfg.buildtarget.name}\""
+    -- }
 
 	filter "system:windows"
 		links { "gdi32", "kernel32", "psapi" }
@@ -153,11 +159,22 @@ project "Engine"
 		links { "QuartzCore.framework", "Metal.framework", "Cocoa.framework", "IOKit.framework", "CoreVideo.framework" }
 	setBxCompat()
 	
+
+group ("Dependencies")
+
+function external(name, type)
+	type = type or "StaticLib"
+	externalproject (name)
+		location (path.join(BGFX_DIR, ".build/projects", _ACTION))
+		uuid (os.uuid(name))
+		kind (type)
+		language "C++"
+end
+
 project "bgfx"
-    location(BGFX_DIR)
 	kind "StaticLib"
 	language "C++"
-	cppdialect "C++14"
+	cppdialect "C++17"
 	exceptionhandling "Off"
 	rtti "Off"
 	defines "__STDC_FORMAT_MACROS"
@@ -181,7 +198,7 @@ project "bgfx"
 		path.join(BGFX_DIR, "3rdparty/khronos")
 	}
 	filter "configurations:Debug"
-		-- defines "BGFX_CONFIG_DEBUG=1"
+		defines "BGFX_CONFIG_DEBUG=1"
 	filter "action:vs*"
 		defines "_CRT_SECURE_NO_WARNINGS"
 		excludes
@@ -197,10 +214,9 @@ project "bgfx"
 	setBxCompat()
 
 project "bimg"
-    location(BIMG_DIR)
 	kind "StaticLib"
 	language "C++"
-	cppdialect "C++14"
+	cppdialect "C++17"
 	exceptionhandling "Off"
 	rtti "Off"
 	files
@@ -221,10 +237,9 @@ project "bimg"
 	setBxCompat()
 
 project "bx"
-    location(BX_DIR)
 	kind "StaticLib"
 	language "C++"
-	cppdialect "C++14"
+	cppdialect "C++17"
 	exceptionhandling "Off"
 	rtti "Off"
 	defines "__STDC_FORMAT_MACROS"
@@ -247,11 +262,12 @@ project "bx"
 	filter "action:vs*"
 		defines "_CRT_SECURE_NO_WARNINGS"
 	setBxCompat()
-		
+
 project "glfw"
     location(GLFW_DIR)
 	kind "StaticLib"
 	language "C"
+	staticruntime "off"
 	files
 	{
 		path.join(GLFW_DIR, "include/GLFW/*.h"),
@@ -305,3 +321,21 @@ project "glfw"
 
 	filter "action:vs*"
 		defines "_CRT_SECURE_NO_WARNINGS"
+
+group ("shaderc")
+
+external("glslang")
+external("fcpp")
+external("glsl-optimizer")
+external("spirv-cross")
+external("spirv-opt")
+
+externalproject "shaderc"
+	location (path.join(BGFX_DIR, ".build/projects", _ACTION))
+	uuid (os.uuid("shaderc"))
+	kind "ConsoleApp"
+	language "C++"
+	postbuildcommands 
+    { 
+        "{COPYFILE} \"" .. "%{cfg.buildtarget.directory}/%{cfg.buildtarget.name}\" " .. "%{wks.location}" .. "/lib/tools/" .. "%{cfg.buildtarget.name}\""
+    }

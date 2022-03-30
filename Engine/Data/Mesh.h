@@ -2,30 +2,46 @@
 
 #include <glm/glm.hpp>
 #include <Vector>
+#include "bgfx/bgfx.h"
+
+
 
 /// <summary>
 /// Stores data for a mesh vertex.
 /// </summary>
 struct Vertex
 {
-	glm::dvec3 Position;
+	glm::vec3 Position;
 	glm::vec3 Normal;
 	glm::vec2 TexCoord;
 
-	Vertex(glm::dvec3 pos, glm::dvec3 normal, glm::dvec2 uv)
+	Vertex(glm::vec3 pos, glm::vec3 normal, glm::vec2 uv)
 	{
 		Position = pos;
-		Normal = (glm::vec3)normal;
-		TexCoord = (glm::vec2)uv;
+		Normal = normal;
+		TexCoord = uv;
 	}
 	Vertex()
 	{
-
+		Position = glm::vec3(0);
+		Normal = glm::vec3(0);
+		TexCoord = glm::vec2(0);
 	}
+
+	static void Init()
+	{
+		Layout.begin()
+			.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+			.add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float)
+			.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+			.end();
+	}
+
+	static bgfx::VertexLayout Layout;
 };
 
 struct MeshData
 {
 	std::vector<Vertex> Vertices;
-	std::vector<int> Indices;
+	std::vector<uint16_t> Indices;
 };
