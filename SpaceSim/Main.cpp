@@ -1,5 +1,7 @@
 #include "Engine.h"
 
+#define flecs_STATIC
+
 #include "Components/Camera.h"
 #include "bgfx/bgfx.h"
 #include "glm/glm.hpp"
@@ -17,7 +19,7 @@ int main()
 	auto cubeMesh = ecse::LoadMesh("Resources/Cube.obj");
 	PerspectiveCamera cam = PerspectiveCamera{ 60, 0.1, 100 };
 
-	auto vbh = bgfx::createVertexBuffer(bgfx::makeRef(cubeMesh->Vertices.data(), sizeof(Vertex) * cubeMesh->Vertices.size()), Vertex::Layout);
+	auto vbh = bgfx::createVertexBuffer(bgfx::makeRef(cubeMesh->Vertices.data(), sizeof(ecse::Vertex) * cubeMesh->Vertices.size()), ecse::Vertex::Layout);
 	auto ibh = bgfx::createIndexBuffer(bgfx::makeRef(cubeMesh->Indices.data(), sizeof(uint16_t) * cubeMesh->Indices.size()));
 
 

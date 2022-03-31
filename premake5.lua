@@ -16,6 +16,7 @@ local BX_DIR = path.join(libDir, "bx")
 local GLFW_DIR = path.join(libDir, "glfw")
 local GLM_DIR = path.join(libDir, "glm")
 local ASSIMP_DIR = path.join(libDir, "assimp")
+local FLECS_DIR = path.join(libDir, "flecs")
 
 solution "ECSSpaceSim"
 	startproject "SpaceSim"
@@ -79,6 +80,7 @@ project "SpaceSim"
     files { "SpaceSim/**.h", "SpaceSim/**.cpp"}
 	dependson { "Engine"}
 	staticruntime "off"
+	defines { "flecs_STATIC" }
     includedirs
 	{
 		path.join(BGFX_DIR, "include"),
@@ -88,21 +90,18 @@ project "SpaceSim"
         GLM_DIR,
         path.join(ASSIMP_DIR, "include"),
         path.join(ASSIMP_DIR, "build/x64/include/assimp"),
+		path.join(FLECS_DIR, "include"),
         "Engine"
 	}
     libdirs { "lib" }
     filter "configurations:Debug"
         assimpLibName = "assimp-vc142-mtd"
-        flecsLibName = "flecs-debug"
-        engineLibName = "Engine.Debug"
-        linkDLLs({assimpLibName, flecsLibName})
+        linkDLLs({assimpLibName})
     filter "configurations:Release"
         assimpLibName = "assimp-vc142-mt"
-        flecsLibName = "flecs-release"
-        engineLibName = "Engine.Release"
-        linkDLLs( {assimpLibName, flecsLibName})
+        linkDLLs( {assimpLibName})
     filter "*"
-    links { "bgfx", "bimg", "bx", "glfw", "Engine" }
+    links { "bgfx", "bimg", "bx", "glfw", "Engine", "flecs" }
     postbuildcommands
     {
         "{COPYDIR} \"%{prj.location}/Resources\" \"%{cfg.buildtarget.directory}/Resources\""
@@ -125,6 +124,7 @@ project "Engine"
     targetname("%{prj.name}.%{cfg.buildcfg}");
 	files { "Engine/**.h", "Engine/**.cpp" }
 	staticruntime "off"
+	defines { "flecs_STATIC" }
 	includedirs
 	{
 		path.join(BGFX_DIR, "include"),
@@ -133,19 +133,18 @@ project "Engine"
 		path.join(BIMG_DIR, "include"),
         GLM_DIR,
         path.join(ASSIMP_DIR, "include"),
-        path.join(ASSIMP_DIR, "build/x64/include/assimp")
+        path.join(ASSIMP_DIR, "build/x64/include/assimp"),
+		path.join(FLECS_DIR, "include")
 	}
     libdirs { "lib" }
     filter "configurations:Debug"
         assimpLibName = "assimp-vc142-mtd"
-        flecsLibName = "flecs-debug"
-        links {assimpLibName, flecsLibName}
+        links {assimpLibName}
     filter "configurations:Release"
         assimpLibName = "assimp-vc142-mt"
-        flecsLibName = "flecs-release"
-        links {assimpLibName, flecsLibName}
+        links {assimpLibName}
     filter "*"
-    links { "bgfx", "bimg", "bx", "glfw"}
+    links { "bgfx", "bimg", "bx", "glfw", "flecs"}
     -- postbuildcommands 
     -- { 
     --     "{COPYFILE} \"" .. "%{cfg.buildtarget.directory}/%{cfg.buildtarget.name}\" " .. "%{wks.location}" .. "/lib/" .. "%{cfg.buildtarget.name}\""
@@ -321,6 +320,21 @@ project "glfw"
 
 	filter "action:vs*"
 		defines "_CRT_SECURE_NO_WARNINGS"
+
+project "flecs"
+	kind "StaticLib"
+	language "C++"
+	defines { "WIN32", "_WINDOWS", "flecs_STATIC", "CMAKE_INTDIR=Debug"}
+	buildoptions { "/machine:x64" }
+	files  
+	{  
+		path.join(FLECS_DIR, "src/**.c"),
+		path.join(FLECS_DIR, "src/**.cpp"),
+		path.join(FLECS_DIR, "src/**.h"),
+		path.join(FLECS_DIR, "include/**.h"),
+		path.join(FLECS_DIR, "include/**.hpp")
+	}
+	includedirs { path.join(FLECS_DIR, "include") }
 
 group ("shaderc")
 
