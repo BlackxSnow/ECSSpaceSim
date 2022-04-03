@@ -9,11 +9,18 @@
 #include "Data/Mesh.h"
 #include "utility/CCXEvent.h"
 
+namespace flecs
+{
+	// Pipeline phases
+	inline flecs::entity_t PreRender;
+	inline flecs::entity_t OnRender;
+	inline flecs::entity_t PostRender;
+}
+
 namespace ecse
 {
 	extern int WindowWidth;
 	extern int WindowHeight;
-
 	
 	const std::vector<GLFWwindow*>& GetWindows();
 	const flecs::world* GetWorld();
