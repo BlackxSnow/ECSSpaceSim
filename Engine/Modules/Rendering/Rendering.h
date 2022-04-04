@@ -36,7 +36,7 @@ namespace ecse
 
 		struct Mask
 		{
-			ecse::Core::MaskBehaviour lastMask;
+			ecse::Core::MaskBehaviour lastMask = (ecse::Core::MaskBehaviour)-1;
 			flecs::query<const ecse::Rendering::Renderer, const ecse::Core::WorldTransform*> maskQuery;
 		};
 
@@ -59,6 +59,8 @@ namespace ecse
 		};
 
 		static void RenderCameraFinal(flecs::iter& iter, const Camera* cam, const ecse::Core::WorldTransform* camTransform, const Mask* mask);
+		
+		inline static flecs::query<const Camera, Mask> maskValidationQuery;
 		static void ValidateCameraQueries(flecs::iter& iter, const Camera* cam, Mask* mask);
 
 		Rendering(flecs::world& world)
@@ -78,6 +80,9 @@ namespace ecse
 
 			world.system<const Camera, const ecse::Core::WorldTransform, const Mask>("RenderCameraFinal")
 				.iter(RenderCameraFinal);
+
+			maskValidationQuery = world.query_builder<const Camera, Mask>().build();
+			OnFinalValidate.Register("Rendering::ValidateCameraQueries", []() {maskValidationQuery.iter(ValidateCameraQueries); });
 		}
 	};
 	

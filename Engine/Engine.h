@@ -25,8 +25,7 @@ namespace ecse
 	const std::vector<GLFWwindow*>& GetWindows();
 	flecs::world* GetWorld();
 
-	extern CCX::Event<double> OnUpdate;
-	extern CCX::Event<> OnDraw;
+	extern CCX::Event<> OnFinalValidate;
 
 	void Init();
 	int Loop(int argc, char** argv);

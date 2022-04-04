@@ -25,8 +25,7 @@
 int ecse::WindowWidth = 1024;
 int ecse::WindowHeight = 768;
 
-CCX::Event<double> ecse::OnUpdate;
-CCX::Event<> ecse::OnDraw;
+CCX::Event<> ecse::OnFinalValidate;
 
 std::vector<GLFWwindow*> Windows;
 flecs::world* World;
@@ -157,14 +156,9 @@ int ecse::Loop(int argc, char** argv)
 		bgfx::touch(kClearView);
 
 		delta = GetDelta(lastTime);
-		OnUpdate.Invoke(delta);
 		World->progress(delta);
 
-		
-
-		OnDraw.Invoke();
-
-		
+		OnFinalValidate.Invoke();
 
 		bgfx::frame();
 	}

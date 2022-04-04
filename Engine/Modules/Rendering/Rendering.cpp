@@ -121,13 +121,18 @@ void ecse::Rendering::RenderCameraFinal(flecs::iter& iter, const Camera* cam, co
 		break;
 	}
 
-	filter.build().iter([camTransform, target](flecs::iter& iter, const Renderer* renderer, const ecse::Core::WorldTransform* rendererTransform)
+	if (mask->lastMask == cam->masking)
 	{
-		RenderSingleCamera(iter, renderer, rendererTransform, camTransform, target);
-	});
-
-	//mask->maskQuery.iter([camTransform, target](flecs::iter& iter, const Renderer* renderer, const ecse::Core::WorldTransform* rendererTransform)
-	//{
-	//	RenderSingleCamera(iter, renderer, rendererTransform, camTransform, target);
-	//});
+		mask->maskQuery.iter([camTransform, target](flecs::iter& iter, const Renderer* renderer, const ecse::Core::WorldTransform* rendererTransform)
+		{
+			RenderSingleCamera(iter, renderer, rendererTransform, camTransform, target);
+		});
+	}
+	else
+	{
+		filter.build().iter([camTransform, target](flecs::iter& iter, const Renderer* renderer, const ecse::Core::WorldTransform* rendererTransform)
+		{
+			RenderSingleCamera(iter, renderer, rendererTransform, camTransform, target);
+		});
+	}
 }
