@@ -48,6 +48,8 @@ namespace ecse
 	{
 		std::vector<Vertex> Vertices;
 		std::vector<uint16_t> Indices;
+		bgfx::VertexBufferHandle vertexBuffer;
+		bgfx::IndexBufferHandle indexBuffer;
 	};
 
 	std::shared_ptr<MeshData> LoadMesh(const std::string& path);

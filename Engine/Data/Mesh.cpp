@@ -54,5 +54,8 @@ std::shared_ptr<ecse::MeshData> ecse::LoadMesh(const std::string& path)
 			data->Indices.push_back(face.mIndices[j]);
 		}
 	}
+
+	data->vertexBuffer = bgfx::createVertexBuffer(bgfx::makeRef(data->Vertices.data(), sizeof(ecse::Vertex) * data->Vertices.size()), ecse::Vertex::Layout);
+	data->indexBuffer = bgfx::createIndexBuffer(bgfx::makeRef(data->Indices.data(), sizeof(uint16_t) * data->Indices.size()));
 	return data;
 }

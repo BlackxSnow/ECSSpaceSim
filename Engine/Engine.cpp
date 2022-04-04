@@ -47,7 +47,7 @@ const std::vector<GLFWwindow*>& ecse::GetWindows()
 {
 	return Windows;
 }
-const flecs::world* ecse::GetWorld()
+flecs::world* ecse::GetWorld()
 {
 	return World;
 }
@@ -154,11 +154,13 @@ int ecse::Loop(int argc, char** argv)
 		glfwPollEvents();
 		HandleWindowResize(Windows[0], kClearView);
 
+		bgfx::touch(kClearView);
+
 		delta = GetDelta(lastTime);
 		OnUpdate.Invoke(delta);
 		World->progress(delta);
 
-		bgfx::touch(kClearView);
+		
 
 		OnDraw.Invoke();
 

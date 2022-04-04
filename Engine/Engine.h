@@ -23,7 +23,7 @@ namespace ecse
 	extern int WindowHeight;
 	
 	const std::vector<GLFWwindow*>& GetWindows();
-	const flecs::world* GetWorld();
+	flecs::world* GetWorld();
 
 	extern CCX::Event<double> OnUpdate;
 	extern CCX::Event<> OnDraw;
