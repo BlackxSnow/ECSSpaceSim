@@ -1,5 +1,5 @@
-**/bgfx_shader.sh -linguist-vendored
-**/bgfx_compute.sh -linguist-vendored
+**/bgfx_shader.sh linguist-vendored
+**/bgfx_compute.sh linguist-vendored
 *.sh linguist-language=GLSL
 
 *.sc linguist-language=GLSL
