@@ -37,6 +37,13 @@ namespace ecse
 			glm::dvec3 Position;
 			glm::quat Rotation;
 			glm::vec3 Scale;
+
+			Transform(glm::dvec3 p = glm::dvec3(0,0,0), glm::quat r = glm::identity<glm::quat>(), glm::vec3 s = glm::vec3(1,1,1))
+			{
+				Position = p;
+				Rotation = r;
+				Scale = s;
+			}
 		};
 
 		struct WorldTransform
