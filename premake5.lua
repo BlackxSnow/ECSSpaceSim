@@ -53,15 +53,6 @@ function setBxCompat()
 		includedirs { path.join(BX_DIR, "include/compat/osx") }
 		buildoptions { "-x objective-c++" }
 end
-	
--- function linkDLLs(ass, fle, eng)
---     postbuildcommands { 
---         "{COPYFILE} \"%{wks.location}/lib/dll/" .. ass .. ".dll\" \"%{cfg.buildtarget.directory}/" .. ass .. ".dll\"",
---         "{COPYFILE} \"%{wks.location}/lib/dll/" .. fle .. ".dll\" \"%{cfg.buildtarget.directory}/" .. fle .. ".dll\"",
---         "{COPYFILE} \"%{wks.location}/lib/dll/" .. eng .. ".dll\" \"%{cfg.buildtarget.directory}/" .. eng .. ".dll\""
---     }
---     links {ass, fle, eng}
--- end
 
 function linkDLLs(values)
     for i, value in ipairs(values) do
@@ -158,6 +149,19 @@ project "Engine"
 		links { "QuartzCore.framework", "Metal.framework", "Cocoa.framework", "IOKit.framework", "CoreVideo.framework" }
 	setBxCompat()
 	
+filter "action:vs*"
+project "EngineTests"
+	location "EngineTests"
+	kind "SharedLib"
+	language "C++"
+	cppdialect "C++17"
+	files { "EngineTests/**.h", "EngineTests/**.cpp" }
+	staticruntime "off"
+	libdirs { "$(VCInstallDir)UnitTest/lib" }
+	includedirs { "$(VCInstallDir)UnitTest/include" }
+	links { "Engine", "kernel32", "user32", "gdi32", "winspool", "comdlg32", "advapi32", "shell32", "ole32", "oleaut32", "uuid", "odbc32", "odbccp32" }
+
+filter "*"
 
 group ("Dependencies")
 
@@ -335,6 +339,7 @@ project "flecs"
 		path.join(FLECS_DIR, "include/**.hpp")
 	}
 	includedirs { path.join(FLECS_DIR, "include") }
+
 
 group ("shaderc")
 
