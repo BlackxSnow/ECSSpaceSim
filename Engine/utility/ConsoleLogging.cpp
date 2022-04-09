@@ -57,7 +57,7 @@ void clog::Error(int line, std::string sourceFunc, std::string sourceFile, std::
 	std::cout << output << message << "\n";
 	if (throwException)
 	{
-		throw std::exception(message.c_str());
+		throw std::runtime_error(message);
 	}
 }
 
