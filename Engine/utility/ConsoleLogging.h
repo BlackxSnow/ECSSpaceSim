@@ -5,8 +5,10 @@
 #define LogInfo(x) clog::Info(CLOGINFO, x);
 #define LogWarning(x) clog::Warning(CLOGINFO, x);
 #define LogError(x, t) clog::Error(CLOGINFO, x, t);
+#define CCXAssert(assertion, message) clog::Assert(CLOGINFO, assertion, message);
 
 #include <string>
+#include <cassert>
 
 /// <summary>
 /// Standardised logging format and colouring scheme.
@@ -32,6 +34,16 @@ namespace clog
 	/// Flags determining which information is prefixed to the message.
 	/// </summary>
 	extern LogFlags LogSettings;
+
+	/// <summary>
+	/// Assert that an expression is true. Logs an error and throws on fail.
+	/// </summary>
+	/// <param name="line"></param>
+	/// <param name="sourceFunc"></param>
+	/// <param name="sourceFile"></param>
+	/// <param name="assertion"></param>
+	/// <param name="message"></param>
+	void Assert(int line, std::string sourceFunc, std::string sourceFile, bool assertion, std::string message);
 
 	/// <summary>
 	/// Log an error into the console. Note: It's recommended to use the LogError macro.

@@ -48,6 +48,14 @@ void LayoutPrefix(int line, const std::string& func, const std::string& file, st
 	}
 }
 
+void clog::Assert(int line, std::string sourceFunc, std::string sourceFile, bool assertion, std::string message = "")
+{
+	if (!assertion)
+	{
+		Error(line, sourceFunc, sourceFile, message, true);
+	}
+}
+
 void clog::Error(int line, std::string sourceFunc, std::string sourceFile, std::string message, bool throwException)
 {
 	Init();
@@ -57,6 +65,7 @@ void clog::Error(int line, std::string sourceFunc, std::string sourceFile, std::
 	std::cout << output << message << "\n";
 	if (throwException)
 	{
+		std::cerr << message;
 		throw std::runtime_error(message);
 	}
 }
