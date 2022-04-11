@@ -4,7 +4,7 @@ newoption
 	description = "Regenerate bgfx project files"
 }
 
--- if not os.isdir(path.join(BGFX_DIR, ".build/projects")) or _OPTIONS["regen-bgfx"] then
+-- if not os.isdir(path.join(BGFX_DIR, ".build/projects/") .. _ACTION) or _OPTIONS["regen-bgfx"] then
 -- 	os.execute("bgfxGenie.bat " .. _ACTION)
 -- end
 
@@ -26,6 +26,7 @@ solution "ECSSpaceSim"
 	else
 		platforms { "x86_64" }
 	end
+	flags { "MultiProcessorCompile" }
 	filter "configurations:Release"
 
 		defines {"NDEBUG", "BX_CONFIG_DEBUG=0"}
@@ -158,7 +159,18 @@ project "EngineTests"
 	files { "EngineTests/**.h", "EngineTests/**.cpp" }
 	staticruntime "off"
 	libdirs { "$(VCInstallDir)UnitTest/lib" }
-	includedirs { "$(VCInstallDir)UnitTest/include" }
+	includedirs
+	{
+		"$(VCInstallDir)UnitTest/include",
+		path.join(BGFX_DIR, "include"),
+		path.join(BX_DIR, "include"),
+		path.join(GLFW_DIR, "include"),
+		path.join(BIMG_DIR, "include"),
+        GLM_DIR,
+        path.join(ASSIMP_DIR, "include"),
+        path.join(ASSIMP_DIR, "build/x64/include/assimp"),
+		path.join(FLECS_DIR, "include")
+	}
 	links { "Engine", "kernel32", "user32", "gdi32", "winspool", "comdlg32", "advapi32", "shell32", "ole32", "oleaut32", "uuid", "odbc32", "odbccp32" }
 
 filter "*"
@@ -341,20 +353,20 @@ project "flecs"
 	includedirs { path.join(FLECS_DIR, "include") }
 
 
-group ("shaderc")
+-- group ("shaderc")
 
-external("glslang")
-external("fcpp")
-external("glsl-optimizer")
-external("spirv-cross")
-external("spirv-opt")
+-- external("glslang")
+-- external("fcpp")
+-- external("glsl-optimizer")
+-- external("spirv-cross")
+-- external("spirv-opt")
 
-externalproject "shaderc"
-	location (path.join(BGFX_DIR, ".build/projects", _ACTION))
-	uuid (os.uuid("shaderc"))
-	kind "ConsoleApp"
-	language "C++"
-	postbuildcommands 
-    { 
-        "{COPYFILE} \"" .. "%{cfg.buildtarget.directory}/%{cfg.buildtarget.name}\" " .. "%{wks.location}" .. "/lib/tools/" .. "%{cfg.buildtarget.name}\""
-    }
+-- externalproject "shaderc"
+-- 	location (path.join(BGFX_DIR, ".build/projects", _ACTION))
+-- 	uuid (os.uuid("shaderc"))
+-- 	kind "ConsoleApp"
+-- 	language "C++"
+-- 	postbuildcommands 
+--     { 
+--         "{COPYFILE} \"" .. "%{cfg.buildtarget.directory}/%{cfg.buildtarget.name}\" " .. "%{wks.location}" .. "/lib/tools/" .. "%{cfg.buildtarget.name}\""
+--     }
