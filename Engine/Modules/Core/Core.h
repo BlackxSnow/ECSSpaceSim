@@ -51,6 +51,10 @@ namespace ecse
 			glm::dvec3 Position;
 			glm::quat Rotation;
 			glm::vec3 Scale;
+
+			glm::vec3 Forward() const;
+			glm::vec3 Right() const;
+			glm::vec3 Up() const;
 		};
 
 		struct Model
