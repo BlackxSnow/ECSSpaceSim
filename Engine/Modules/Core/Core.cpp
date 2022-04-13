@@ -27,20 +27,20 @@ void ecse::Core::UpdateWorldTransforms(flecs::iter& it, const Transform* local, 
 glm::vec3 ecse::Core::WorldTransform::Forward() const
 {
 	glm::vec3 forward = glm::vec3(0, 0, -1);
-	forward = Rotation * forward;
+	forward = forward * Rotation;
 	return glm::normalize(forward);
 }
 
 glm::vec3 ecse::Core::WorldTransform::Right() const
 {
 	glm::vec3 right = glm::vec3(1, 0, 0);
-	right = Rotation * right;
+	right = right * Rotation;
 	return glm::normalize(right);
 }
 
 glm::vec3 ecse::Core::WorldTransform::Up() const
 {
 	glm::vec3 up = glm::vec3(0,1,0);
-	up = Rotation * up;
+	up = up * Rotation;
 	return glm::normalize(up);
 }

@@ -21,25 +21,26 @@
 #include "utility/Conversion.h"
 #include "Modules/Core/Core.h"
 #include "Modules/Rendering/Rendering.h"
+#include "Modules/Input/Input.h"
 
 int ecse::WindowWidth = 1024;
 int ecse::WindowHeight = 768;
 
+CCX::Event<> ecse::OnInit;
+CCX::Event<> ecse::OnInputPoll;
 CCX::Event<> ecse::OnFinalValidate;
 
 std::vector<GLFWwindow*> Windows;
 flecs::world* World;
+flecs::entity GameRoot;
+
+size_t currentFrame = 1;
 
 const bgfx::ViewId kClearView = 0;
 
 static void glfw_error(int error, const char* description)
 {
 	LogError(description, false);
-}
-
-static void glfw_key(GLFWwindow* window, int key, int scanCode, int action, int mods)
-{
-	//TODO replace this function with an input manager
 }
 
 const std::vector<GLFWwindow*>& ecse::GetWindows()
@@ -50,20 +51,32 @@ flecs::world* ecse::GetWorld()
 {
 	return World;
 }
+flecs::entity* ecse::GetGameRoot()
+{
+	return &GameRoot;
+}
 
-static GLFWwindow* InitialiseGLFW()
+size_t ecse::FrameCount()
+{
+	return currentFrame;
+}
+
+static GLFWwindow* InitialiseGLFW(std::function<void()>* setHints = nullptr)
 {
 	glfwSetErrorCallback(glfw_error);
 	if (!glfwInit())
 	{
 		LogError("Unable to initialise GLFW", true);
 	}
+	if (setHints != nullptr)
+	{
+		(*setHints)();
+	}
 	GLFWwindow* window = glfwCreateWindow(ecse::WindowWidth, ecse::WindowHeight, "SpaceSim", nullptr, nullptr);
 	if (!window)
 	{
 		LogError("Unable to create GLFW Window", true);
 	}
-	glfwSetKeyCallback(window, glfw_key);
 	return window;
 }
 
@@ -110,15 +123,19 @@ void ecse::Init()
 	bgfx::setViewClear(kClearView, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH);
 
 	World = new flecs::world();
+	GameRoot = World->entity("Game");
 
 	World->import<flecs::units>();
 	World->import<ecse::Core>();
 	World->import<ecse::Rendering>();
 
+	Input::Initialise();
+
 	flecs::PreRender = World->entity();
 	flecs::OnRender = World->entity();
 	flecs::PostRender = World->entity();
 
+	OnInit.Invoke();
 
 	auto pipeline = World->pipeline("ECSEPipeline");
 	pipeline.add(flecs::PreFrame);
@@ -129,6 +146,13 @@ void ecse::Init()
 	pipeline.add(flecs::PostFrame);
 
 	World->set<flecs::rest::Rest>({});
+}
+
+void ecse::TestInit()
+{
+	std::function<void()> hints = []() { glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); };
+	Windows.push_back(InitialiseGLFW(&hints));
+	Input::Initialise();
 }
 
 void Shutdown()
@@ -151,6 +175,7 @@ int ecse::Loop(int argc, char** argv)
 	while (!glfwWindowShouldClose(Windows[0])) 
 	{
 		glfwPollEvents();
+		OnInputPoll.Invoke();
 		HandleWindowResize(Windows[0], kClearView);
 
 		bgfx::touch(kClearView);
@@ -161,6 +186,7 @@ int ecse::Loop(int argc, char** argv)
 		OnFinalValidate.Invoke();
 
 		bgfx::frame();
+		currentFrame++;
 	}
 
 	Shutdown();

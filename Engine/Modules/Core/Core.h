@@ -55,6 +55,18 @@ namespace ecse
 			glm::vec3 Forward() const;
 			glm::vec3 Right() const;
 			glm::vec3 Up() const;
+
+			WorldTransform()
+			{
+				Position = glm::dvec3(0, 0, 0);
+				Rotation = glm::identity<glm::quat>();
+				Scale = glm::vec3(1, 1, 1);
+			}
+			
+			WorldTransform& operator=(WorldTransform&&) = default;
+			WorldTransform(WorldTransform&&) = default;
+			WorldTransform(WorldTransform&) = default;
+			~WorldTransform() = default;
 		};
 
 		struct Model

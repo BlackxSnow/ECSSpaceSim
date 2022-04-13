@@ -24,9 +24,15 @@ namespace ecse
 	
 	const std::vector<GLFWwindow*>& GetWindows();
 	flecs::world* GetWorld();
+	flecs::entity* GetGameRoot();
 
+	size_t FrameCount();
+
+	extern CCX::Event<> OnInit;
+	extern CCX::Event<> OnInputPoll;
 	extern CCX::Event<> OnFinalValidate;
 
 	void Init();
+	void TestInit();
 	int Loop(int argc, char** argv);
 }
