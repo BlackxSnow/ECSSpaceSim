@@ -18,3 +18,6 @@ Engine.*.dll
 
 # Static assimp binaries
 lib/assimps*.lib
+
+# Utilities
+.obsidian
