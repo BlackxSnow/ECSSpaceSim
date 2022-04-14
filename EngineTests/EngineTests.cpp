@@ -63,17 +63,20 @@ namespace EngineTests
 
 		TEST_METHOD(Create_Key)
 		{
-			auto binding = ecse::Input::CreateBinding(nullptr, ecse::Input::Key::A);
+			auto action = ecse::Input::CreateAction("test", ecse::Input::Output::Scalar);
+			auto binding = ecse::Input::CreateBinding(action, ecse::Input::Key::A);
 		}
 
 		TEST_METHOD(Create_Mouse)
 		{
-			auto binding = ecse::Input::CreateBinding(nullptr, ecse::Input::Mouse::ButtonLeft);
+			auto action = ecse::Input::CreateAction("test", ecse::Input::Output::Scalar);
+			auto binding = ecse::Input::CreateBinding(action, ecse::Input::Mouse::ButtonLeft);
 		}
 
 		TEST_METHOD(GetData_Key)
 		{
-			auto binding = ecse::Input::CreateBinding(nullptr, ecse::Input::Key::A);
+			auto action = ecse::Input::CreateAction("test", ecse::Input::Output::Scalar);
+			auto binding = ecse::Input::CreateBinding(action, ecse::Input::Key::A);
 			binding->master.ForcePoll();
 			auto fData = binding->GetData<float>();
 			Assert::AreEqual(0.0f, fData, 0.01f, L"Unexpected float value");
@@ -81,15 +84,18 @@ namespace EngineTests
 		
 		TEST_METHOD(GetData_MouseButton)
 		{
-			auto binding = ecse::Input::CreateBinding(nullptr, ecse::Input::Mouse::ButtonLeft);
+			auto action = ecse::Input::CreateAction("test", ecse::Input::Output::Scalar);
+			auto binding = ecse::Input::CreateBinding(action, ecse::Input::Mouse::ButtonLeft);
 			binding->master.ForcePoll();
 			auto fData = binding->GetData<float>();
 			Assert::AreEqual(0.0f, fData, 0.01f, L"Unexpected float value");
 		}
 
+		// Note: may fail if mouse is moved too quickly during test.
 		TEST_METHOD(GetData_MousePosition)
 		{
-			auto binding = ecse::Input::CreateBinding(nullptr, ecse::Input::Mouse::Position);
+			auto action = ecse::Input::CreateAction("test", ecse::Input::Output::Vector2);
+			auto binding = ecse::Input::CreateBinding(action, ecse::Input::Mouse::Position);
 			binding->master.ForcePoll();
 			double expectedX, expectedY;
 			glfwGetCursorPos(ecse::GetWindows()[0], &expectedX, &expectedY);

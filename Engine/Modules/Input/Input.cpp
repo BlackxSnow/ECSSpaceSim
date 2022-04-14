@@ -38,11 +38,13 @@ void ecse::Input::Reset(bool iterateBindings)
 
 ecse::Input::BindingInstance* ecse::Input::CreateBinding(Action* bindTo, Key key)
 {
+	CCXAssert(bindTo != nullptr, "bindTo cannot be null");
 	return bindings[static_cast<int>(key)].CreateInstance(bindTo);
 }
 
 ecse::Input::BindingInstance* ecse::Input::CreateBinding(Action* bindTo, Mouse mouse)
 {
+	CCXAssert(bindTo != nullptr, "bindTo cannot be null");
 	return bindings[static_cast<int>(mouse)].CreateInstance(bindTo);
 }
 
