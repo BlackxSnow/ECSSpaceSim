@@ -20,7 +20,6 @@ namespace CCX
 		typedef Registree* Handle;
 	private:
 		std::vector<std::shared_ptr<Registree>> Registrees = std::vector<std::shared_ptr<Registree>>();
-		std::unordered_map<std::string, Handle> namedHandles = std::unordered_map<std::string, Handle>();
 
 		inline Handle AddCallback(Registree& callback)
 		{
@@ -31,14 +30,10 @@ namespace CCX
 
 	public:
 		/// <summary>
-		/// Register a new callback to the event under 'name'.
+		/// Register a new callback and return a handle to it.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="registree"></param>
-		void Register(std::string&& name, Registree callback)
-		{
-			namedHandles[name] = AddCallback(callback);
-		}
+		/// <param name="callback"></param>
+		/// <returns></returns>
 		Handle Register(Registree callback)
 		{
 			return AddCallback(callback);
@@ -48,25 +43,6 @@ namespace CCX
 		/// Remove an existing registree from the event.
 		/// </summary>
 		/// <param name="name"></param>
-		/// <returns></returns>
-		bool Deregister(const std::string& name)
-		{
-			auto it = namedHandles.find(name);
-			if (it == namedHandles.end())
-			{
-				return false;
-			}
-			Handle handle = it->second;
-			auto pos = std::find_if(Registrees.begin(), Registrees.end(), [handle](std::shared_ptr<Registree> r) { return r.get() == handle; });
-			if (pos != Registrees.end())
-			{
-				Registrees.erase(pos);
-				namedHandles.erase(it);
-				return true;
-			}
-
-			return false;
-		}
 		bool Deregister(const Handle handle)
 		{
 			auto pos = std::find_if(Registrees.begin(), Registrees.end(), [handle](std::shared_ptr<Registree> r) { return r.get() == handle; });

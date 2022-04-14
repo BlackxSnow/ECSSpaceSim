@@ -82,7 +82,7 @@ namespace ecse
 				.iter(RenderCameraFinal);
 
 			maskValidationQuery = world.query_builder<const Camera, Mask>().build();
-			OnFinalValidate.Register("Rendering::ValidateCameraQueries", []() {maskValidationQuery.iter(ValidateCameraQueries); });
+			OnFinalValidate.Register([]() {maskValidationQuery.iter(ValidateCameraQueries); });
 		}
 	};
 	
