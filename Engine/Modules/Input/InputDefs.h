@@ -26,6 +26,16 @@ namespace ecse::Input
 		Double = 8
 	};
 
+	enum class Component
+	{
+		NegX = 0,
+		PosX = 1,
+		NegY = 2,
+		PosY = 3,
+		NegZ = 4,
+		PosZ = 5
+	};
+
 	inline std::unordered_map<int, std::string> outputToString
 	{
 		{ 1, "Scalar" },

@@ -4,15 +4,34 @@
 
 void ecse::Input::MasterBinding::HandleEvent(GLFWwindow* window, int action, int mods)
 {
-	ForcePoll();
+	/*ForcePoll();*/
 	
+	CCXAssert(dataType == Output::Scalar, "Non-scalar bindings should not recieve dataless events.");
+
+	if (action == GLFW_RELEASE)
+	{
+		memset(data, 0, (int)dataType * (int)dataPrecision);
+	}
+	else
+	{
+		if (dataPrecision == Precision::Single)
+		{
+			*static_cast<float*>(data) = 1.0f;
+		}
+		else if (dataPrecision == Precision::Double)
+		{
+			*static_cast<double*>(data) = 1.0;
+		}
+	}
+	lastUpdate = ecse::FrameCount();
+
 	for (auto& instance : instances)
 	{
 		instance->HandleEvent(window, action, mods);
 	}
 }
 
-void ecse::Input::MasterBinding::Poll()
+void ecse::Input::MasterBinding::TryPoll()
 {
 	size_t frameCount = ecse::FrameCount();
 	if (lastUpdate < frameCount)
@@ -28,6 +47,80 @@ void ecse::Input::MasterBinding::ForcePoll()
 	lastUpdate = ecse::FrameCount();
 }
 
+template<class O, class C>
+void ReadConstituent(void* outData, ecse::Input::Constituent& constituent)
+{
+	O* castData = static_cast<O*>(outData);
+	const C* bindingData = static_cast<const C*>(constituent.binding->GetData<const void*>());
+
+	for (int i = 0; i < constituent.indices.size(); i++)
+	{
+		int index = floor(constituent.indices[i] / 2);
+		castData[index] += bindingData[i] * (constituent.indices[i] % 2 ? 1 : -1);
+	}
+}
+
+void ecse::Input::CompositeBinding::PollConstituents()
+{
+	memset(data, 0, (int)dataType * (int)dataPrecision);
+	for (auto& constituent : constituents)
+	{
+		Precision bindPrecision = constituent.binding->master.dataPrecision;
+		// This could probably be cleaned up
+		if (dataPrecision == Precision::Single)
+		{
+			if (bindPrecision == Precision::Single)
+			{
+				ReadConstituent<float, float>(data, constituent);
+			}
+			else if (bindPrecision == Precision::Double)
+			{
+				ReadConstituent<float, double>(data, constituent);
+			}
+		}
+		else if (dataPrecision == Precision::Double)
+		{
+			if (bindPrecision == Precision::Single)
+			{
+				ReadConstituent<double, float>(data, constituent);
+			}
+			else if (bindPrecision == Precision::Double)
+			{
+				ReadConstituent<double, double>(data, constituent);
+			}
+		}
+	}
+}
+
+void ecse::Input::CompositeBinding::TryPoll()
+{
+	size_t frameCount = ecse::FrameCount();
+	if (lastUpdate < frameCount)
+	{
+		PollConstituents();
+		lastUpdate = frameCount;
+	}
+}
+
+void ecse::Input::CompositeBinding::ForcePoll()
+{
+	PollConstituents();
+	lastUpdate = ecse::FrameCount();
+}
+
+void ecse::Input::CompositeBinding::ValidateConstituents()
+{
+	byte filledComponents = 0;
+	for (auto& constituent : constituents)
+	{
+		for (int& component : constituent.indices)
+		{
+			CCXAssert(!(filledComponents & (1 << component)), "Constituent component index '" + std::to_string(component)  + "' is already used");
+			filledComponents |= (1 << component);
+		}
+	}
+}
+
 void ecse::Input::MasterBinding::RemoveInstance(BindingInstance* remove)
 {
 	instances.erase(std::find_if(instances.begin(), instances.end(), [remove](std::shared_ptr<BindingInstance> inst) { return remove == inst.get(); }));
@@ -40,6 +133,10 @@ void ecse::Input::MasterBinding::ClearInstances()
 
 void ecse::Input::BindingInstance::HandleEvent(GLFWwindow* window, int action, int mods)
 {
+	if (boundAction == nullptr)
+	{
+		return;
+	}
 	// TODO: Preprocessing here
 
 	InputEventData eventData = InputEventData(*this, action, mods);
@@ -69,7 +166,14 @@ void ecse::Input::Action::HandleEvent(InputEventData& eventData)
 
 void ecse::Input::Action::AddBinding(BindingInstance* binding)
 {
+	CCXAssert(dataType == binding->master.dataType, "Data type mismatch. Expected: " + std::to_string(static_cast<int>(dataType)) + " Got: " + std::to_string(static_cast<int>(binding->master.dataType)));
 	bindings.push_back(binding);
+}
+
+void ecse::Input::Action::AddBinding(CompositeBinding* composite)
+{
+	CCXAssert(dataType == composite->dataType, "Data type mismatch. Expected: " + std::to_string(static_cast<int>(dataType)) + " Got: " + std::to_string(static_cast<int>(composite->dataType)));
+	composites.push_back(composite);
 }
 
 ecse::Input::BindingInstance* ecse::Input::MasterBinding::CreateInstance(Action* bindTo)
@@ -85,6 +189,14 @@ ecse::Input::BindingInstance* ecse::Input::MasterBinding::CreateInstance(Action*
 	}
 	return inst;
 }
+
+ecse::Input::BindingInstance* ecse::Input::MasterBinding::CreateUnboundInstance()
+{
+	instances.push_back(std::make_unique<BindingInstance>(*this));
+	return instances.back().get();
+}
+
+
 
 using MB = ecse::Input::MasterBinding;
 #define V2D ecse::Input::Output::Vector2, ecse::Input::Precision::Double

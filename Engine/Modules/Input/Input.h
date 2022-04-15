@@ -53,6 +53,13 @@ namespace ecse
 		BindingInstance* CreateBinding(Key key);
 		BindingInstance* CreateBinding(Mouse mouse);
 
+		Constituent CreateConstituent(Key key, std::initializer_list<Component> components);
+		Constituent CreateConstituent(Mouse mouse, std::initializer_list<Component> components);
+		Constituent CreateConstituent(Key mouse, std::initializer_list<int> components);
+		Constituent CreateConstituent(Mouse mouse, std::initializer_list<int> components);
+		CompositeBinding* CreateCompositeBinding(Action* bindTo, Output _dataType, Precision dataPrecision, std::vector<Constituent>&& constituents);
+		CompositeBinding* CreateCompositeBinding(Output _dataType, Precision dataPrecision, std::vector<Constituent>&& constituents);
+
 		Action* CreateAction(std::string& name, Output dataType, Precision precision = Precision::Double);
 		Action* CreateAction(std::string&& name, Output dataType, Precision precision = Precision::Double);
 

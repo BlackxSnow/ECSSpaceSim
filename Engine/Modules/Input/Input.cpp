@@ -1,4 +1,5 @@
 #include "Input.h"
+using namespace ecse::Input;
 
 ecse::Input::Action* context;
 
@@ -29,6 +30,7 @@ void ecse::Input::Initialise()
 void ecse::Input::Reset(bool iterateBindings)
 {
 	actions.clear();
+	composites.clear();
 	context = nullptr;
 	for (auto& mb : bindings)
 	{
@@ -38,13 +40,13 @@ void ecse::Input::Reset(bool iterateBindings)
 
 ecse::Input::BindingInstance* ecse::Input::CreateBinding(Action* bindTo, Key key)
 {
-	CCXAssert(bindTo != nullptr, "bindTo cannot be null");
+	CCXAssert(bindTo != nullptr, "bindTo cannot be null. If creating bindings for composites, use CreateConstituent instead.");
 	return bindings[static_cast<int>(key)].CreateInstance(bindTo);
 }
 
 ecse::Input::BindingInstance* ecse::Input::CreateBinding(Action* bindTo, Mouse mouse)
 {
-	CCXAssert(bindTo != nullptr, "bindTo cannot be null");
+	CCXAssert(bindTo != nullptr, "bindTo cannot be null. If creating bindings for composites, use CreateConstituent instead.");
 	return bindings[static_cast<int>(mouse)].CreateInstance(bindTo);
 }
 
@@ -58,6 +60,30 @@ ecse::Input::BindingInstance* ecse::Input::CreateBinding(Mouse mouse)
 {
 	CCXAssert(context != nullptr, "Context cannot be null when using this overload. Use SetBindContext first.");
 	return bindings[static_cast<int>(mouse)].CreateInstance(context);
+}
+
+Constituent ecse::Input::CreateConstituent(Key key, std::initializer_list<Component> components)
+{
+	return Constituent(bindings[static_cast<int>(key)].CreateUnboundInstance(), components);
+}
+
+Constituent ecse::Input::CreateConstituent(Mouse mouse, std::initializer_list<Component> components)
+{
+	return Constituent(bindings[static_cast<int>(mouse)].CreateUnboundInstance(), components);
+}
+
+CompositeBinding* ecse::Input::CreateCompositeBinding(Action* bindTo, Output _dataType, Precision dataPrecision, std::vector<Constituent>&& constituents)
+{
+	composites.push_back(std::make_unique<CompositeBinding>(bindTo, _dataType, dataPrecision, std::forward<std::vector<Constituent>>(constituents)));
+	bindTo->AddBinding(composites.back().get());
+	return composites.back().get();
+}
+CompositeBinding* ecse::Input::CreateCompositeBinding(Output _dataType, Precision dataPrecision, std::vector<Constituent>&& constituents)
+{
+	CCXAssert(context != nullptr, "Context cannot be null when using this overload. Use SetBindContext first.");
+	composites.push_back(std::make_unique<CompositeBinding>(context, _dataType, dataPrecision, std::forward<std::vector<Constituent>>(constituents)));
+	context->AddBinding(composites.back().get());
+	return composites.back().get();
 }
 
 ecse::Input::Action* ecse::Input::CreateAction(std::string& name, Output dataType, Precision precision)
