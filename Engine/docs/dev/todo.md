@@ -10,7 +10,11 @@
 - [ ] [[Notes#Processors|Implement binding processors]]
 - [ ] [[Notes#^477310|Store input bounds data in Master Bindings]]
 - [ ] [[Notes#Action Maps]]
-- [ ] [[Notes#Composite Bindings]]
+- [ ] [[Notes#^567d10|Binding Instance control schemes (Keyboard, Controller, etc.)]]
+-  Composite Bindings
+	- [x] Implementation
+	- [ ] Event support
+	- [ ] Constituent Absolute Signs (Option)
 - [ ] [[Notes#^aa15e4|Gamepad bindings (Joystick / Controller)]]
 - [ ] (De)serialization from data format
 - [ ] Multi-window input handling
@@ -21,8 +25,8 @@
 - [ ] Determine Linux/OSX compatilities
 
 # Code Health
-- [ ] Remove CCX::Event string handles
-	- [ ] Remove all references to string handles
+- [x] Remove CCX::Event string handles
+	- [x] Remove all references to string handles
 - [ ] Add thorough XML code documentation
 
 # Graphics

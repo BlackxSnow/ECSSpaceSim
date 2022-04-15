@@ -22,7 +22,6 @@
 // - Implement `InputDevice GetDeviceType(int bindingID)` utility to convert binding indices to more legible device types.
 // - Different action maps
 //		- Priorities and overrides?
-// - Composite bindings
 // - Gamepad bindings
 
 namespace ecse
