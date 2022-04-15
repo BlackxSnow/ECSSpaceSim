@@ -108,7 +108,7 @@ namespace EngineTests
 			Assert::AreEqual(expectedY, vData.y);
 		}
 
-		TEST_METHOD(Create_Action)
+		TEST_METHOD(Action_Create)
 		{
 			auto action = ecse::Input::CreateAction("test", ecse::Input::Output::Scalar);
 			Assert::IsNotNull(action);
@@ -163,6 +163,76 @@ namespace EngineTests
 			ecse::Input::Context()->OnStart.Register([&eventFired](ecse::Input::InputEventData& _) { eventFired = true; });
 			ecse::Input::GLFWKeyCallback(ecse::GetWindows()[0], GLFW_KEY_A, GLFW_PRESS, GLFW_PRESS, 0);
 			Assert::IsTrue(eventFired);
+		}
+
+		TEST_METHOD(Composite_Create)
+		{
+			auto action = ecse::Input::CreateAction("test", ecse::Input::Output::Vector2);
+			auto composite = ecse::Input::CreateCompositeBinding(action, ecse::Input::Output::Vector2, ecse::Input::Precision::Single, 
+				{
+					ecse::Input::CreateConstituent(ecse::Input::Key::A, { ecse::Input::Component::NegX }),
+					ecse::Input::CreateConstituent(ecse::Input::Key::D, { ecse::Input::Component::PosX }),
+					ecse::Input::CreateConstituent(ecse::Input::Key::S, { ecse::Input::Component::NegY }),
+					ecse::Input::CreateConstituent(ecse::Input::Key::W, { ecse::Input::Component::PosY })
+				});
+		}
+
+		TEST_METHOD(Composite_Create_OverlappingComponents)
+		{
+			auto action = ecse::Input::CreateAction("test", ecse::Input::Output::Scalar);
+			Assert::ExpectException<std::runtime_error, std::function<void()>>([action]() {
+				auto composite = ecse::Input::CreateCompositeBinding(action, ecse::Input::Output::Scalar, ecse::Input::Precision::Single,
+				{
+					ecse::Input::CreateConstituent(ecse::Input::Key::A, { ecse::Input::Component::PosX }),
+					ecse::Input::CreateConstituent(ecse::Input::Key::D, { ecse::Input::Component::PosX })
+				});
+			}, L"Overlapping Components did not throw an exception and should.");
+		}
+		
+		TEST_METHOD(Composite_Create_IncorrectType)
+		{
+			auto action = ecse::Input::CreateAction("test", ecse::Input::Output::Vector2);
+			Assert::ExpectException<std::runtime_error, std::function<void()>>([action]() {
+				auto composite = ecse::Input::CreateCompositeBinding(action, ecse::Input::Output::Scalar, ecse::Input::Precision::Single,
+				{
+					ecse::Input::CreateConstituent(ecse::Input::Key::A, { ecse::Input::Component::PosX }),
+					ecse::Input::CreateConstituent(ecse::Input::Key::D, { ecse::Input::Component::PosY })
+				});
+			}, L"Incorrect type did not throw an exception and should.");
+		}
+		
+		TEST_METHOD(Composite_GetData)
+		{
+			auto action = ecse::Input::CreateAction("test", ecse::Input::Output::Vector2);
+			auto composite = ecse::Input::CreateCompositeBinding(action, ecse::Input::Output::Vector2, ecse::Input::Precision::Single,
+			{
+				ecse::Input::CreateConstituent(ecse::Input::Key::A, { ecse::Input::Component::NegX }),
+				ecse::Input::CreateConstituent(ecse::Input::Key::D, { ecse::Input::Component::PosX }),
+				ecse::Input::CreateConstituent(ecse::Input::Key::S, { ecse::Input::Component::NegY }),
+				ecse::Input::CreateConstituent(ecse::Input::Key::W, { ecse::Input::Component::PosY })
+			});
+			ecse::Input::GLFWKeyCallback(nullptr, GLFW_KEY_A, 0, GLFW_PRESS, 0);
+			ecse::Input::GLFWKeyCallback(nullptr, GLFW_KEY_W, 0, GLFW_PRESS, 0);
+			glm::vec2 data = composite->GetData<glm::vec2>();
+			Assert::AreEqual(-1.0f, data.x);
+			Assert::AreEqual(1.0f, data.y);
+		}
+
+		TEST_METHOD(Composite_GetActionData)
+		{
+			auto action = ecse::Input::CreateAction("test", ecse::Input::Output::Vector2);
+			auto composite = ecse::Input::CreateCompositeBinding(action, ecse::Input::Output::Vector2, ecse::Input::Precision::Single,
+				{
+					ecse::Input::CreateConstituent(ecse::Input::Key::A, { ecse::Input::Component::NegX }),
+					ecse::Input::CreateConstituent(ecse::Input::Key::D, { ecse::Input::Component::PosX }),
+					ecse::Input::CreateConstituent(ecse::Input::Key::S, { ecse::Input::Component::NegY }),
+					ecse::Input::CreateConstituent(ecse::Input::Key::W, { ecse::Input::Component::PosY })
+				});
+			ecse::Input::GLFWKeyCallback(nullptr, GLFW_KEY_A, 0, GLFW_PRESS, 0);
+			ecse::Input::GLFWKeyCallback(nullptr, GLFW_KEY_W, 0, GLFW_PRESS, 0);
+			glm::vec2 data = action->GetData<glm::vec2>();
+			Assert::AreEqual(-1.0f, data.x);
+			Assert::AreEqual(1.0f, data.y);
 		}
 	};
 }
