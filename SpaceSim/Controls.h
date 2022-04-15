@@ -9,17 +9,14 @@ namespace sim
 	{
 		namespace inp = ecse::Input;
 
-		inp::SetBindContext(inp::CreateAction("Left", inp::Output::Scalar));
-		inp::CreateBinding(inp::Key::A);
-
-		inp::SetBindContext(inp::CreateAction("Right", inp::Output::Scalar));
-		inp::CreateBinding(inp::Key::D);
-
-		inp::SetBindContext(inp::CreateAction("Forward", inp::Output::Scalar));
-		inp::CreateBinding(inp::Key::W);
-
-		inp::SetBindContext(inp::CreateAction("Back", inp::Output::Scalar));
-		inp::CreateBinding(inp::Key::S);
+		inp::SetBindContext(inp::CreateAction("Move", inp::Output::Vector2, ecse::Input::Precision::Single));
+		ecse::Input::CreateCompositeBinding(ecse::Input::Output::Vector2, ecse::Input::Precision::Single,
+		{
+			ecse::Input::CreateConstituent(ecse::Input::Key::A, { ecse::Input::Component::NegX }),
+			ecse::Input::CreateConstituent(ecse::Input::Key::D, { ecse::Input::Component::PosX }),
+			ecse::Input::CreateConstituent(ecse::Input::Key::S, { ecse::Input::Component::NegY }),
+			ecse::Input::CreateConstituent(ecse::Input::Key::W, { ecse::Input::Component::PosY })
+		});
 
 		inp::SetBindContext(inp::CreateAction("Rotation", inp::Output::Vector2));
 		inp::CreateBinding(inp::Mouse::Delta);

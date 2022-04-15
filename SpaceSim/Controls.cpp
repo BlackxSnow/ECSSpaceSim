@@ -13,12 +13,7 @@ void sim::Controls::TransformControllables(flecs::iter& iter, ecse::Core::Transf
 	
 	transform->Rotation = transform->Rotation * vRotation;
 
-	glm::vec2 input = glm::vec2(0);
-
-	input.x -= ecse::Input::GetAction("Left")->GetData<float>();
-	input.x += ecse::Input::GetAction("Right")->GetData<float>();
-	input.y += ecse::Input::GetAction("Forward")->GetData<float>();
-	input.y -= ecse::Input::GetAction("Back")->GetData<float>();
+	glm::vec2 input = ecse::Input::GetAction("Move")->GetData<glm::vec2>();
 	
 	glm::vec3 forward = worldTransform->Forward();
 
