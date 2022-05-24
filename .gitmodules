@@ -19,3 +19,6 @@
 [submodule "lib/src/flecs"]
 	path = lib/src/flecs
 	url = git@github.com:SanderMertens/flecs.git
+[submodule "lib/src/asio"]
+	path = lib/src/asio
+	url = git@github.com:chriskohlhoff/asio.git

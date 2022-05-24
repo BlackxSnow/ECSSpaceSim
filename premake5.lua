@@ -17,6 +17,7 @@ local GLFW_DIR = path.join(libDir, "glfw")
 local GLM_DIR = path.join(libDir, "glm")
 local ASSIMP_DIR = path.join(libDir, "assimp")
 local FLECS_DIR = path.join(libDir, "flecs")
+local ASIO_DIR = path.join(libDir, "asio")
 
 solution "ECSSpaceSim"
 	startproject "SpaceSim"
@@ -83,6 +84,7 @@ project "SpaceSim"
         path.join(ASSIMP_DIR, "include"),
         path.join(ASSIMP_DIR, "build/x64/include/assimp"),
 		path.join(FLECS_DIR, "include"),
+		path.join(ASIO_DIR, "asio/include"),
         "Engine"
 	}
     libdirs { "lib" }
@@ -126,7 +128,8 @@ project "Engine"
         GLM_DIR,
         path.join(ASSIMP_DIR, "include"),
         path.join(ASSIMP_DIR, "build/x64/include/assimp"),
-		path.join(FLECS_DIR, "include")
+		path.join(FLECS_DIR, "include"),
+		path.join(ASIO_DIR, "asio/include")
 	}
     libdirs { "lib" }
     filter "configurations:Debug"
