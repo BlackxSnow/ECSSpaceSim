@@ -19,8 +19,8 @@ local ASSIMP_DIR = path.join(libDir, "assimp")
 local FLECS_DIR = path.join(libDir, "flecs")
 local ASIO_DIR = path.join(libDir, "asio")
 
-solution "ECSSpaceSim"
-	startproject "SpaceSim"
+solution "TheraEngine"
+	startproject "3D"
 	configurations { "Release", "Debug" }
 	if os.is64bit() and not os.istarget("windows") then
 		platforms "x86_64"
@@ -62,51 +62,6 @@ function linkDLLs(values)
         links { value }
     end
 end
-
-project "SpaceSim"
-    location "SpaceSim"
-    kind "ConsoleApp"
-    language "C++"
-    cppdialect "C++17"
-    exceptionhandling "Off"
-    rtti "Off"
-    files { "SpaceSim/**.h", "SpaceSim/**.cpp"}
-	dependson { "Engine"}
-	staticruntime "off"
-	defines { "flecs_STATIC" }
-    includedirs
-	{
-		path.join(BGFX_DIR, "include"),
-		path.join(BX_DIR, "include"),
-		path.join(GLFW_DIR, "include"),
-		path.join(BIMG_DIR, "include"),
-        GLM_DIR,
-        path.join(ASSIMP_DIR, "include"),
-        path.join(ASSIMP_DIR, "build/x64/include/assimp"),
-		path.join(FLECS_DIR, "include"),
-		path.join(ASIO_DIR, "asio/include"),
-        "Engine"
-	}
-    libdirs { "lib" }
-    filter "configurations:Debug"
-        assimpLibName = "assimp-vc142-mtd"
-        linkDLLs({assimpLibName})
-    filter "configurations:Release"
-        assimpLibName = "assimp-vc142-mt"
-        linkDLLs( {assimpLibName})
-    filter "*"
-    links { "bgfx", "bimg", "bx", "glfw", "Engine", "flecs" }
-    postbuildcommands
-    {
-        "{COPYDIR} \"%{prj.location}/Resources\" \"%{cfg.buildtarget.directory}/Resources\""
-    }
-    filter "system:windows"
-    	links { "gdi32", "kernel32", "psapi" }
-    filter "system:linux"
-        links { "dl", "GL", "pthread", "X11" }
-    filter "system:macosx"
-        links { "QuartzCore.framework", "Metal.framework", "Cocoa.framework", "IOKit.framework", "CoreVideo.framework" }
-    setBxCompat()
 
 project "Engine"
     location "Engine"
@@ -177,6 +132,142 @@ project "EngineTests"
 	links { "Engine", "kernel32", "user32", "gdi32", "winspool", "comdlg32", "advapi32", "shell32", "ole32", "oleaut32", "uuid", "odbc32", "odbccp32" }
 
 filter "*"
+
+group ("Demos")
+project "3D"
+    location "Demos/3D"
+    kind "ConsoleApp"
+    language "C++"
+    cppdialect "C++17"
+    exceptionhandling "Off"
+    rtti "Off"
+    files { "Demos/3D/**.h", "Demos/3D/**.cpp"}
+	dependson { "Engine"}
+	staticruntime "off"
+	defines { "flecs_STATIC" }
+    includedirs
+	{
+		path.join(BGFX_DIR, "include"),
+		path.join(BX_DIR, "include"),
+		path.join(GLFW_DIR, "include"),
+		path.join(BIMG_DIR, "include"),
+        GLM_DIR,
+        path.join(ASSIMP_DIR, "include"),
+        path.join(ASSIMP_DIR, "build/x64/include/assimp"),
+		path.join(FLECS_DIR, "include"),
+		path.join(ASIO_DIR, "asio/include"),
+        "Engine"
+	}
+    libdirs { "lib" }
+    filter "configurations:Debug"
+        assimpLibName = "assimp-vc142-mtd"
+        linkDLLs({assimpLibName})
+    filter "configurations:Release"
+        assimpLibName = "assimp-vc142-mt"
+        linkDLLs( {assimpLibName})
+    filter "*"
+    links { "bgfx", "bimg", "bx", "glfw", "Engine", "flecs" }
+    postbuildcommands
+    {
+        "{COPYDIR} \"%{prj.location}/Resources\" \"%{cfg.buildtarget.directory}/Resources\""
+    }
+    filter "system:windows"
+    	links { "gdi32", "kernel32", "psapi" }
+    filter "system:linux"
+        links { "dl", "GL", "pthread", "X11" }
+    filter "system:macosx"
+        links { "QuartzCore.framework", "Metal.framework", "Cocoa.framework", "IOKit.framework", "CoreVideo.framework" }
+    setBxCompat()
+
+project "PongServer"
+    location "Demos/PongServer"
+    kind "ConsoleApp"
+    language "C++"
+    cppdialect "C++17"
+    exceptionhandling "Off"
+    rtti "Off"
+    files { "Demo/PongServer/**.h", "Demo/PongServer/**.cpp"}
+	dependson { "Engine"}
+	staticruntime "off"
+	defines { "flecs_STATIC" }
+    includedirs
+	{
+		path.join(BGFX_DIR, "include"),
+		path.join(BX_DIR, "include"),
+		path.join(GLFW_DIR, "include"),
+		path.join(BIMG_DIR, "include"),
+        GLM_DIR,
+        path.join(ASSIMP_DIR, "include"),
+        path.join(ASSIMP_DIR, "build/x64/include/assimp"),
+		path.join(FLECS_DIR, "include"),
+		path.join(ASIO_DIR, "asio/include"),
+        "Engine"
+	}
+    libdirs { "lib" }
+    filter "configurations:Debug"
+        assimpLibName = "assimp-vc142-mtd"
+        linkDLLs({assimpLibName})
+    filter "configurations:Release"
+        assimpLibName = "assimp-vc142-mt"
+        linkDLLs( {assimpLibName})
+    filter "*"
+    links { "bgfx", "bimg", "bx", "glfw", "Engine", "flecs" }
+    postbuildcommands
+    {
+        "{COPYDIR} \"%{prj.location}/Resources\" \"%{cfg.buildtarget.directory}/Resources\""
+    }
+    filter "system:windows"
+    	links { "gdi32", "kernel32", "psapi" }
+    filter "system:linux"
+        links { "dl", "GL", "pthread", "X11" }
+    filter "system:macosx"
+        links { "QuartzCore.framework", "Metal.framework", "Cocoa.framework", "IOKit.framework", "CoreVideo.framework" }
+    setBxCompat()
+
+project "PongClient"
+    location "Demos/PongClient"
+    kind "ConsoleApp"
+    language "C++"
+    cppdialect "C++17"
+    exceptionhandling "Off"
+    rtti "Off"
+    files { "Demo/PongClient/**.h", "Demo/PongClient/**.cpp"}
+	dependson { "Engine"}
+	staticruntime "off"
+	defines { "flecs_STATIC" }
+    includedirs
+	{
+		path.join(BGFX_DIR, "include"),
+		path.join(BX_DIR, "include"),
+		path.join(GLFW_DIR, "include"),
+		path.join(BIMG_DIR, "include"),
+        GLM_DIR,
+        path.join(ASSIMP_DIR, "include"),
+        path.join(ASSIMP_DIR, "build/x64/include/assimp"),
+		path.join(FLECS_DIR, "include"),
+		path.join(ASIO_DIR, "asio/include"),
+        "Engine"
+	}
+    libdirs { "lib" }
+    filter "configurations:Debug"
+        assimpLibName = "assimp-vc142-mtd"
+        linkDLLs({assimpLibName})
+    filter "configurations:Release"
+        assimpLibName = "assimp-vc142-mt"
+        linkDLLs( {assimpLibName})
+    filter "*"
+    links { "bgfx", "bimg", "bx", "glfw", "Engine", "flecs" }
+    postbuildcommands
+    {
+        "{COPYDIR} \"%{prj.location}/Resources\" \"%{cfg.buildtarget.directory}/Resources\""
+    }
+    filter "system:windows"
+    	links { "gdi32", "kernel32", "psapi" }
+    filter "system:linux"
+        links { "dl", "GL", "pthread", "X11" }
+    filter "system:macosx"
+        links { "QuartzCore.framework", "Metal.framework", "Cocoa.framework", "IOKit.framework", "CoreVideo.framework" }
+    setBxCompat()
 
 group ("Dependencies")
 

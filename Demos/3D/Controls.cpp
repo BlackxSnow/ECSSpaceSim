@@ -17,8 +17,6 @@ void sim::Controls::TransformControllables(flecs::iter& iter, ecse::Core::Transf
 	
 	glm::vec3 forward = worldTransform->Forward();
 
-	LogInfo(std::to_string(forward.x) + ", " + std::to_string(forward.y) + ", " + std::to_string(forward.z));
-
 	if (input.x != 0 || input.y != 0)
 	{
 		input = glm::normalize(input);
