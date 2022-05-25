@@ -70,10 +70,11 @@ project "Engine"
 	cppdialect "C++17"
 	exceptionhandling "Off"
 	rtti "Off"
-    targetname("%{prj.name}.%{cfg.buildcfg}");
+    targetname("%{prj.name}.%{cfg.buildcfg}")
 	files { "Engine/**.h", "Engine/**.cpp" }
 	staticruntime "off"
 	defines { "flecs_STATIC" }
+	buildoptions { "/permissive-"}
 	includedirs
 	{
 		path.join(BGFX_DIR, "include"),
@@ -186,7 +187,7 @@ project "PongServer"
     cppdialect "C++17"
     exceptionhandling "Off"
     rtti "Off"
-    files { "Demo/PongServer/**.h", "Demo/PongServer/**.cpp"}
+    files { "Demos/PongServer/**.h", "Demos/PongServer/**.cpp"}
 	dependson { "Engine"}
 	staticruntime "off"
 	defines { "flecs_STATIC" }
@@ -231,7 +232,7 @@ project "PongClient"
     cppdialect "C++17"
     exceptionhandling "Off"
     rtti "Off"
-    files { "Demo/PongClient/**.h", "Demo/PongClient/**.cpp"}
+    files { "Demos/PongClient/**.h", "Demos/PongClient/**.cpp"}
 	dependson { "Engine"}
 	staticruntime "off"
 	defines { "flecs_STATIC" }
