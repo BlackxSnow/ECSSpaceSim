@@ -10,7 +10,7 @@ namespace ecse::Networking
 		return _Header.ID;
 	}
 
-	uint32_t Packet::Size()
+	PacketSize Packet::Size()
 	{
 		return _Header.Size;
 	}
@@ -25,9 +25,9 @@ namespace ecse::Networking
 		data += sizeof(PacketID);
 		dataSize -= sizeof(PacketID);
 
-		uint32_t packetSize = *reinterpret_cast<uint32_t*>(data);
-		data += sizeof(uint32_t);
-		dataSize -= sizeof(uint32_t);
+		PacketSize packetSize = *reinterpret_cast<PacketSize*>(data);
+		data += sizeof(PacketSize);
+		dataSize -= sizeof(PacketSize);
 
 		if (dataSize != packetSize)
 		{
@@ -36,6 +36,34 @@ namespace ecse::Networking
 		}
 
 		Write(data, dataSize);
+	}
+	Packet::Packet(CCX::MemoryReader& reader) : _Header(reader.Read<PacketID>())
+	{
+		PacketSize dataSize = reader.Read<PacketSize>();
+		size_t remaining = reader.Remaining();
+		if (dataSize > remaining)
+		{
+			LogError("Packet size mismatch: Packet reports " + std::to_string(dataSize) + " but received: " + std::to_string(reader.Remaining()) + " after header.", false);
+			return;
+		}
+		
+		Write(reader.Current(), dataSize);
+		reader.Skip(dataSize);
+	}
+	std::array<asio::const_buffer, 2> Packet::GetBuffer()
+	{
+		return std::array<asio::const_buffer, 2> {
+			asio::buffer(this, PacketHeader::HEADER_SIZE),
+				asio::buffer(_Data.data(), _Data.size())
+		};
+	}
+	void Packet::GetBuffer(OUT std::vector<asio::const_buffer>& addTo)
+	{
+		addTo.emplace_back(this, PacketHeader::HEADER_SIZE);
+		if (_Data.size() > 0)
+		{
+			addTo.emplace_back(_Data.data(), _Data.size());
+		}
 	}
 
 	void Packet::Write(void* data, size_t dataSize)
@@ -69,5 +97,35 @@ namespace ecse::Networking
 
 		handler = &result->second;
 		return true;
+	}
+	void AggregatePacket::AddPacket(Packet& packet)
+	{
+		Packets.push_back(packet);
+		Count++;
+		Size += packet.FullSize();
+	}
+	void AggregatePacket::AddPacket(char* data, size_t dataSize)
+	{
+		Packets.emplace_back(data, dataSize);
+		Count++;
+		Size += dataSize;
+	}
+	void AggregatePacket::AddPacket(CCX::MemoryReader& reader)
+	{
+		Packets.emplace_back(reader);
+		Count++;
+		Size += (Packets.end() - 1)->Size();
+	}
+
+	std::vector<asio::const_buffer> AggregatePacket::GetBuffer()
+	{
+		std::vector<asio::const_buffer> buffer;
+		buffer.reserve(Count * 2 + 1);
+		buffer.emplace_back(this, HEADER_SIZE);
+		for (int i = 0; i < Count; i++)
+		{
+			Packets[i].GetBuffer(buffer);
+		}
+		return buffer;
 	}
 }

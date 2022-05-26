@@ -6,10 +6,12 @@
 
 #include "NetDefs.h"
 #include "../../utility/CCXType.h"
+#include "../../utility/CCXMemory.h"
 
 namespace ecse::Networking
 {
-	typedef uint32_t PacketID;
+	typedef uint16_t PacketID;
+	typedef uint16_t PacketSize;
 
 	enum class PacketType : PacketID
 	{
@@ -23,9 +25,9 @@ namespace ecse::Networking
 	class PacketHeader
 	{
 	public:
-		static const uint32_t HEADER_SIZE = sizeof(PacketID) + sizeof(uint32_t);
+		static const size_t HEADER_SIZE = sizeof(PacketID) + sizeof(PacketSize);
 		PacketID ID;
-		uint32_t Size;
+		PacketSize Size;
 
 		PacketHeader(PacketID id) : ID(id), Size(0) {}
 	};
@@ -38,7 +40,7 @@ namespace ecse::Networking
 		
 	public:
 		PacketID ID();
-		uint32_t Size();
+		PacketSize Size();
 		size_t FullSize();
 
 		Packet(PacketID id) : _Header(id) {}
@@ -47,15 +49,19 @@ namespace ecse::Networking
 		{
 			static_assert(CCX::is_explicitly_convertible<Enum, PacketID>::value, "Type must be convertible to PacketID");
 		}
+		/// <summary>
+		/// Create packet from raw data including ID and size.
+		/// </summary>
+		/// <param name="data"></param>
+		/// <param name="dataSize"></param>
 		Packet(char* data, size_t dataSize);
+		/// <summary>
+		/// Create a packet from a reader, assuming the reader is at the start of the packet header.
+		/// </summary>
+		Packet(CCX::MemoryReader& reader);
 
-		std::array<asio::const_buffer, 2> GetBuffer()
-		{
-			return std::array<asio::const_buffer, 2> {
-				asio::buffer(this, PacketHeader::HEADER_SIZE),
-					asio::buffer(_Data.data(), _Data.size())
-			};
-		}
+		std::array<asio::const_buffer, 2> GetBuffer();
+		void GetBuffer(OUT std::vector<asio::const_buffer>& addTo);
 
 		void Write(void* data, size_t dataSize);
 
@@ -87,16 +93,36 @@ namespace ecse::Networking
 
 	};
 
-	class ReceivedPacket
+	class AggregatePacket
 	{
 	public:
-		asio::ip::udp::endpoint Source;
-		Packet packet;
+		static const size_t HEADER_SIZE = sizeof(PacketSize) * 2;
+		PacketSize Count;
+		PacketSize Size;
+		std::vector<Packet> Packets;
 
-		ReceivedPacket(asio::ip::udp::endpoint& source, char* data, size_t size) : Source(source), packet(data, size) {}
+		AggregatePacket(size_t expected) : Count(0), Size(0)
+		{
+			Packets.reserve(expected);
+		}
+
+		void AddPacket(Packet& packet);
+		/// <summary>
+		/// Add a packet from raw data including ID and size.
+		/// </summary>
+		/// <param name="data"></param>
+		/// <param name="dataSize"></param>
+		void AddPacket(char* data, size_t dataSize);
+		/// <summary>
+		/// Add a packet from a memory reader, assuming the reader is at the start of the packet header.
+		/// </summary>
+		/// <param name="reader"></param>
+		void AddPacket(CCX::MemoryReader& reader);
+
+		std::vector<asio::const_buffer> GetBuffer();
 	};
 
-	using PacketHandler = std::function<void(ReceivedPacket*)>;
+	using PacketHandler = std::function<void(const asio::ip::udp::endpoint&, Packet*)>;
 
 	void RegisterPacket(PacketID id, PacketHandler handler);
 	template<typename Enum>

@@ -2,26 +2,40 @@
 #include <iostream>
 #include <vector>
 
+ecse::Networking::Connection* connection;
+
+void HandleConnect(const asio::ip::udp::endpoint& source, ecse::Networking::Packet* packet)
+{
+	ecse::Networking::Packet pack(ecse::Networking::PacketType::Heartbeat);
+	connection->Send(pack);
+	connection->Flush();
+}
+
 
 int main()
 {
-	asio::io_context context;
+	ecse::Networking::RegisterPacket(ecse::Networking::PacketType::Connect, HandleConnect);
+	connection = new ecse::Networking::Connection(asio::ip::udp::endpoint(asio::ip::make_address("127.0.0.1"), 7331), asio::ip::make_address("127.0.0.1"), 1337);
+	
+	ecse::Networking::Packet pack1(ecse::Networking::PacketType::Connect);
+	pack1 << "Hello World!";
+	connection->Send(pack1);
+	connection->Flush();
+	
+	ecse::Networking::Packet loopPack(ecse::Networking::PacketType::Heartbeat);
 
-	asio::ip::udp::resolver resolver(context);
-	asio::ip::udp::endpoint local(asio::ip::make_address("127.0.0.1"), 7331);
-	asio::ip::udp::endpoint destination(asio::ip::make_address("127.0.0.1"), 1337);
-
-	asio::ip::udp::socket socket(context);
-	socket.open(asio::ip::udp::v4());
-	socket.bind(local);
-
-	ecse::Networking::Packet packet(ecse::Networking::PacketType::Connect);
-	packet << "Hello World!";
-
-	//auto buffer = asio::buffer(asio::buffer(&packet, ecse::Networking::PacketHeader::HEADER_SIZE), asio::buffer(packet.)
-
-	//socket.send_to(asio::buffer(&packet, packet.FullSize()), destination);
-	socket.send_to(packet.GetBuffer(), destination);
+	int count = 8;
+	while (true)
+	{
+		system("pause");
+		for (int i = 0; i < count; i++)
+		{
+			connection->Send(loopPack);
+		}
+		LogInfo("Sending " + std::to_string(count) + " packets with size " + std::to_string(ecse::Networking::PacketHeader::HEADER_SIZE * count + ecse::Networking::AggregatePacket::HEADER_SIZE));
+		connection->Flush();
+		count *= 2;
+	}
 
 
 	return 0;
