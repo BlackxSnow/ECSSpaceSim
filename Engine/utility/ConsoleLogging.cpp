@@ -38,7 +38,8 @@ void LayoutPrefix(int line, const std::string& func, const std::string& file, st
 				len = strftime(&buffer[0], buffer.size(), "%X", &timeInfo);
 			}
 			
-			buffer.erase(buffer.begin() + buffer.find_last_not_of(' '), buffer.end());
+			size_t lastNonSpace = buffer.find_last_not_of(" \0", buffer.length(), 2);
+			buffer.erase(buffer.begin() + lastNonSpace + 1, buffer.end());
 
 			output += "[" + buffer +"]";
 		}
