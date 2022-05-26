@@ -31,12 +31,14 @@ void LayoutPrefix(int line, const std::string& func, const std::string& file, st
 			localtime_s(&timeInfo, &t);
 
 			std::string buffer;
-			buffer.resize(20);
+			buffer.resize(32);
 			int len = strftime(&buffer[0], buffer.size(), "%X", &timeInfo);
 			while (len == 0) {
 				buffer.resize(buffer.size() * 2);
 				len = strftime(&buffer[0], buffer.size(), "%X", &timeInfo);
 			}
+			
+			buffer.erase(buffer.begin() + buffer.find_last_not_of(' '), buffer.end());
 
 			output += "[" + buffer +"]";
 		}
