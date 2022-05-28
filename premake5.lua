@@ -1,13 +1,3 @@
-newoption
-{
-	trigger = "regen-bgfx",
-	description = "Regenerate bgfx project files"
-}
-
--- if not os.isdir(path.join(BGFX_DIR, ".build/projects/") .. _ACTION) or _OPTIONS["regen-bgfx"] then
--- 	os.execute("bgfxGenie.bat " .. _ACTION)
--- end
-
 local libDir = "lib/src"
 
 local BGFX_DIR = path.join(libDir, "bgfx")
@@ -22,24 +12,21 @@ local ASIO_DIR = path.join(libDir, "asio")
 solution "TheraEngine"
 	startproject "3D"
 	configurations { "Release", "Debug" }
-	if os.is64bit() and not os.istarget("windows") then
-		platforms "x86_64"
-	else
-		platforms { "x86_64" }
-	end
+	platforms { "Win64", "Linux64" }
 	flags { "MultiProcessorCompile" }
 	filter "configurations:Release"
-
 		defines {"NDEBUG", "BX_CONFIG_DEBUG=0"}
 		optimize "Full"
 	filter "configurations:Debug*"
 		defines {"_DEBUG", "BX_CONFIG_DEBUG=1" }
 		optimize "Debug"
 		symbols "On"
-	filter "platforms:x86"
-		architecture "x86"
-	filter "platforms:x86_64"
+	filter "platforms:*"
 		architecture "x86_64"
+	filter "platforms:Win64"
+		system ("windows")
+	filter "platforms:Linux64"
+		system ("linux")
 	filter "system:macosx"
 		xcodebuildsettings {
 			["MACOSX_DEPLOYMENT_TARGET"] = "10.9",
@@ -61,6 +48,15 @@ function linkDLLs(values)
         postbuildcommands { "{COPYFILE} \"%{wks.location}/lib/dll/" .. value .. ".dll\" \"%{cfg.buildtarget.directory}/" .. value .. ".dll\"" }
         links { value }
     end
+end
+
+function linkSysLibs()
+	filter "system:windows"
+		links { "gdi32", "kernel32", "psapi"}
+	filter "system:linux"
+		links { "dl", "GL", "pthread", "X11" }
+	filter "system:macosx"
+		links { "QuartzCore.framework", "Metal.framework", "Cocoa.framework", "IOKit.framework", "CoreVideo.framework" }
 end
 
 project "Engine"
@@ -96,17 +92,9 @@ project "Engine"
         links {assimpLibName}
     filter "*"
     links { "bgfx", "bimg", "bx", "glfw", "flecs"}
-    -- postbuildcommands 
-    -- { 
-    --     "{COPYFILE} \"" .. "%{cfg.buildtarget.directory}/%{cfg.buildtarget.name}\" " .. "%{wks.location}" .. "/lib/" .. "%{cfg.buildtarget.name}\""
-    -- }
-
 	filter "system:windows"
-		links { "gdi32", "kernel32", "psapi" }
-	filter "system:linux"
-		links { "dl", "GL", "pthread", "X11" }
-	filter "system:macosx"
-		links { "QuartzCore.framework", "Metal.framework", "Cocoa.framework", "IOKit.framework", "CoreVideo.framework" }
+		links { "iphlpapi.lib" }
+	linkSysLibs()
 	setBxCompat()
 	
 filter "action:vs*"
@@ -130,7 +118,8 @@ project "EngineTests"
         path.join(ASSIMP_DIR, "build/x64/include/assimp"),
 		path.join(FLECS_DIR, "include")
 	}
-	links { "Engine", "kernel32", "user32", "gdi32", "winspool", "comdlg32", "advapi32", "shell32", "ole32", "oleaut32", "uuid", "odbc32", "odbccp32" }
+	links { "Engine", "user32", "winspool", "comdlg32", "advapi32", "shell32", "ole32", "oleaut32", "uuid", "odbc32", "odbccp32" }
+	linkSysLibs()
 
 filter "*"
 
@@ -172,12 +161,7 @@ project "3D"
     {
         "{COPYDIR} \"%{prj.location}/Resources\" \"%{cfg.buildtarget.directory}/Resources\""
     }
-    filter "system:windows"
-    	links { "gdi32", "kernel32", "psapi" }
-    filter "system:linux"
-        links { "dl", "GL", "pthread", "X11" }
-    filter "system:macosx"
-        links { "QuartzCore.framework", "Metal.framework", "Cocoa.framework", "IOKit.framework", "CoreVideo.framework" }
+    linkSysLibs()
     setBxCompat()
 
 project "PongServer"
@@ -217,12 +201,7 @@ project "PongServer"
     {
         "{COPYDIR} \"%{prj.location}/Resources\" \"%{cfg.buildtarget.directory}/Resources\""
     }
-    filter "system:windows"
-    	links { "gdi32", "kernel32", "psapi" }
-    filter "system:linux"
-        links { "dl", "GL", "pthread", "X11" }
-    filter "system:macosx"
-        links { "QuartzCore.framework", "Metal.framework", "Cocoa.framework", "IOKit.framework", "CoreVideo.framework" }
+    linkSysLibs()
     setBxCompat()
 
 project "PongClient"
@@ -262,13 +241,7 @@ project "PongClient"
     {
         "{COPYDIR} \"%{prj.location}/Resources\" \"%{cfg.buildtarget.directory}/Resources\""
     }
-    filter "system:windows"
-    	links { "gdi32", "kernel32", "psapi" }
-    filter "system:linux"
-        links { "dl", "GL", "pthread", "X11" }
-    filter "system:macosx"
-        links { "QuartzCore.framework", "Metal.framework", "Cocoa.framework", "IOKit.framework", "CoreVideo.framework" }
-    setBxCompat()
+    linkSysLibs()
 
 group ("Dependencies")
 
@@ -446,22 +419,3 @@ project "flecs"
 		path.join(FLECS_DIR, "include/**.hpp")
 	}
 	includedirs { path.join(FLECS_DIR, "include") }
-
-
--- group ("shaderc")
-
--- external("glslang")
--- external("fcpp")
--- external("glsl-optimizer")
--- external("spirv-cross")
--- external("spirv-opt")
-
--- externalproject "shaderc"
--- 	location (path.join(BGFX_DIR, ".build/projects", _ACTION))
--- 	uuid (os.uuid("shaderc"))
--- 	kind "ConsoleApp"
--- 	language "C++"
--- 	postbuildcommands 
---     { 
---         "{COPYFILE} \"" .. "%{cfg.buildtarget.directory}/%{cfg.buildtarget.name}\" " .. "%{wks.location}" .. "/lib/tools/" .. "%{cfg.buildtarget.name}\""
---     }
