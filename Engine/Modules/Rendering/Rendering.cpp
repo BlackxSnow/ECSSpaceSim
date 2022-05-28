@@ -3,7 +3,7 @@
 #include <bgfx/bgfx.h>
 #include <glm/gtc/type_ptr.hpp>
 
-flecs::query<const ecse::Rendering::Renderer, const ecse::Core::WorldTransform*> BuildQuery(flecs::entity& camEntity, ecse::Core::MaskBehaviour mask)
+flecs::query<const ecse::Rendering::Renderer, const ecse::Core::WorldTransform*> BuildQuery(flecs::entity camEntity, ecse::Core::MaskBehaviour mask)
 {
 	flecs::world* world = ecse::GetWorld();
 
