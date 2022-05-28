@@ -81,6 +81,7 @@ namespace ecse::Networking
 			auto& aggregate = _SendQueue.front();
 			auto buffer = aggregate->GetBuffer();
 			auto size = asio::buffer_size(buffer);
+			std::cout << "sending on " << _Endpoint << std::endl;
 			size_t sent = _Socket.send_to(buffer, _Endpoint);
 			if (sent != size)
 			{
@@ -92,7 +93,16 @@ namespace ecse::Networking
 
 	Connection::Connection(const asio::ip::udp::endpoint& local, const asio::ip::address& address, const asio::ip::port_type port) : _Socket(_Context), _ReceiveBuffer(1024)
 	{
-		_Endpoint = asio::ip::udp::endpoint(address, port);
+		auto endpoints = asio::ip::udp::resolver(_Context).resolve(address.to_string(), std::to_string(port));
+		_Endpoint = *endpoints.begin();
+		
+		std::cout << "Results begin" << std::endl;
+		for (auto& endpoint : endpoints)
+		{
+			std::cout << endpoint.endpoint() << std::endl;
+		}
+		std::cout << "Results end" << std::endl;
+
 		_Socket.open(asio::ip::udp::v4());
 		_Socket.set_option(asio::ip::udp::socket::reuse_address(true));
 		_Socket.bind(local);

@@ -10,7 +10,7 @@ void HandleConnect(const asio::ip::udp::endpoint& source, ecse::Networking::Pack
 	char helloworld[13];
 	*packet >> helloworld;
 	std::cout << "Received: " << helloworld << std::endl;
-	auto& con = _Clients.emplace_back(asio::ip::udp::endpoint(asio::ip::make_address("127.0.0.1"), 1337), source);
+	auto& con = _Clients.emplace_back(asio::ip::udp::endpoint(asio::ip::make_address("192.168.1.108"), 1337), source);
 	con.Send(ecse::Networking::Packet(ecse::Networking::PacketType::Connect));
 	con.Flush();
 }
