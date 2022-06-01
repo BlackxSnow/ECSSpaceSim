@@ -8,7 +8,7 @@
 
 
 
-namespace ecse
+namespace Thera
 {
 	/// <summary>
 	/// Stores data for a mesh vertex.

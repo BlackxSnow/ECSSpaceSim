@@ -11,7 +11,7 @@
 
 #undef DELETE
 
-namespace ecse::Input
+namespace Thera::Input
 {
 	enum class Output
 	{

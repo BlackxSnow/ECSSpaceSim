@@ -5,7 +5,7 @@
 
 #include "../../utility/ConsoleLogging.h"
 
-using Key = ecse::Input::Key;
+using Key = Thera::Input::Key;
 
 const std::unordered_map<int, Key> GLFWToKey
 {
@@ -129,7 +129,7 @@ const std::unordered_map<int, Key> GLFWToKey
 	{ GLFW_KEY_KP_DECIMAL, Key::KeypadPeriod },
 };
 
-using Mouse = ecse::Input::Mouse;
+using Mouse = Thera::Input::Mouse;
 
 const std::unordered_map<int, Mouse> GLFWToMouse
 {
@@ -143,12 +143,12 @@ const std::unordered_map<int, Mouse> GLFWToMouse
 	{ GLFW_MOUSE_BUTTON_8, Mouse::Button8 }
 };
 
-Key ecse::Input::GLFWInputToKey(const int glfwInput)
+Key Thera::Input::GLFWInputToKey(const int glfwInput)
 {
 	return GLFWToKey.at(glfwInput);
 }
 
-Mouse ecse::Input::GLFWInputToMouse(const int glfwInput)
+Mouse Thera::Input::GLFWInputToMouse(const int glfwInput)
 {
 	return GLFWToMouse.at(glfwInput);
 }

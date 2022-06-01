@@ -17,7 +17,7 @@ namespace flecs
 	inline flecs::entity_t PostRender;
 }
 
-namespace ecse
+namespace Thera
 {
 	extern int WindowWidth;
 	extern int WindowHeight;

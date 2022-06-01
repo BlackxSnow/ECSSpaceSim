@@ -23,12 +23,12 @@
 #include "Modules/Rendering/Rendering.h"
 #include "Modules/Input/Input.h"
 
-int ecse::WindowWidth = 1024;
-int ecse::WindowHeight = 768;
+int Thera::WindowWidth = 1024;
+int Thera::WindowHeight = 768;
 
-CCX::Event<> ecse::OnInit;
-CCX::Event<> ecse::OnInputPoll;
-CCX::Event<> ecse::OnFinalValidate;
+CCX::Event<> Thera::OnInit;
+CCX::Event<> Thera::OnInputPoll;
+CCX::Event<> Thera::OnFinalValidate;
 
 std::vector<GLFWwindow*> Windows;
 flecs::world* World;
@@ -43,20 +43,20 @@ static void glfw_error(int error, const char* description)
 	LogError(description, false);
 }
 
-const std::vector<GLFWwindow*>& ecse::GetWindows()
+const std::vector<GLFWwindow*>& Thera::GetWindows()
 {
 	return Windows;
 }
-flecs::world* ecse::GetWorld()
+flecs::world* Thera::GetWorld()
 {
 	return World;
 }
-flecs::entity* ecse::GetGameRoot()
+flecs::entity* Thera::GetGameRoot()
 {
 	return &GameRoot;
 }
 
-size_t ecse::FrameCount()
+size_t Thera::FrameCount()
 {
 	return currentFrame;
 }
@@ -72,7 +72,7 @@ static GLFWwindow* InitialiseGLFW(std::function<void()>* setHints = nullptr)
 	{
 		(*setHints)();
 	}
-	GLFWwindow* window = glfwCreateWindow(ecse::WindowWidth, ecse::WindowHeight, "SpaceSim", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(Thera::WindowWidth, Thera::WindowHeight, "SpaceSim", nullptr, nullptr);
 	if (!window)
 	{
 		LogError("Unable to create GLFW Window", true);
@@ -93,8 +93,8 @@ static void InitialiseBGFX(GLFWwindow* window)
 	init.platformData.nwh = glfwGetWin32Window(window);
 #endif
 
-	init.resolution.width = (uint32_t)ecse::WindowWidth;
-	init.resolution.height = (uint32_t)ecse::WindowHeight;
+	init.resolution.width = (uint32_t)Thera::WindowWidth;
+	init.resolution.height = (uint32_t)Thera::WindowHeight;
 	init.resolution.reset = BGFX_RESET_VSYNC;
 	if (!bgfx::init(init))
 	{
@@ -104,17 +104,17 @@ static void InitialiseBGFX(GLFWwindow* window)
 
 static void HandleWindowResize(GLFWwindow* window, const bgfx::ViewId& clearView)
 {
-	int oldWidth = ecse::WindowWidth, oldHeight = ecse::WindowHeight;
-	glfwGetWindowSize(window, &ecse::WindowWidth, &ecse::WindowHeight);
+	int oldWidth = Thera::WindowWidth, oldHeight = Thera::WindowHeight;
+	glfwGetWindowSize(window, &Thera::WindowWidth, &Thera::WindowHeight);
 
-	if (oldWidth != ecse::WindowWidth || oldHeight != ecse::WindowHeight)
+	if (oldWidth != Thera::WindowWidth || oldHeight != Thera::WindowHeight)
 	{
-		bgfx::reset((uint32_t)ecse::WindowWidth, (uint32_t)ecse::WindowHeight, BGFX_RESET_VSYNC);
+		bgfx::reset((uint32_t)Thera::WindowWidth, (uint32_t)Thera::WindowHeight, BGFX_RESET_VSYNC);
 		bgfx::setViewRect(clearView, 0, 0, bgfx::BackbufferRatio::Equal);
 	}
 }
 
-void ecse::Init()
+void Thera::Init()
 {
 	Windows.push_back(InitialiseGLFW());
 	InitialiseBGFX(Windows[0]);
@@ -126,8 +126,8 @@ void ecse::Init()
 	GameRoot = World->entity("Game");
 
 	World->import<flecs::units>();
-	World->import<ecse::Core>();
-	World->import<ecse::Rendering>();
+	World->import<Thera::Core>();
+	World->import<Thera::Rendering>();
 
 	Input::Initialise();
 
@@ -148,7 +148,7 @@ void ecse::Init()
 	World->set<flecs::rest::Rest>({});
 }
 
-void ecse::TestInit()
+void Thera::TestInit()
 {
 	std::function<void()> hints = []() { glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); };
 	Windows.push_back(InitialiseGLFW(&hints));
@@ -168,7 +168,7 @@ double GetDelta(std::chrono::system_clock::time_point& last)
 	return delta;
 }
 
-int ecse::Loop(int argc, char** argv)
+int Thera::Loop(int argc, char** argv)
 {
 	auto lastTime = std::chrono::system_clock::now();
 	double delta = 0;

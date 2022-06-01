@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-namespace ecse
+namespace Thera
 {
 	struct Core
 	{

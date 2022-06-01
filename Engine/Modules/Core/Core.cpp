@@ -1,6 +1,6 @@
 #include "Core.h"
 
-void ecse::Core::UpdateWorldTransforms(flecs::iter& it, const Transform* local, WorldTransform* world)
+void Thera::Core::UpdateWorldTransforms(flecs::iter& it, const Transform* local, WorldTransform* world)
 {
 	if (!it.changed())
 	{
@@ -24,21 +24,21 @@ void ecse::Core::UpdateWorldTransforms(flecs::iter& it, const Transform* local, 
 	}
 }
 
-glm::vec3 ecse::Core::WorldTransform::Forward() const
+glm::vec3 Thera::Core::WorldTransform::Forward() const
 {
 	glm::vec3 forward = glm::vec3(0, 0, -1);
 	forward = forward * Rotation;
 	return glm::normalize(forward);
 }
 
-glm::vec3 ecse::Core::WorldTransform::Right() const
+glm::vec3 Thera::Core::WorldTransform::Right() const
 {
 	glm::vec3 right = glm::vec3(1, 0, 0);
 	right = right * Rotation;
 	return glm::normalize(right);
 }
 
-glm::vec3 ecse::Core::WorldTransform::Up() const
+glm::vec3 Thera::Core::WorldTransform::Up() const
 {
 	glm::vec3 up = glm::vec3(0,1,0);
 	up = up * Rotation;

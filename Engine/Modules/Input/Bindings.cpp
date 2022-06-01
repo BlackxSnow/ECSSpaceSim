@@ -2,7 +2,7 @@
 #include "Input.h"
 #include "../../Engine.h"
 
-void ecse::Input::MasterBinding::HandleEvent(GLFWwindow* window, int action, int mods)
+void Thera::Input::MasterBinding::HandleEvent(GLFWwindow* window, int action, int mods)
 {
 	/*ForcePoll();*/
 	
@@ -23,7 +23,7 @@ void ecse::Input::MasterBinding::HandleEvent(GLFWwindow* window, int action, int
 			*static_cast<double*>(data) = 1.0;
 		}
 	}
-	lastUpdate = ecse::FrameCount();
+	lastUpdate = Thera::FrameCount();
 
 	for (auto& instance : instances)
 	{
@@ -31,9 +31,9 @@ void ecse::Input::MasterBinding::HandleEvent(GLFWwindow* window, int action, int
 	}
 }
 
-void ecse::Input::MasterBinding::TryPoll()
+void Thera::Input::MasterBinding::TryPoll()
 {
-	size_t frameCount = ecse::FrameCount();
+	size_t frameCount = Thera::FrameCount();
 	if (lastUpdate < frameCount)
 	{
 		poller(data, dataType, dataPrecision);
@@ -41,14 +41,14 @@ void ecse::Input::MasterBinding::TryPoll()
 	}
 }
 
-void ecse::Input::MasterBinding::ForcePoll()
+void Thera::Input::MasterBinding::ForcePoll()
 {
 	poller(data, dataType, dataPrecision);
-	lastUpdate = ecse::FrameCount();
+	lastUpdate = Thera::FrameCount();
 }
 
 template<class O, class C>
-void ReadConstituent(void* outData, ecse::Input::Constituent& constituent)
+void ReadConstituent(void* outData, Thera::Input::Constituent& constituent)
 {
 	O* castData = static_cast<O*>(outData);
 	const C* bindingData = static_cast<const C*>(constituent.binding->GetData<const void*>());
@@ -60,7 +60,7 @@ void ReadConstituent(void* outData, ecse::Input::Constituent& constituent)
 	}
 }
 
-void ecse::Input::CompositeBinding::PollConstituents()
+void Thera::Input::CompositeBinding::PollConstituents()
 {
 	memset(data, 0, (int)dataType * (int)dataPrecision);
 	for (auto& constituent : constituents)
@@ -92,9 +92,9 @@ void ecse::Input::CompositeBinding::PollConstituents()
 	}
 }
 
-void ecse::Input::CompositeBinding::TryPoll()
+void Thera::Input::CompositeBinding::TryPoll()
 {
-	size_t frameCount = ecse::FrameCount();
+	size_t frameCount = Thera::FrameCount();
 	if (lastUpdate < frameCount)
 	{
 		PollConstituents();
@@ -102,13 +102,13 @@ void ecse::Input::CompositeBinding::TryPoll()
 	}
 }
 
-void ecse::Input::CompositeBinding::ForcePoll()
+void Thera::Input::CompositeBinding::ForcePoll()
 {
 	PollConstituents();
-	lastUpdate = ecse::FrameCount();
+	lastUpdate = Thera::FrameCount();
 }
 
-void ecse::Input::CompositeBinding::ValidateConstituents()
+void Thera::Input::CompositeBinding::ValidateConstituents()
 {
 	byte filledComponents = 0;
 	for (auto& constituent : constituents)
@@ -121,17 +121,17 @@ void ecse::Input::CompositeBinding::ValidateConstituents()
 	}
 }
 
-void ecse::Input::MasterBinding::RemoveInstance(BindingInstance* remove)
+void Thera::Input::MasterBinding::RemoveInstance(BindingInstance* remove)
 {
 	instances.erase(std::find_if(instances.begin(), instances.end(), [remove](std::shared_ptr<BindingInstance> inst) { return remove == inst.get(); }));
 }
 
-void ecse::Input::MasterBinding::ClearInstances()
+void Thera::Input::MasterBinding::ClearInstances()
 {
 	instances.clear();
 }
 
-void ecse::Input::BindingInstance::HandleEvent(GLFWwindow* window, int action, int mods)
+void Thera::Input::BindingInstance::HandleEvent(GLFWwindow* window, int action, int mods)
 {
 	if (boundAction == nullptr)
 	{
@@ -143,7 +143,7 @@ void ecse::Input::BindingInstance::HandleEvent(GLFWwindow* window, int action, i
 	boundAction->HandleEvent(eventData);
 }
 
-void ecse::Input::Action::HandleEvent(InputEventData& eventData)
+void Thera::Input::Action::HandleEvent(InputEventData& eventData)
 {
 	// TODO: Apply processors
 
@@ -164,19 +164,19 @@ void ecse::Input::Action::HandleEvent(InputEventData& eventData)
 	}
 }
 
-void ecse::Input::Action::AddBinding(BindingInstance* binding)
+void Thera::Input::Action::AddBinding(BindingInstance* binding)
 {
 	CCXAssert(dataType == binding->master.dataType, "Data type mismatch. Expected: " + std::to_string(static_cast<int>(dataType)) + " Got: " + std::to_string(static_cast<int>(binding->master.dataType)));
 	bindings.push_back(binding);
 }
 
-void ecse::Input::Action::AddBinding(CompositeBinding* composite)
+void Thera::Input::Action::AddBinding(CompositeBinding* composite)
 {
 	CCXAssert(dataType == composite->dataType, "Data type mismatch. Expected: " + std::to_string(static_cast<int>(dataType)) + " Got: " + std::to_string(static_cast<int>(composite->dataType)));
 	composites.push_back(composite);
 }
 
-ecse::Input::BindingInstance* ecse::Input::MasterBinding::CreateInstance(Action* bindTo)
+Thera::Input::BindingInstance* Thera::Input::MasterBinding::CreateInstance(Action* bindTo)
 {
 	CCXAssert(bindTo->dataType == dataType, "Action type '" + outputToString[(int)bindTo->dataType] + "' does not match binding type '" + outputToString[(int)dataType] + "'.");
 	//CCXAssert((int)bindTo->dataPrecision <= (int)dataPrecision, "Precision of action must be less than or equal to the binding precision.");
@@ -190,7 +190,7 @@ ecse::Input::BindingInstance* ecse::Input::MasterBinding::CreateInstance(Action*
 	return inst;
 }
 
-ecse::Input::BindingInstance* ecse::Input::MasterBinding::CreateUnboundInstance()
+Thera::Input::BindingInstance* Thera::Input::MasterBinding::CreateUnboundInstance()
 {
 	instances.push_back(std::make_unique<BindingInstance>(*this));
 	return instances.back().get();
@@ -198,13 +198,13 @@ ecse::Input::BindingInstance* ecse::Input::MasterBinding::CreateUnboundInstance(
 
 
 
-using MB = ecse::Input::MasterBinding;
-#define V2D ecse::Input::Output::Vector2, ecse::Input::Precision::Double
-#define INPUTS void* data, ecse::Input::Output type, ecse::Input::Precision precision
-#define KEYPARAMS(glfw_code) ecse::Input::Output::Scalar, ecse::Input::Precision::Single, [](void* data, ecse::Input::Output type, ecse::Input::Precision precision) { *static_cast<float*>(data) = glfwGetKey(ecse::GetWindows()[0], glfw_code); }
-#define MOUSEBUTTONPARAMS(glfw_code) ecse::Input::Output::Scalar, ecse::Input::Precision::Single, [](void* data, ecse::Input::Output type, ecse::Input::Precision precision) { *static_cast<float*>(data) = glfwGetMouseButton(ecse::GetWindows()[0], glfw_code); }
+using MB = Thera::Input::MasterBinding;
+#define V2D Thera::Input::Output::Vector2, Thera::Input::Precision::Double
+#define INPUTS void* data, Thera::Input::Output type, Thera::Input::Precision precision
+#define KEYPARAMS(glfw_code) Thera::Input::Output::Scalar, Thera::Input::Precision::Single, [](void* data, Thera::Input::Output type, Thera::Input::Precision precision) { *static_cast<float*>(data) = glfwGetKey(Thera::GetWindows()[0], glfw_code); }
+#define MOUSEBUTTONPARAMS(glfw_code) Thera::Input::Output::Scalar, Thera::Input::Precision::Single, [](void* data, Thera::Input::Output type, Thera::Input::Precision precision) { *static_cast<float*>(data) = glfwGetMouseButton(Thera::GetWindows()[0], glfw_code); }
 
-std::vector<ecse::Input::MasterBinding> ecse::Input::bindings
+std::vector<Thera::Input::MasterBinding> Thera::Input::bindings
 {
 	// Keys
 	MB(KEYPARAMS(GLFW_KEY_ESCAPE)),
@@ -337,8 +337,8 @@ std::vector<ecse::Input::MasterBinding> ecse::Input::bindings
 	MB(MOUSEBUTTONPARAMS(GLFW_MOUSE_BUTTON_7)),
 	MB(MOUSEBUTTONPARAMS(GLFW_MOUSE_BUTTON_8)),
 	
-	MB(V2D, [](INPUTS) { *static_cast<glm::dvec2*>(data) = ecse::Input::mousePosition; }),
-	MB(V2D, [](INPUTS) { *static_cast<glm::dvec2*>(data) = ecse::Input::mouseDelta; })
+	MB(V2D, [](INPUTS) { *static_cast<glm::dvec2*>(data) = Thera::Input::mousePosition; }),
+	MB(V2D, [](INPUTS) { *static_cast<glm::dvec2*>(data) = Thera::Input::mouseDelta; })
 	
 };
 

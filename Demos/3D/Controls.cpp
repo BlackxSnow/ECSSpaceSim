@@ -1,8 +1,8 @@
 #include "Controls.h"
 
-void sim::Controls::TransformControllables(flecs::iter& iter, ecse::Core::Transform* transform, const Controllable* controllable, const ecse::Core::WorldTransform* worldTransform)
+void sim::Controls::TransformControllables(flecs::iter& iter, Thera::Core::Transform* transform, const Controllable* controllable, const Thera::Core::WorldTransform* worldTransform)
 {
-	glm::vec2 delta = ecse::Input::GetAction("Rotation")->GetData<glm::dvec2>();
+	glm::vec2 delta = Thera::Input::GetAction("Rotation")->GetData<glm::dvec2>();
 	
 	glm::quat hRotation = glm::angleAxis(delta.x * controllable->sensitivity, worldTransform->Up());
 	
@@ -13,7 +13,7 @@ void sim::Controls::TransformControllables(flecs::iter& iter, ecse::Core::Transf
 	
 	transform->Rotation = transform->Rotation * vRotation;
 
-	glm::vec2 input = ecse::Input::GetAction("Move")->GetData<glm::vec2>();
+	glm::vec2 input = Thera::Input::GetAction("Move")->GetData<glm::vec2>();
 	
 	glm::vec3 forward = worldTransform->Forward();
 

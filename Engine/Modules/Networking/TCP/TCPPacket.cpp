@@ -1,6 +1,6 @@
 #include "TCPPacket.h"
 
-namespace ecse::Networking::tcp
+namespace Thera::Net::tcp
 {
 	std::unordered_map<PacketID, PacketHandler> _PacketHandlers;
 	

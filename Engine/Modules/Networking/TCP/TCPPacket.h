@@ -2,7 +2,7 @@
 #include "../Packet.h"
 #include "TCPConnection.h"
 
-namespace ecse::Networking::tcp
+namespace Thera::Net::tcp
 {
 	using PacketHandler = std::function<void(Connection&, Packet*)>;
 

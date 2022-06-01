@@ -1,33 +1,33 @@
 #include "Input.h"
-using namespace ecse::Input;
+using namespace Thera::Input;
 
-ecse::Input::Action* context;
+Thera::Input::Action* context;
 
-std::unordered_map<std::string, std::unique_ptr<ecse::Input::Action>> actions;
+std::unordered_map<std::string, std::unique_ptr<Thera::Input::Action>> actions;
 
-void ecse::Input::GLFWKeyCallback(GLFWwindow* window, int glfwKey, int scanCode, int action, int mods)
+void Thera::Input::GLFWKeyCallback(GLFWwindow* window, int glfwKey, int scanCode, int action, int mods)
 {
 	Key key = GLFWInputToKey(glfwKey);
 	bindings[(int)key].HandleEvent(window, action, mods);
 }
 
-void ecse::Input::GLFWMouseButtonCallback(GLFWwindow* window, int glfwMouse, int action, int mods)
+void Thera::Input::GLFWMouseButtonCallback(GLFWwindow* window, int glfwMouse, int action, int mods)
 {
 	Mouse mouse = GLFWInputToMouse(glfwMouse);
 	bindings[(int)mouse].HandleEvent(window, action, mods);
 }
 
-void ecse::Input::Initialise()
+void Thera::Input::Initialise()
 {
-	OnInit.Register([]() {glfwSetKeyCallback(ecse::GetWindows()[0], ecse::Input::GLFWKeyCallback); });
+	OnInit.Register([]() {glfwSetKeyCallback(Thera::GetWindows()[0], Thera::Input::GLFWKeyCallback); });
 	UpdateMouse();
 	OnInputPoll.Register(UpdateMouse);
 
 	// Validity check
-	CCXAssert(ecse::Input::bindings.size() == ecse::Input::LastBinding + 1, "Misaligned ecse::Input::bindings count. Count: " + std::to_string(ecse::Input::bindings.size()) + " Expected: " + std::to_string(ecse::Input::LastBinding + 1));
+	CCXAssert(Thera::Input::bindings.size() == Thera::Input::LastBinding + 1, "Misaligned Thera::Input::bindings count. Count: " + std::to_string(Thera::Input::bindings.size()) + " Expected: " + std::to_string(Thera::Input::LastBinding + 1));
 }
 
-void ecse::Input::Reset(bool iterateBindings)
+void Thera::Input::Reset(bool iterateBindings)
 {
 	actions.clear();
 	composites.clear();
@@ -38,47 +38,47 @@ void ecse::Input::Reset(bool iterateBindings)
 	}
 }
 
-ecse::Input::BindingInstance* ecse::Input::CreateBinding(Action* bindTo, Key key)
+Thera::Input::BindingInstance* Thera::Input::CreateBinding(Action* bindTo, Key key)
 {
 	CCXAssert(bindTo != nullptr, "bindTo cannot be null. If creating bindings for composites, use CreateConstituent instead.");
 	return bindings[static_cast<int>(key)].CreateInstance(bindTo);
 }
 
-ecse::Input::BindingInstance* ecse::Input::CreateBinding(Action* bindTo, Mouse mouse)
+Thera::Input::BindingInstance* Thera::Input::CreateBinding(Action* bindTo, Mouse mouse)
 {
 	CCXAssert(bindTo != nullptr, "bindTo cannot be null. If creating bindings for composites, use CreateConstituent instead.");
 	return bindings[static_cast<int>(mouse)].CreateInstance(bindTo);
 }
 
-ecse::Input::BindingInstance* ecse::Input::CreateBinding(Key key)
+Thera::Input::BindingInstance* Thera::Input::CreateBinding(Key key)
 {
 	CCXAssert(context != nullptr, "Context cannot be null when using this overload. Use SetBindContext first.");
 	return bindings[static_cast<int>(key)].CreateInstance(context);
 }
 
-ecse::Input::BindingInstance* ecse::Input::CreateBinding(Mouse mouse)
+Thera::Input::BindingInstance* Thera::Input::CreateBinding(Mouse mouse)
 {
 	CCXAssert(context != nullptr, "Context cannot be null when using this overload. Use SetBindContext first.");
 	return bindings[static_cast<int>(mouse)].CreateInstance(context);
 }
 
-Constituent ecse::Input::CreateConstituent(Key key, std::initializer_list<Component> components)
+Constituent Thera::Input::CreateConstituent(Key key, std::initializer_list<Component> components)
 {
 	return Constituent(bindings[static_cast<int>(key)].CreateUnboundInstance(), components);
 }
 
-Constituent ecse::Input::CreateConstituent(Mouse mouse, std::initializer_list<Component> components)
+Constituent Thera::Input::CreateConstituent(Mouse mouse, std::initializer_list<Component> components)
 {
 	return Constituent(bindings[static_cast<int>(mouse)].CreateUnboundInstance(), components);
 }
 
-CompositeBinding* ecse::Input::CreateCompositeBinding(Action* bindTo, Output _dataType, Precision dataPrecision, std::vector<Constituent>&& constituents)
+CompositeBinding* Thera::Input::CreateCompositeBinding(Action* bindTo, Output _dataType, Precision dataPrecision, std::vector<Constituent>&& constituents)
 {
 	composites.push_back(std::make_unique<CompositeBinding>(bindTo, _dataType, dataPrecision, std::forward<std::vector<Constituent>>(constituents)));
 	bindTo->AddBinding(composites.back().get());
 	return composites.back().get();
 }
-CompositeBinding* ecse::Input::CreateCompositeBinding(Output _dataType, Precision dataPrecision, std::vector<Constituent>&& constituents)
+CompositeBinding* Thera::Input::CreateCompositeBinding(Output _dataType, Precision dataPrecision, std::vector<Constituent>&& constituents)
 {
 	CCXAssert(context != nullptr, "Context cannot be null when using this overload. Use SetBindContext first.");
 	composites.push_back(std::make_unique<CompositeBinding>(context, _dataType, dataPrecision, std::forward<std::vector<Constituent>>(constituents)));
@@ -86,7 +86,7 @@ CompositeBinding* ecse::Input::CreateCompositeBinding(Output _dataType, Precisio
 	return composites.back().get();
 }
 
-ecse::Input::Action* ecse::Input::CreateAction(std::string& name, Output dataType, Precision precision)
+Thera::Input::Action* Thera::Input::CreateAction(std::string& name, Output dataType, Precision precision)
 {
 	auto insertResult = actions.insert({ name, std::make_unique<Action>(dataType, precision) });
 	if (!insertResult.second)
@@ -96,7 +96,7 @@ ecse::Input::Action* ecse::Input::CreateAction(std::string& name, Output dataTyp
 	return insertResult.first->second.get();
 }
 
-ecse::Input::Action* ecse::Input::CreateAction(std::string&& name, Output dataType, Precision precision)
+Thera::Input::Action* Thera::Input::CreateAction(std::string&& name, Output dataType, Precision precision)
 {
 	auto insertResult = actions.insert({ name, std::make_unique<Action>(dataType, precision) });
 	if (!insertResult.second)
@@ -106,7 +106,7 @@ ecse::Input::Action* ecse::Input::CreateAction(std::string&& name, Output dataTy
 	return insertResult.first->second.get();
 }
 
-ecse::Input::Action* ecse::Input::GetAction(std::string&& name)
+Thera::Input::Action* Thera::Input::GetAction(std::string&& name)
 {
 	Action* action = nullptr;
 	try
@@ -120,12 +120,12 @@ ecse::Input::Action* ecse::Input::GetAction(std::string&& name)
 	return action;
 }
 
-void ecse::Input::SetBindContext(Action* _context)
+void Thera::Input::SetBindContext(Action* _context)
 {
 	context = _context;
 }
 
-ecse::Input::Action* ecse::Input::Context()
+Thera::Input::Action* Thera::Input::Context()
 {
 	return context;
 }

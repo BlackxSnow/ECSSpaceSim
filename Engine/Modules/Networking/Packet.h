@@ -8,7 +8,7 @@
 #include "../../utility/CCXType.h"
 #include "../../utility/CCXMemory.h"
 
-namespace ecse::Networking
+namespace Thera::Net
 {
 	typedef uint16_t PacketID;
 	typedef uint16_t PacketSize;

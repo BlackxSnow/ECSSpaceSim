@@ -4,7 +4,7 @@
 #include "Packet.h"
 #include "Connection.h"
 
-namespace ecse::Networking
+namespace Thera::Net
 {
 	
 }

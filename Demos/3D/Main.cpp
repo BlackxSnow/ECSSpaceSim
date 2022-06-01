@@ -16,40 +16,40 @@
 int main()
 {
 
-	ecse::OnInit.Register([]() { ecse::GetWorld()->import<sim::Controls>(); });
-	ecse::Init();
+	Thera::OnInit.Register([]() { Thera::GetWorld()->import<sim::Controls>(); });
+	Thera::Init();
 	sim::BuildControls();
 
-	auto prev = ecse::GetWorld()->set_scope(*ecse::GetGameRoot());
+	auto prev = Thera::GetWorld()->set_scope(*Thera::GetGameRoot());
 
 	auto defaultShader = CCX::LoadShaderProgram("default_vs", "default_fs");
 
-	auto cubeMesh = ecse::LoadMesh("Resources/Cube.obj");
+	auto cubeMesh = Thera::LoadMesh("Resources/Cube.obj");
 
-	flecs::entity cam = ecse::GetWorld()->entity();
-	cam.set<ecse::Rendering::Camera>({ ecse::Rendering::CameraView::Perspective, ecse::Core::MaskBehaviour::None, 0.1f, 100.0f, 1.0472f });
-	cam.set<ecse::Core::Transform>({ glm::dvec3(0, 0, 10), glm::identity<glm::quat>(), glm::vec3(1,1,1) });
+	flecs::entity cam = Thera::GetWorld()->entity();
+	cam.set<Thera::Rendering::Camera>({ Thera::Rendering::CameraView::Perspective, Thera::Core::MaskBehaviour::None, 0.1f, 100.0f, 1.0472f });
+	cam.set<Thera::Core::Transform>({ glm::dvec3(0, 0, 10), glm::identity<glm::quat>(), glm::vec3(1,1,1) });
 	cam.set<sim::Controls::Controllable>({ 10.0f, 0.01f });
 
-	flecs::entity parent1 = ecse::GetWorld()->entity();
-	parent1.set<ecse::Core::Transform>({ glm::dvec3(0,0,1) });
-	ecse::GetWorld()->set_scope(parent1);
-	flecs::entity parent2 = ecse::GetWorld()->entity();
-	parent2.set<ecse::Core::Transform>({ glm::dvec3(0,-2,0) });
-	ecse::GetWorld()->set_scope(parent2);
+	flecs::entity parent1 = Thera::GetWorld()->entity();
+	parent1.set<Thera::Core::Transform>({ glm::dvec3(0,0,1) });
+	Thera::GetWorld()->set_scope(parent1);
+	flecs::entity parent2 = Thera::GetWorld()->entity();
+	parent2.set<Thera::Core::Transform>({ glm::dvec3(0,-2,0) });
+	Thera::GetWorld()->set_scope(parent2);
 
-	flecs::entity cube = ecse::GetWorld()->entity();
-	auto cubeRenderer = cube.get_mut<ecse::Rendering::Renderer>();
+	flecs::entity cube = Thera::GetWorld()->entity();
+	auto cubeRenderer = cube.get_mut<Thera::Rendering::Renderer>();
 	cubeRenderer->meshes.push_back(cubeMesh);
 	cubeRenderer->material.shader = defaultShader;
 
-	cube.set<ecse::Core::Transform>({ glm::dvec3(3, 3, -10), glm::identity<glm::quat>(), glm::vec3(1, 1, 1) });
+	cube.set<Thera::Core::Transform>({ glm::dvec3(3, 3, -10), glm::identity<glm::quat>(), glm::vec3(1, 1, 1) });
 
 	
 
 	bgfx::setDebug(BGFX_DEBUG_NONE);
 
-	ecse::GetWorld()->set_scope(prev);
+	Thera::GetWorld()->set_scope(prev);
 
-	ecse::Loop(0, nullptr);
+	Thera::Loop(0, nullptr);
 }

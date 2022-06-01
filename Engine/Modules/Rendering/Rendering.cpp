@@ -3,28 +3,28 @@
 #include <bgfx/bgfx.h>
 #include <glm/gtc/type_ptr.hpp>
 
-flecs::query<const ecse::Rendering::Renderer, const ecse::Core::WorldTransform*> BuildQuery(flecs::entity camEntity, ecse::Core::MaskBehaviour mask)
+flecs::query<const Thera::Rendering::Renderer, const Thera::Core::WorldTransform*> BuildQuery(flecs::entity camEntity, Thera::Core::MaskBehaviour mask)
 {
-	flecs::world* world = ecse::GetWorld();
+	flecs::world* world = Thera::GetWorld();
 
 	auto def = world->is_deferred();
 
-	flecs::query_builder query = world->query_builder<const ecse::Rendering::Renderer, const ecse::Core::WorldTransform*>();
+	flecs::query_builder query = world->query_builder<const Thera::Rendering::Renderer, const Thera::Core::WorldTransform*>();
 
 	switch (mask)
 	{
-	case ecse::Core::MaskBehaviour::Whitelist:
-		query.term<ecse::Core::WhitelistedBy>(camEntity);
+	case Thera::Core::MaskBehaviour::Whitelist:
+		query.term<Thera::Core::WhitelistedBy>(camEntity);
 		break;
-	case ecse::Core::MaskBehaviour::Blacklist:
-		query.term<ecse::Core::BlacklistedBy>(camEntity).oper(flecs::Not);
+	case Thera::Core::MaskBehaviour::Blacklist:
+		query.term<Thera::Core::BlacklistedBy>(camEntity).oper(flecs::Not);
 		break;
 	}
 
 	return query.build();
 }
 
-void ecse::Rendering::ValidateCameraQueries(flecs::iter& iter, const Camera* cam, Mask* mask)
+void Thera::Rendering::ValidateCameraQueries(flecs::iter& iter, const Camera* cam, Mask* mask)
 {
 	if (!iter.changed() && mask->lastMask == cam->masking && mask->maskQuery)
 	{
@@ -37,7 +37,7 @@ void ecse::Rendering::ValidateCameraQueries(flecs::iter& iter, const Camera* cam
 }
 
 
-void RenderSingleCamera(flecs::iter& iter, const ecse::Rendering::Renderer* renderer, const ecse::Core::WorldTransform* transform, const ecse::Core::WorldTransform* cam, const bgfx::ViewId target)
+void RenderSingleCamera(flecs::iter& iter, const Thera::Rendering::Renderer* renderer, const Thera::Core::WorldTransform* transform, const Thera::Core::WorldTransform* cam, const bgfx::ViewId target)
 {
 	if (renderer->meshes.size() == 0)
 	{
@@ -72,7 +72,7 @@ void RenderSingleCamera(flecs::iter& iter, const ecse::Rendering::Renderer* rend
 	}
 }
 
-void ecse::Rendering::RenderCameraFinal(flecs::iter& iter, const Camera* cam, const ecse::Core::WorldTransform* camTransform, const Mask* mask)
+void Thera::Rendering::RenderCameraFinal(flecs::iter& iter, const Camera* cam, const Thera::Core::WorldTransform* camTransform, const Mask* mask)
 {
 	if (!cam->isEnabled)
 	{
@@ -84,7 +84,7 @@ void ecse::Rendering::RenderCameraFinal(flecs::iter& iter, const Camera* cam, co
 
 	if (cam->view == CameraView::Perspective)
 	{
-		proj = glm::perspective(cam->fovRad, (float)ecse::WindowWidth / (float)ecse::WindowHeight, cam->nearClip, cam->farClip);
+		proj = glm::perspective(cam->fovRad, (float)Thera::WindowWidth / (float)Thera::WindowHeight, cam->nearClip, cam->farClip);
 	}
 	else
 	{
@@ -106,31 +106,31 @@ void ecse::Rendering::RenderCameraFinal(flecs::iter& iter, const Camera* cam, co
 	auto target = cam->target;
 
 	bgfx::setViewTransform(target, glm::value_ptr(view), glm::value_ptr(proj));
-	bgfx::setViewRect(0, 0, 0, uint16_t(ecse::WindowWidth), uint16_t(ecse::WindowHeight));
+	bgfx::setViewRect(0, 0, 0, uint16_t(Thera::WindowWidth), uint16_t(Thera::WindowHeight));
 	bgfx::setState(state);
 
-	auto filter = iter.world().filter_builder<const ecse::Rendering::Renderer, const ecse::Core::WorldTransform*>();
+	auto filter = iter.world().filter_builder<const Thera::Rendering::Renderer, const Thera::Core::WorldTransform*>();
 
 	switch (cam->masking)
 	{
-	case ecse::Core::MaskBehaviour::Whitelist:
-		filter.term<ecse::Core::WhitelistedBy>(iter.entity(0));
+	case Thera::Core::MaskBehaviour::Whitelist:
+		filter.term<Thera::Core::WhitelistedBy>(iter.entity(0));
 		break;
-	case ecse::Core::MaskBehaviour::Blacklist:
-		filter.term<ecse::Core::BlacklistedBy>(iter.entity(0)).oper(flecs::Not);
+	case Thera::Core::MaskBehaviour::Blacklist:
+		filter.term<Thera::Core::BlacklistedBy>(iter.entity(0)).oper(flecs::Not);
 		break;
 	}
 
 	if (mask->lastMask == cam->masking)
 	{
-		mask->maskQuery.iter([camTransform, target](flecs::iter& iter, const Renderer* renderer, const ecse::Core::WorldTransform* rendererTransform)
+		mask->maskQuery.iter([camTransform, target](flecs::iter& iter, const Renderer* renderer, const Thera::Core::WorldTransform* rendererTransform)
 		{
 			RenderSingleCamera(iter, renderer, rendererTransform, camTransform, target);
 		});
 	}
 	else
 	{
-		filter.build().iter([camTransform, target](flecs::iter& iter, const Renderer* renderer, const ecse::Core::WorldTransform* rendererTransform)
+		filter.build().iter([camTransform, target](flecs::iter& iter, const Renderer* renderer, const Thera::Core::WorldTransform* rendererTransform)
 		{
 			RenderSingleCamera(iter, renderer, rendererTransform, camTransform, target);
 		});

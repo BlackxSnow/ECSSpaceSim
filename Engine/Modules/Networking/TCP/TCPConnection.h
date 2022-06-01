@@ -4,7 +4,7 @@
 #include "../Packet.h"
 #include <queue>
 
-namespace ecse::Networking::tcp
+namespace Thera::Net::tcp
 {
 	class Connection
 	{

@@ -24,7 +24,7 @@
 //		- Priorities and overrides?
 // - Gamepad bindings
 
-namespace ecse
+namespace Thera
 {
 	namespace Input
 	{

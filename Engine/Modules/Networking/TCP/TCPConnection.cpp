@@ -1,7 +1,7 @@
 #include "TCPConnection.h"
 #include "TCPPacket.h"
 
-namespace ecse::Networking::tcp
+namespace Thera::Net::tcp
 {
 	void Connection::Listen()
 	{
@@ -20,6 +20,11 @@ namespace ecse::Networking::tcp
 			if (error.value() == asio::error::eof)
 			{
 				LogWarning((std::ostringstream() << "Connection " << _Endpoint << " closed connection (EOF).").str());
+				return;
+			}
+			if (error.value() == asio::error::connection_reset)
+			{
+				LogWarning((std::ostringstream() << "Connection " << _Endpoint << " closed connection (Reset).").str());
 				return;
 			}
 			LogError(error.message(), false);

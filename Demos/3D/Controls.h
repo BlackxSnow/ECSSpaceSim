@@ -7,15 +7,15 @@ namespace sim
 {
 	inline void BuildControls()
 	{
-		namespace inp = ecse::Input;
+		namespace inp = Thera::Input;
 
-		inp::SetBindContext(inp::CreateAction("Move", inp::Output::Vector2, ecse::Input::Precision::Single));
-		ecse::Input::CreateCompositeBinding(ecse::Input::Output::Vector2, ecse::Input::Precision::Single,
+		inp::SetBindContext(inp::CreateAction("Move", inp::Output::Vector2, Thera::Input::Precision::Single));
+		Thera::Input::CreateCompositeBinding(Thera::Input::Output::Vector2, Thera::Input::Precision::Single,
 		{
-			ecse::Input::CreateConstituent(ecse::Input::Key::A, { ecse::Input::Component::NegX }),
-			ecse::Input::CreateConstituent(ecse::Input::Key::D, { ecse::Input::Component::PosX }),
-			ecse::Input::CreateConstituent(ecse::Input::Key::S, { ecse::Input::Component::NegY }),
-			ecse::Input::CreateConstituent(ecse::Input::Key::W, { ecse::Input::Component::PosY })
+			Thera::Input::CreateConstituent(Thera::Input::Key::A, { Thera::Input::Component::NegX }),
+			Thera::Input::CreateConstituent(Thera::Input::Key::D, { Thera::Input::Component::PosX }),
+			Thera::Input::CreateConstituent(Thera::Input::Key::S, { Thera::Input::Component::NegY }),
+			Thera::Input::CreateConstituent(Thera::Input::Key::W, { Thera::Input::Component::PosY })
 		});
 
 		inp::SetBindContext(inp::CreateAction("Rotation", inp::Output::Vector2));
@@ -31,7 +31,7 @@ namespace sim
 			float sensitivity = 0.1f;
 		};
 
-		static void TransformControllables(flecs::iter& iter, ecse::Core::Transform* transform, const Controllable* controllable, const ecse::Core::WorldTransform* worldTransform);
+		static void TransformControllables(flecs::iter& iter, Thera::Core::Transform* transform, const Controllable* controllable, const Thera::Core::WorldTransform* worldTransform);
 
 		Controls(flecs::world& world)
 		{
@@ -40,9 +40,9 @@ namespace sim
 			world.component<Controllable>()
 				.member<float>("Speed")
 				.member<float>("Sensitivity")
-				.add(flecs::With, world.id<ecse::Core::Transform>());
+				.add(flecs::With, world.id<Thera::Core::Transform>());
 
-			world.system<ecse::Core::Transform, const Controllable, const ecse::Core::WorldTransform>().iter(TransformControllables);
+			world.system<Thera::Core::Transform, const Controllable, const Thera::Core::WorldTransform>().iter(TransformControllables);
 		}
 	};
 }

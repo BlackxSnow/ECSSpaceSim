@@ -11,7 +11,7 @@
 #include "../../utility/CCXMath.h"
 #include "../../utility/CCXType.h"
 
-namespace ecse::Input
+namespace Thera::Input
 {
 	class Action;
 	class BindingInstance;

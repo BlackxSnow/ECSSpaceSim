@@ -1,7 +1,7 @@
 #include "Connection.h"
 #include <iostream>
 
-namespace ecse::Networking
+namespace Thera::Net
 {
 
 	void Connection::HandleReceive(const asio::error_code& error, size_t bytesTransferred)

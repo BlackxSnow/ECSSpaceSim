@@ -1,7 +1,7 @@
 #include "Packet.h"
 #include "../../utility/ConsoleLogging.h"
 
-namespace ecse::Networking
+namespace Thera::Net
 {
 	std::unordered_map<PacketID, PacketHandler> _PacketHandlers;
 

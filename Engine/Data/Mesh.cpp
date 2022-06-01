@@ -7,14 +7,14 @@
 #include "../utility/Conversion.h"
 
 
-bgfx::VertexLayout ecse::Vertex::Layout;
+bgfx::VertexLayout Thera::Vertex::Layout;
 
 /// <summary>
 /// Placeholder. Loads the first mesh in a scene from a given file.
 /// </summary>
 /// <param name="path"></param>
 /// <returns></returns>
-std::shared_ptr<ecse::MeshData> ecse::LoadMesh(const std::string& path)
+std::shared_ptr<Thera::MeshData> Thera::LoadMesh(const std::string& path)
 {
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path, aiProcessPreset_TargetRealtime_Quality);
@@ -55,7 +55,7 @@ std::shared_ptr<ecse::MeshData> ecse::LoadMesh(const std::string& path)
 		}
 	}
 
-	data->vertexBuffer = bgfx::createVertexBuffer(bgfx::makeRef(data->Vertices.data(), sizeof(ecse::Vertex) * data->Vertices.size()), ecse::Vertex::Layout);
+	data->vertexBuffer = bgfx::createVertexBuffer(bgfx::makeRef(data->Vertices.data(), sizeof(Thera::Vertex) * data->Vertices.size()), Thera::Vertex::Layout);
 	data->indexBuffer = bgfx::createIndexBuffer(bgfx::makeRef(data->Indices.data(), sizeof(uint16_t) * data->Indices.size()));
 	return data;
 }

@@ -7,7 +7,7 @@
 #include <asio/ts/buffer.hpp>
 #include <asio/ts/internet.hpp>
 
-namespace ecse::Networking
+namespace Thera::Net
 {
 	
 }

@@ -3,16 +3,16 @@
 #include <iostream>
 #include <vector>
 
-ecse::Networking::Connection* connection;
+Thera::Net::Connection* connection;
 
-void HandleConnect(const asio::ip::udp::endpoint& source, ecse::Networking::Packet* packet)
+void HandleConnect(const asio::ip::udp::endpoint& source, Thera::Net::Packet* packet)
 {
-	ecse::Networking::Packet pack(ecse::Networking::PacketType::Heartbeat);
+	Thera::Net::Packet pack(Thera::Net::PacketType::Heartbeat);
 	connection->Send(pack);
 	connection->Flush();
 }
 
-void HandleConnectTCP(ecse::Networking::tcp::Connection& source, ecse::Networking::Packet* packet)
+void HandleConnectTCP(Thera::Net::tcp::Connection& source, Thera::Net::Packet* packet)
 {
 	char helloworld[13];
 	*packet >> helloworld;
@@ -21,22 +21,22 @@ void HandleConnectTCP(ecse::Networking::tcp::Connection& source, ecse::Networkin
 
 int main()
 {
-	ecse::Networking::RegisterPacket(ecse::Networking::PacketType::Connect, HandleConnect);
-	ecse::Networking::tcp::RegisterPacket(ecse::Networking::PacketType::Connect, HandleConnectTCP);
+	Thera::Net::RegisterPacket(Thera::Net::PacketType::Connect, HandleConnect);
+	Thera::Net::tcp::RegisterPacket(Thera::Net::PacketType::Connect, HandleConnectTCP);
 
 	asio::ip::address_v4 target = asio::ip::make_address_v4("202.91.194.220");
 	asio::ip::address_v4 targetLAN = asio::ip::make_address_v4("192.168.1.108");
 
-	connection = new ecse::Networking::Connection(asio::ip::udp::endpoint(asio::ip::udp::v4(), 7331), target, 1337);
+	connection = new Thera::Net::Connection(asio::ip::udp::endpoint(asio::ip::udp::v4(), 7331), target, 1337);
 	
-	ecse::Networking::Packet pack1(ecse::Networking::PacketType::Connect);
+	Thera::Net::Packet pack1(Thera::Net::PacketType::Connect);
 	pack1 << "Hello World!";
 	connection->Send(pack1);
 	connection->Flush();
 	
-	ecse::Networking::DiscoverMTU(target);
+	Thera::Net::DiscoverMTU(target);
 
-	auto tcpConnection = ecse::Networking::tcp::Connection(asio::ip::tcp::endpoint(asio::ip::tcp::v4(), 7331), targetLAN, 1337);
+	auto tcpConnection = Thera::Net::tcp::Connection(asio::ip::tcp::endpoint(asio::ip::tcp::v4(), 7331), targetLAN, 1337);
 	tcpConnection.Send(pack1);
 	tcpConnection.Flush();
 

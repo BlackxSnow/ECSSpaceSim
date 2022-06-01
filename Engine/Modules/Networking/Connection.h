@@ -12,7 +12,7 @@
 #include <iostream>
 #endif
 
-namespace ecse::Networking
+namespace Thera::Net
 {
 	class Connection
 	{

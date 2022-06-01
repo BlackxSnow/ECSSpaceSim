@@ -10,7 +10,7 @@
 #include "../Core/Core.h"
 #include "../../Engine.h"
 
-namespace ecse
+namespace Thera
 {
 	/// <summary>
 	/// FLECS rendering module for ECSE
@@ -36,8 +36,8 @@ namespace ecse
 
 		struct Mask
 		{
-			ecse::Core::MaskBehaviour lastMask = (ecse::Core::MaskBehaviour)-1;
-			flecs::query<const ecse::Rendering::Renderer, const ecse::Core::WorldTransform*> maskQuery;
+			Thera::Core::MaskBehaviour lastMask = (Thera::Core::MaskBehaviour)-1;
+			flecs::query<const Thera::Rendering::Renderer, const Thera::Core::WorldTransform*> maskQuery;
 		};
 
 		enum class CameraView
@@ -49,7 +49,7 @@ namespace ecse
 		struct Camera
 		{
 			CameraView view;
-			ecse::Core::MaskBehaviour masking;
+			Thera::Core::MaskBehaviour masking;
 			float nearClip;
 			float farClip;
 			float fovRad;
@@ -58,7 +58,7 @@ namespace ecse
 			bgfx::ViewId target;
 		};
 
-		static void RenderCameraFinal(flecs::iter& iter, const Camera* cam, const ecse::Core::WorldTransform* camTransform, const Mask* mask);
+		static void RenderCameraFinal(flecs::iter& iter, const Camera* cam, const Thera::Core::WorldTransform* camTransform, const Mask* mask);
 		
 		inline static flecs::query<const Camera, Mask> maskValidationQuery;
 		static void ValidateCameraQueries(flecs::iter& iter, const Camera* cam, Mask* mask);
@@ -75,10 +75,10 @@ namespace ecse
 				.member<float, flecs::units::length::Meters>("Clip Distance", 2)
 				.member<float, flecs::units::angle::Radians>("fovRad")
 				.member<float>("Ortho size", 2)
-				.add(flecs::With, world.id<ecse::Core::Transform>())
+				.add(flecs::With, world.id<Thera::Core::Transform>())
 				.add(flecs::With, world.id<Mask>());
 
-			world.system<const Camera, const ecse::Core::WorldTransform, const Mask>("RenderCameraFinal")
+			world.system<const Camera, const Thera::Core::WorldTransform, const Mask>("RenderCameraFinal")
 				.iter(RenderCameraFinal);
 
 			maskValidationQuery = world.query_builder<const Camera, Mask>().build();
