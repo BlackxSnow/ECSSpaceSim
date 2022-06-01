@@ -66,7 +66,7 @@ namespace Thera::Net
 		}
 	}
 
-	void Packet::Write(void* data, size_t dataSize)
+	void Packet::Write(const void* data, size_t dataSize)
 	{
 		if (dataSize <= 0) return;
 		size_t startOffset = _Data.size();
@@ -75,6 +75,11 @@ namespace Thera::Net
 		_Header.Size = _Data.size();
 	}
 	
+	CCX::MemoryReader Packet::GetReader()
+	{
+		return CCX::MemoryReader(_Data.data(), _Data.size());
+	}
+
 	void RegisterPacket(PacketID id, PacketHandler handler)
 	{
 		if (_PacketHandlers.find(id) != _PacketHandlers.end())

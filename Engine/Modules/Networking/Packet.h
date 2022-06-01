@@ -6,6 +6,7 @@
 
 #include "NetDefs.h"
 #include "../../utility/CCXType.h"
+#include "../../utility/CCXSerialisation.h"
 #include "../../utility/CCXMemory.h"
 
 namespace Thera::Net
@@ -63,7 +64,13 @@ namespace Thera::Net
 		std::array<asio::const_buffer, 2> GetBuffer();
 		void GetBuffer(OUT std::vector<asio::const_buffer>& addTo);
 
-		void Write(void* data, size_t dataSize);
+		void Write(const void* data, size_t dataSize);
+		template<typename T>
+		void Write(const T data)
+		{
+			CCX::Serialise<T, Packet>(data, *this);
+		}
+		CCX::MemoryReader GetReader();
 
 		template<typename T>
 		friend Packet& operator<<(Packet& packet, T& data)

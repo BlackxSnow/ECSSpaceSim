@@ -33,4 +33,13 @@ namespace CCX
 
         static bool const value = test<From, To>(0);
     };
+
+	template<typename, typename = void>
+    struct has_write : std::false_type {};
+
+	template<typename T> 
+    struct has_write<T, decltype(std::declval<T>().Write(std::declval<void*>(), std::declval<size_t>()))> : std::true_type {};
+
+    //template<typename T>
+    //using has_write_v = has_write<T>::value;
 }

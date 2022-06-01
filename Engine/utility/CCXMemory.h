@@ -27,9 +27,9 @@ namespace CCX
 		template<typename T, if_not_t<std::is_standard_layout<T>::value> = 0>
 		T Read()
 		{
-			size_t* size = nullptr;
-			T value = CCX::Deserialise<T>(Current(), size);
-			_Position += *size;
+			size_t size;
+			T value = CCX::Deserialise<T>(Current(), &size);
+			_Position += size;
 			return value;
 		}
 
