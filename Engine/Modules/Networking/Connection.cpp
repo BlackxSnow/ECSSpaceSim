@@ -41,7 +41,7 @@ namespace ecse::Networking
 			(*handler)(_Endpoint, &packet);
 		}
 
-		std::cout << "Received " << bytesTransferred << " bytes from " << _Endpoint << std::endl;
+		LogInfo((std::ostringstream() << "Received " << bytesTransferred << " bytes from " << _Endpoint).str());
 		Listen();
 	}
 	
@@ -95,13 +95,6 @@ namespace ecse::Networking
 	{
 		auto endpoints = asio::ip::udp::resolver(_Context).resolve(address.to_string(), std::to_string(port));
 		_Endpoint = *endpoints.begin();
-		
-		std::cout << "Results begin" << std::endl;
-		for (auto& endpoint : endpoints)
-		{
-			std::cout << endpoint.endpoint() << std::endl;
-		}
-		std::cout << "Results end" << std::endl;
 
 		_Socket.open(asio::ip::udp::v4());
 		_Socket.set_option(asio::ip::udp::socket::reuse_address(true));

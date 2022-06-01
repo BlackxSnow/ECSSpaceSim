@@ -1,4 +1,5 @@
 #include <Modules/Networking/Networking.h>
+#include <Modules/Networking/TCP/TCPNetworking.h>
 #include <iostream>
 #include <vector>
 
@@ -11,12 +12,20 @@ void HandleConnect(const asio::ip::udp::endpoint& source, ecse::Networking::Pack
 	connection->Flush();
 }
 
+void HandleConnectTCP(ecse::Networking::tcp::Connection& source, ecse::Networking::Packet* packet)
+{
+	char helloworld[13];
+	*packet >> helloworld;
+	LogInfo((std::ostringstream() << "TCP received: " << helloworld).str());
+}
 
 int main()
 {
 	ecse::Networking::RegisterPacket(ecse::Networking::PacketType::Connect, HandleConnect);
+	ecse::Networking::tcp::RegisterPacket(ecse::Networking::PacketType::Connect, HandleConnectTCP);
 
 	asio::ip::address_v4 target = asio::ip::make_address_v4("202.91.194.220");
+	asio::ip::address_v4 targetLAN = asio::ip::make_address_v4("192.168.1.108");
 
 	connection = new ecse::Networking::Connection(asio::ip::udp::endpoint(asio::ip::udp::v4(), 7331), target, 1337);
 	
@@ -26,20 +35,12 @@ int main()
 	connection->Flush();
 	
 	ecse::Networking::DiscoverMTU(target);
+
+	auto tcpConnection = ecse::Networking::tcp::Connection(asio::ip::tcp::endpoint(asio::ip::tcp::v4(), 7331), targetLAN, 1337);
+	tcpConnection.Send(pack1);
+	tcpConnection.Flush();
+
 	system("pause");
-
-
-	ecse::Networking::Packet loopPack(ecse::Networking::PacketType::Heartbeat);
-	char someData[256];
-
-	while (true)
-	{
-		//system("pause");
-		//loopPack << someData;
-		//LogInfo("Sending " + std::to_string(loopPack.FullSize()) + " bytes");
-		//connection->Send(loopPack);
-		//connection->Flush();
-	}
 
 
 	return 0;
