@@ -124,4 +124,53 @@ namespace ecse::Networking
 		Listen();
 		_Thread = new std::thread([&]() { _Context.run(); });
 	}
+
+#ifdef _WIN32
+	inline bool TestMTUOnce(int size, int& minMTU, int& maxMTU, HANDLE icmpHandle, IPAddr target, void* data, PIP_OPTION_INFORMATION options)
+	{
+		auto replyCount = IcmpSendEcho(icmpHandle, target, data, size, options, data, 65536, 1000);
+		bool gotReply = replyCount > 0;
+		if (gotReply) minMTU = size;
+		else maxMTU = size;
+
+		return gotReply;
+	}
+	int DiscoverMTU(asio::ip::address_v4& target)
+	{
+		auto icmpHandle = IcmpCreateFile();
+		if (icmpHandle == INVALID_HANDLE_VALUE)
+		{
+			auto error = GetLastError();
+			LogError("ICMP handle creation failed: " + std::to_string(error), false);
+			return 576;
+		}
+
+		char* data = new char[65536];
+		auto options32 = IP_OPTION_INFORMATION32();
+		options32.Ttl = 255;
+		options32.Flags = IP_FLAG_DF;
+		options32.OptionsSize = 0;
+		options32.OptionsData = nullptr;
+		auto options = reinterpret_cast<IP_OPTION_INFORMATION*>(&options32);
+
+		int minMTU = 548; // (UDP min MTU) 576 - (ICMP Header) 28
+		int maxMTU = 65536;
+
+		bool gotReply = true;
+		while (gotReply)
+		{
+			int current = minMTU * 2;
+			gotReply = TestMTUOnce(current, minMTU, maxMTU, icmpHandle, target.to_uint(), data, options);
+		}
+
+		while (maxMTU - minMTU > 1)
+		{
+			int current = minMTU + (maxMTU - minMTU) / 2.0f;
+			TestMTUOnce(current, minMTU, maxMTU, icmpHandle, target.to_uint(), data, options);
+		}
+
+		LogInfo("Found MTU of " + std::to_string(minMTU));
+		return minMTU;
+	}
+#endif
 }

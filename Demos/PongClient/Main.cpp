@@ -15,14 +15,17 @@ void HandleConnect(const asio::ip::udp::endpoint& source, ecse::Networking::Pack
 int main()
 {
 	ecse::Networking::RegisterPacket(ecse::Networking::PacketType::Connect, HandleConnect);
-	connection = new ecse::Networking::Connection(asio::ip::udp::endpoint(asio::ip::udp::v4(), 7331), asio::ip::make_address("202.91.194.220"), 1337);
+
+	asio::ip::address_v4 target = asio::ip::make_address_v4("202.91.194.220");
+
+	connection = new ecse::Networking::Connection(asio::ip::udp::endpoint(asio::ip::udp::v4(), 7331), target, 1337);
 	
 	ecse::Networking::Packet pack1(ecse::Networking::PacketType::Connect);
 	pack1 << "Hello World!";
 	connection->Send(pack1);
 	connection->Flush();
 	
-	ecse::Networking::DiscoverMTU(202,91,194,220);
+	ecse::Networking::DiscoverMTU(target);
 	system("pause");
 
 
