@@ -64,8 +64,8 @@ project "Engine"
 	kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"
-	exceptionhandling "Off"
-	rtti "Off"
+	exceptionhandling "On"
+	rtti "On"
     targetname("%{prj.name}.%{cfg.buildcfg}")
 	files { "Engine/**.h", "Engine/**.cpp" }
 	staticruntime "off"
@@ -129,8 +129,8 @@ project "3D"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++17"
-    exceptionhandling "Off"
-    rtti "Off"
+    exceptionhandling "On"
+    rtti "On"
     files { "Demos/3D/**.h", "Demos/3D/**.cpp"}
 	dependson { "Engine"}
 	staticruntime "off"
@@ -169,8 +169,8 @@ project "PongServer"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++17"
-    exceptionhandling "Off"
-    rtti "Off"
+    exceptionhandling "On"
+    rtti "On"
     files { "Demos/PongServer/**.h", "Demos/PongServer/**.cpp"}
 	dependson { "Engine"}
 	staticruntime "off"
@@ -209,8 +209,8 @@ project "PongClient"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++17"
-    exceptionhandling "Off"
-    rtti "Off"
+    exceptionhandling "On"
+    rtti "On"
     files { "Demos/PongClient/**.h", "Demos/PongClient/**.cpp"}
 	dependson { "Engine"}
 	staticruntime "off"
@@ -258,8 +258,8 @@ project "bgfx"
 	kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"
-	exceptionhandling "Off"
-	rtti "Off"
+    exceptionhandling "On"
+    rtti "On"
 	defines "__STDC_FORMAT_MACROS"
 	files
 	{
@@ -300,8 +300,8 @@ project "bimg"
 	kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"
-	exceptionhandling "Off"
-	rtti "Off"
+    exceptionhandling "On"
+    rtti "On"
 	files
 	{
 		path.join(BIMG_DIR, "include/bimg/*.h"),
@@ -323,8 +323,8 @@ project "bx"
 	kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"
-	exceptionhandling "Off"
-	rtti "Off"
+    exceptionhandling "On"
+    rtti "On"
 	defines "__STDC_FORMAT_MACROS"
 	files
 	{
