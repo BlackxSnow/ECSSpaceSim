@@ -118,6 +118,14 @@ namespace Thera::Net
 		_Thread = new std::thread([&]() { _Context.run(); });
 	}
 
+	Connection::~Connection()
+	{
+		_Context.stop();
+		_Socket.close();
+		_Thread->join();
+		delete _Thread;
+	}
+
 #ifdef _WIN32
 	inline bool TestMTUOnce(int size, int& minMTU, int& maxMTU, HANDLE icmpHandle, IPAddr target, void* data, PIP_OPTION_INFORMATION options)
 	{

@@ -39,6 +39,7 @@ namespace Thera::Net
 		Connection(const asio::ip::udp::endpoint& local, const asio::ip::address& address, const asio::ip::port_type port);
 		Connection(const asio::ip::udp::endpoint& local, const asio::ip::udp::endpoint& endpoint);
 		Connection(const asio::ip::port_type& port);
+		~Connection();
 	};
 
 
