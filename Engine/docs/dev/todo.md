@@ -1,10 +1,8 @@
 # Macro (expand upon)
 - [ ] Physics (Find library, integrate)
-- [ ] Networking
 - [ ] C# interop
 - [ ] Interpreted interop?
 - [ ] Audio handling
-- [ ] Electron (?) UI integration
 
 # Input
 - [ ] [[Notes#Processors|Implement binding processors]]
@@ -18,16 +16,18 @@
 - [ ] [[Notes#^aa15e4|Gamepad bindings (Joystick / Controller)]]
 - [ ] (De)serialization from data format
 - [ ] Multi-window input handling
-- [ ] Develop input manager utility (Code generation?)
+- [ ] Develop input manager GUI utility (Code generation?)
 
 # Application
 - [ ] Multi-Window support
 - [ ] Determine Linux/OSX compatilities
 
-# Code Health
+# Code Health  / Configuration
 - [x] Remove CCX::Event string handles
 	- [x] Remove all references to string handles
 - [ ] Add thorough XML code documentation
+- [ ] Add / swap to CMake configuration
+- [ ] Further modularise engine
 
 # Graphics
 - [ ] Automatic runtime shader compilation
@@ -39,6 +39,7 @@
 	- [ ] Tonemapping
 - [ ] Multi-Camera support
 - [ ] Runtime modification / creation of meshes
+
 ## Lighting
 - [ ] Phong
 	- [ ] Diffuse
@@ -58,9 +59,29 @@
 		- [ ] Texel incremented movement
 		- [ ] Slope-scale depth bias
 
+# UI
+- [ ] Rudimentary ultralight integration
+- [ ] API (expand)
+- [ ] Ultralight GPU rendering
+
+# Networking
+- [ ] UDP
+	- [x] Functional implementation
+	- [ ] Packet split on MTU
+		- [x] MTU Discovery
+		- [ ] API to assign MTU (modify buffer size)
+	- [ ] Reliable non-sequenced transfer
+- [ ] TCP
+	- [x] Functional implementation
+	- [ ] TCP MTU Discovery
+	- [ ] Refactor source
+- [ ] Improved error handling and logging
+- [ ] High level 'bootstrap' wrapper
+
 # Misc
 - [ ] Add on-demand world transform validation
 	- [ ] Add parent and Transform `flecs::ref` members to WorldTransform
+- [ ] Configurable logging levels (ConsoleLogging.h)
 
 # Documentation
 - [ ] Finish Input manual
