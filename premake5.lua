@@ -59,6 +59,14 @@ function linkSysLibs()
 		links { "QuartzCore.framework", "Metal.framework", "Cocoa.framework", "IOKit.framework", "CoreVideo.framework" }
 end
 
+function linkUltralight()
+	filter "system:windows"
+		links { "AppCore", "Ultralight", "UltralightCore", "WebCore" }
+	
+	filter "*"
+		includedirs { "lib/include" }
+end
+
 project "Engine"
     location "Engine"
 	kind "StaticLib"
@@ -92,6 +100,7 @@ project "Engine"
         links {assimpLibName}
     filter "*"
     links { "bgfx", "bimg", "bx", "glfw", "flecs"}
+	linkUltralight()
 	filter "system:windows"
 		links { "iphlpapi.lib" }
 	linkSysLibs()
@@ -157,6 +166,7 @@ project "3D"
         linkDLLs( {assimpLibName})
     filter "*"
     links { "bgfx", "bimg", "bx", "glfw", "Engine", "flecs" }
+	linkUltralight()
     postbuildcommands
     {
         "{COPYDIR} \"%{prj.location}/Resources\" \"%{cfg.buildtarget.directory}/Resources\""
@@ -197,6 +207,7 @@ project "PongServer"
         linkDLLs( {assimpLibName})
     filter "*"
     links { "bgfx", "bimg", "bx", "glfw", "Engine", "flecs" }
+	linkUltralight()
     postbuildcommands
     {
         "{COPYDIR} \"%{prj.location}/Resources\" \"%{cfg.buildtarget.directory}/Resources\""
@@ -237,6 +248,7 @@ project "PongClient"
         linkDLLs( {assimpLibName})
     filter "*"
     links { "bgfx", "bimg", "bx", "glfw", "Engine", "flecs" }
+	linkUltralight()
     postbuildcommands
     {
         "{COPYDIR} \"%{prj.location}/Resources\" \"%{cfg.buildtarget.directory}/Resources\""
