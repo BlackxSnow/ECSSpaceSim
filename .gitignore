@@ -8,7 +8,7 @@
 **/bin
 
 *.obj
-!SpaceSim/Resources/*.obj
+!Demos/*/Resources/*.obj
 *.idb
 *.pdb
 
@@ -21,3 +21,4 @@ lib/assimps*.lib
 
 # Utilities
 .obsidian
+.log

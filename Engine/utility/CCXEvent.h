@@ -15,7 +15,6 @@ namespace CCX
 	class Event
 	{
 	public:
-		static int a;
 		typedef std::function<void(Types...)> Registree;
 		typedef Registree* Handle;
 	private:
