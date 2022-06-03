@@ -1,13 +1,13 @@
 #include "Rendering.h"
 
+#include "../UI/UI.h"
+
 #include <bgfx/bgfx.h>
 #include <glm/gtc/type_ptr.hpp>
 
 flecs::query<const Thera::Rendering::Renderer, const Thera::Core::WorldTransform*> BuildQuery(flecs::entity camEntity, Thera::Core::MaskBehaviour mask)
 {
 	flecs::world* world = Thera::GetWorld();
-
-	auto def = world->is_deferred();
 
 	flecs::query_builder query = world->query_builder<const Thera::Rendering::Renderer, const Thera::Core::WorldTransform*>();
 
@@ -24,9 +24,9 @@ flecs::query<const Thera::Rendering::Renderer, const Thera::Core::WorldTransform
 	return query.build();
 }
 
-void Thera::Rendering::ValidateCameraQueries(flecs::iter& iter, const Camera* cam, Mask* mask)
+void Thera::Rendering::ValidateCameraQueries(flecs::iter& iter, const Camera* cam, CachedRendererMask* mask)
 {
-	if (!iter.changed() && mask->lastMask == cam->masking && mask->maskQuery)
+	if (mask->lastMask == cam->masking && mask->maskQuery)
 	{
 		iter.skip();
 		return;
@@ -72,7 +72,7 @@ void RenderSingleCamera(flecs::iter& iter, const Thera::Rendering::Renderer* ren
 	}
 }
 
-void Thera::Rendering::RenderCameraFinal(flecs::iter& iter, const Camera* cam, const Thera::Core::WorldTransform* camTransform, const Mask* mask)
+void Thera::Rendering::RenderCameraFinal(flecs::iter& iter, const Camera* cam, const Thera::Core::WorldTransform* camTransform, const CachedRendererMask* mask)
 {
 	if (!cam->isEnabled)
 	{

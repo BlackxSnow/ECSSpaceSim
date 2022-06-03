@@ -247,6 +247,7 @@ project "PongClient"
         assimpLibName = "assimp-vc142-mt"
         linkDLLs( {assimpLibName})
     filter "*"
+	linkDLLs({"AppCore", "Ultralight", "UltralightCore", "WebCore"})
     links { "bgfx", "bimg", "bx", "glfw", "Engine", "flecs" }
 	linkUltralight()
     postbuildcommands
@@ -254,6 +255,7 @@ project "PongClient"
         "{COPYDIR} \"%{prj.location}/Resources\" \"%{cfg.buildtarget.directory}/Resources\""
     }
     linkSysLibs()
+	setBxCompat()
 
 group ("Dependencies")
 

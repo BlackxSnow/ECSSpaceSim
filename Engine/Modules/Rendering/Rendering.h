@@ -34,7 +34,7 @@ namespace Thera
 			Material material;
 		};
 
-		struct Mask
+		struct CachedRendererMask
 		{
 			Thera::Core::MaskBehaviour lastMask = (Thera::Core::MaskBehaviour)-1;
 			flecs::query<const Thera::Rendering::Renderer, const Thera::Core::WorldTransform*> maskQuery;
@@ -58,10 +58,10 @@ namespace Thera
 			bgfx::ViewId target;
 		};
 
-		static void RenderCameraFinal(flecs::iter& iter, const Camera* cam, const Thera::Core::WorldTransform* camTransform, const Mask* mask);
+		static void RenderCameraFinal(flecs::iter& iter, const Camera* cam, const Thera::Core::WorldTransform* camTransform, const CachedRendererMask* mask);
 		
-		inline static flecs::query<const Camera, Mask> maskValidationQuery;
-		static void ValidateCameraQueries(flecs::iter& iter, const Camera* cam, Mask* mask);
+		inline static flecs::query<const Camera, CachedRendererMask> _MaskValidationQuery;
+		static void ValidateCameraQueries(flecs::iter& iter, const Camera* cam, CachedRendererMask* mask);
 
 		Rendering(flecs::world& world)
 		{
@@ -76,13 +76,13 @@ namespace Thera
 				.member<float, flecs::units::angle::Radians>("fovRad")
 				.member<float>("Ortho size", 2)
 				.add(flecs::With, world.id<Thera::Core::Transform>())
-				.add(flecs::With, world.id<Mask>());
+				.add(flecs::With, world.id<CachedRendererMask>());
 
-			world.system<const Camera, const Thera::Core::WorldTransform, const Mask>("RenderCameraFinal")
+			world.system<const Camera, const Thera::Core::WorldTransform, const CachedRendererMask>("RenderCameraFinal")
 				.iter(RenderCameraFinal);
 
-			maskValidationQuery = world.query_builder<const Camera, Mask>().build();
-			OnFinalValidate.Register([]() {maskValidationQuery.iter(ValidateCameraQueries); });
+			_MaskValidationQuery = world.query_builder<const Camera, CachedRendererMask>().build();
+			OnFinalValidate.Register([]() {_MaskValidationQuery.iter(ValidateCameraQueries); });
 		}
 	};
 	

@@ -41,7 +41,8 @@ std::shared_ptr<Thera::MeshData> Thera::LoadMesh(const std::string& path)
 	size_t indexCount = mesh->mNumFaces * static_cast<size_t>(3);
 	if (indexCount > std::numeric_limits<uint16_t>::max())
 	{
-		LogWarning("Unable to load mesh - index count exceeds uint16 limit!")
+		LogWarning("Unable to load mesh - index count exceeds uint16 limit!");
+		return nullptr;
 	}
 
 	data->Indices.reserve(mesh->mNumFaces * static_cast<size_t>(3));

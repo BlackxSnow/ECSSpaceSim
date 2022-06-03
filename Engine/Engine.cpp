@@ -22,6 +22,7 @@
 #include "Modules/Core/Core.h"
 #include "Modules/Rendering/Rendering.h"
 #include "Modules/Input/Input.h"
+#include "Modules/UI/UI.h"
 
 int Thera::WindowWidth = 1024;
 int Thera::WindowHeight = 768;
@@ -128,6 +129,7 @@ void Thera::Init()
 	World->import<flecs::units>();
 	World->import<Thera::Core>();
 	World->import<Thera::Rendering>();
+	World->import<Thera::UI::Module>();
 
 	Input::Initialise();
 
