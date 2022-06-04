@@ -8,12 +8,14 @@ std::unordered_map<std::string, std::unique_ptr<Thera::Input::Action>> actions;
 void Thera::Input::GLFWKeyCallback(GLFWwindow* window, int glfwKey, int scanCode, int action, int mods)
 {
 	Key key = GLFWInputToKey(glfwKey);
+	RawKeyInputReceived.Invoke(window, glfwKey, scanCode, action, mods);
 	bindings[(int)key].HandleEvent(window, action, mods);
 }
 
 void Thera::Input::GLFWMouseButtonCallback(GLFWwindow* window, int glfwMouse, int action, int mods)
 {
 	Mouse mouse = GLFWInputToMouse(glfwMouse);
+	RawMouseInputReceived.Invoke(window, glfwMouse, action, mods);
 	bindings[(int)mouse].HandleEvent(window, action, mods);
 }
 
