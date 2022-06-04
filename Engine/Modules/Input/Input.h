@@ -45,11 +45,21 @@ namespace Thera
 		void GLFWMouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 
 		/// <summary>
-		/// Invoked with raw GLFW input data on key input event.
+		/// Invoked with raw GLFW input data on key input event.<para/>
+		/// 
+		/// <c>GLFWWindow*</c>: The window that received the input event.<para/>
+		/// <c>int</c>: The button that was pressed or released.<para/>
+		/// <c>int</c>: The action that was performed.<para/>
+		/// <c>int</c>: The modifier keys that were pressed.<para/>
 		/// </summary>
 		inline CCX::Event<GLFWwindow*, int, int, int, int> RawKeyInputReceived;
 		/// <summary>
-		/// Invoked with raw GLFW input data on mouse button input event.
+		/// Invoked with raw GLFW input data on mouse button input event.<para/>
+		/// 
+		/// GLFWWindow*: The window that received the input event.<para/>
+		/// int: The button that was pressed or released.<para/>
+		/// int: The action that was performed.<para/>
+		/// int: The modifier keys that were pressed.<para/>
 		/// </summary>
 		inline CCX::Event<GLFWwindow*, int, int, int> RawMouseInputReceived;
 
