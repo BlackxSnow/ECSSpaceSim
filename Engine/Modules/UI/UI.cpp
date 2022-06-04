@@ -30,6 +30,8 @@ namespace Thera::UI
 			iter.skip();
 			return;
 		}
+
+		if (maskCache->maskQuery) { maskCache->maskQuery.destruct(); }
 		maskCache->maskQuery = BuildUIQuery(iter.entity(0), camera->masking);
 		maskCache->lastMask = camera->masking;
 	}

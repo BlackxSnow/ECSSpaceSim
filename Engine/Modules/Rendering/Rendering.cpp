@@ -31,7 +31,7 @@ void Thera::Rendering::ValidateCameraQueries(flecs::iter& iter, const Camera* ca
 		iter.skip();
 		return;
 	}
-
+	if (mask->maskQuery) { mask->maskQuery.destruct(); }
 	mask->maskQuery = BuildQuery(iter.entity(0), cam->masking);
 	mask->lastMask = cam->masking;
 }
