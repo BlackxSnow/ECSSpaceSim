@@ -9,7 +9,7 @@
 ///
 /// Website: <http://ultralig.ht>
 ///
-/// Copyright (C) 2020 Ultralight, Inc. All rights reserved.
+/// Copyright (C) 2022 Ultralight, Inc. All rights reserved.
 ///
 #pragma once
 
@@ -61,10 +61,10 @@
 
 #endif
 
-#define ULTRALIGHT_VERSION "1.2.1"
+#define ULTRALIGHT_VERSION "1.3.0"
 #define ULTRALIGHT_VERSION_MAJOR 1
-#define ULTRALIGHT_VERSION_MINOR 2
-#define ULTRALIGHT_VERSION_PATCH 1
+#define ULTRALIGHT_VERSION_MINOR 3
+#define ULTRALIGHT_VERSION_PATCH 0
 
 #ifdef __cplusplus
 extern "C" {
@@ -88,8 +88,7 @@ UExport uint32_t UltralightVersionPatch();
 ///
 /// Ultralight is a next-generation HTML renderer for desktop apps and games.
 ///
-/// If this is your first time exploring the API, we recommend
-/// starting with ultralight::Renderer and ultralight::View.
+/// If this is your first time exploring the API, we recommend starting with Renderer.h and View.h.
 ///
 ///
 /// @section usefullinks_sec Useful Links
@@ -99,5 +98,5 @@ UExport uint32_t UltralightVersionPatch();
 /// - GitHub:   <https://github.com/ultralight-ux/ultralight> -- Report issues and browse code
 ///
 /// @section copyright_sec Copyright
-/// Documentation is Copyright (C) 2020 Ultralight, Inc. All rights reserved.
+/// Documentation is Copyright (C) 2021 Ultralight, Inc. All rights reserved.
 ///
