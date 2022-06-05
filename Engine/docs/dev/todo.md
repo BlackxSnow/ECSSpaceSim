@@ -60,9 +60,10 @@
 		- [ ] Slope-scale depth bias
 
 # UI
-- [ ] Rudimentary ultralight integration
+- [ ] Rudimentary Chromium Embedded Framework (CEF) integration
+- [ ] GPU accelerated OSR
 - [ ] API (expand)
-- [ ] Ultralight GPU rendering
+- [x] Integrate IMGUI for debug
 
 # Networking
 - [ ] UDP
