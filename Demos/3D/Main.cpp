@@ -12,6 +12,10 @@
 
 #include <filesystem>
 #include <Modules/Rendering/Rendering.h>
+#include <Modules/UI/UI.h>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
 int main()
 {
@@ -19,6 +23,13 @@ int main()
 	Thera::OnInit.Register([]() { Thera::GetWorld()->import<sim::Controls>(); });
 	Thera::Init();
 	sim::BuildControls();
+
+	//auto img = imageLoad("./Resources/test.png", bgfx::TextureFormat::RGBA32F);
+	int width, height, channels;
+	auto img = stbi_load("./Resources/test.png", &width, &height, &channels, 0);
+
+	flecs::entity texTest = Thera::GetWorld()->entity();
+	texTest.set<Thera::UI::ScreenRenderer>({ bgfx::createTexture2D(width, height, false, 1, bgfx::TextureFormat::RGB8, 0, bgfx::makeRef(img, width * height * channels))});
 
 	auto prev = Thera::GetWorld()->set_scope(*Thera::GetGameRoot());
 

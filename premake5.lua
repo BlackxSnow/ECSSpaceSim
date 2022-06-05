@@ -50,6 +50,12 @@ function linkDLLs(values)
     end
 end
 
+function copyDLLs(values)
+    for i, value in ipairs(values) do
+        postbuildcommands { "{COPYFILE} \"%{wks.location}/lib/dll/" .. value .. ".dll\" \"%{cfg.buildtarget.directory}/" .. value .. ".dll\"" }
+    end
+end
+
 function linkSysLibs()
 	filter "system:windows"
 		links { "gdi32", "kernel32", "psapi"}
@@ -57,14 +63,6 @@ function linkSysLibs()
 		links { "dl", "GL", "pthread", "X11" }
 	filter "system:macosx"
 		links { "QuartzCore.framework", "Metal.framework", "Cocoa.framework", "IOKit.framework", "CoreVideo.framework" }
-end
-
-function linkUltralight()
-	filter "system:windows"
-		links { "AppCore", "Ultralight", "UltralightCore", "WebCore" }
-	
-	filter "*"
-		includedirs { "lib/include" }
 end
 
 project "Engine"
@@ -89,7 +87,8 @@ project "Engine"
         path.join(ASSIMP_DIR, "include"),
         path.join(ASSIMP_DIR, "build/x64/include/assimp"),
 		path.join(FLECS_DIR, "include"),
-		path.join(ASIO_DIR, "asio/include")
+		path.join(ASIO_DIR, "asio/include"),
+		"lib/include"
 	}
     libdirs { "lib" }
     filter "configurations:Debug"
@@ -100,7 +99,6 @@ project "Engine"
         links {assimpLibName}
     filter "*"
     links { "bgfx", "bimg", "bx", "glfw", "flecs"}
-	linkUltralight()
 	filter "system:windows"
 		links { "iphlpapi.lib" }
 	linkSysLibs()
@@ -155,7 +153,8 @@ project "3D"
         path.join(ASSIMP_DIR, "build/x64/include/assimp"),
 		path.join(FLECS_DIR, "include"),
 		path.join(ASIO_DIR, "asio/include"),
-        "Engine"
+        "Engine",
+		"lib/include"
 	}
     libdirs { "lib" }
     filter "configurations:Debug"
@@ -166,7 +165,6 @@ project "3D"
         linkDLLs( {assimpLibName})
     filter "*"
     links { "bgfx", "bimg", "bx", "glfw", "Engine", "flecs" }
-	linkUltralight()
     postbuildcommands
     {
         "{COPYDIR} \"%{prj.location}/Resources\" \"%{cfg.buildtarget.directory}/Resources\""
@@ -196,7 +194,8 @@ project "PongServer"
         path.join(ASSIMP_DIR, "build/x64/include/assimp"),
 		path.join(FLECS_DIR, "include"),
 		path.join(ASIO_DIR, "asio/include"),
-        "Engine"
+        "Engine",
+		"lib/include"
 	}
     libdirs { "lib" }
     filter "configurations:Debug"
@@ -207,7 +206,6 @@ project "PongServer"
         linkDLLs( {assimpLibName})
     filter "*"
     links { "bgfx", "bimg", "bx", "glfw", "Engine", "flecs" }
-	linkUltralight()
     postbuildcommands
     {
         "{COPYDIR} \"%{prj.location}/Resources\" \"%{cfg.buildtarget.directory}/Resources\""
@@ -237,7 +235,8 @@ project "PongClient"
         path.join(ASSIMP_DIR, "build/x64/include/assimp"),
 		path.join(FLECS_DIR, "include"),
 		path.join(ASIO_DIR, "asio/include"),
-        "Engine"
+        "Engine",
+		"lib/include"
 	}
     libdirs { "lib" }
     filter "configurations:Debug"
@@ -247,9 +246,7 @@ project "PongClient"
         assimpLibName = "assimp-vc142-mt"
         linkDLLs( {assimpLibName})
     filter "*"
-	linkDLLs({"AppCore", "Ultralight", "UltralightCore", "WebCore"})
     links { "bgfx", "bimg", "bx", "glfw", "Engine", "flecs" }
-	linkUltralight()
     postbuildcommands
     {
         "{COPYDIR} \"%{prj.location}/Resources\" \"%{cfg.buildtarget.directory}/Resources\""

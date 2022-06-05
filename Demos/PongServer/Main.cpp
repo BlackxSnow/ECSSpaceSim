@@ -4,28 +4,26 @@
 #include <vector>
 #include <iostream>
 
+enum class PacketType
+{
+	Connect
+};
+
 std::list<Thera::Net::Connection> _Clients;
 std::list<std::shared_ptr<Thera::Net::tcp::Connection>> _TCPClients;
 
-void HandleConnect(const asio::ip::udp::endpoint& source, Thera::Net::Packet* packet)
-{
-	char helloworld[13];
-	*packet >> helloworld;
-	std::cout << "Received: " << helloworld << std::endl;
-	auto& con = _Clients.emplace_back(asio::ip::udp::endpoint(asio::ip::make_address("192.168.1.108"), 1337), source);
-	con.Send(Thera::Net::Packet(Thera::Net::PacketType::Connect));
-	con.Flush();
-}
+std::string motd;
 
 void HandleConnectTCP(Thera::Net::tcp::Connection& source, Thera::Net::Packet* packet)
 {
-	char helloworld[13];
-	*packet >> helloworld;
-	LogInfo((std::ostringstream() << "TCP received: " << helloworld).str());
+	auto reader = packet->GetReader();
+	auto name = reader.Read<std::string>();
 	
-	Thera::Net::Packet pack(Thera::Net::PacketType::Connect);
-	pack << "Hello World!";
-	source.Send(pack);
+	LogInfo("Client connected! Name: " + name);
+	
+	Thera::Net::Packet motdResponse(Thera::Net::PacketType::Connect);
+	motdResponse.Write<std::string>(motd);
+	source.Send(motdResponse);
 	source.Flush();
 }
 
@@ -35,15 +33,16 @@ void TCPOnAccept(std::shared_ptr<Thera::Net::tcp::Connection> connection)
 	_TCPClients.push_back(connection);
 }
 
-void test(int a) {};
-
 int main()
 {
 	try
 	{
-		Thera::Net::RegisterPacket(Thera::Net::PacketType::Connect, HandleConnect);
+		std::cout << "Enter server MOTD" << std::endl;
+		std::getline(std::cin, motd);
+
 		Thera::Net::tcp::RegisterPacket(Thera::Net::PacketType::Connect, HandleConnectTCP);
-		auto server = Thera::Net::Connection(1337);
+		
+		Thera::Net::Connection udpListener(1337);
 		Thera::Net::tcp::Listener tcpListener(1337, TCPOnAccept);
 
 		while (true)
@@ -55,7 +54,6 @@ int main()
 	catch (const std::exception& e)
 	{
 		std::cerr << e.what() << std::endl;
-		
 	}
 	system("pause");
 	return 0;

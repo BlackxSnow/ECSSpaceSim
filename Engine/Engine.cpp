@@ -112,6 +112,7 @@ static void HandleWindowResize(GLFWwindow* window, const bgfx::ViewId& clearView
 	{
 		bgfx::reset((uint32_t)Thera::WindowWidth, (uint32_t)Thera::WindowHeight, BGFX_RESET_VSYNC);
 		bgfx::setViewRect(clearView, 0, 0, bgfx::BackbufferRatio::Equal);
+		Thera::WindowResized.Invoke(Thera::WindowWidth, Thera::WindowHeight);
 	}
 }
 

@@ -21,4 +21,4 @@ lib/assimps*.lib
 
 # Utilities
 .obsidian
-.log
+*.log

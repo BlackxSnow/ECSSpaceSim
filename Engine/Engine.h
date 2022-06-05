@@ -22,6 +22,9 @@ namespace Thera
 	extern int WindowWidth;
 	extern int WindowHeight;
 	
+	// This will need to be changed when multiple windows are implemented.
+	inline CCX::Event<int, int> WindowResized;
+
 	const std::vector<GLFWwindow*>& GetWindows();
 	flecs::world* GetWorld();
 	flecs::entity* GetGameRoot();
