@@ -7,8 +7,8 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+
+#include <imgui.h>
 
 enum class PacketType
 {
@@ -28,71 +28,19 @@ int main()
 	
 	Thera::Init();
 
-	//ultralight::Config config;
-	//auto& platform = ultralight::Platform::instance();
-	//platform.set_config(config);
+	auto world = Thera::GetWorld();
 
-	//platform.set_font_loader(ultralight::GetPlatformFontLoader());
-	//platform.set_file_system(ultralight::GetPlatformFileSystem("."));
-	//platform.set_logger(ultralight::GetDefaultLogger("ultralight.log"));
+	ImGui::StyleColorsDark();
 
-	//auto renderer = ultralight::Renderer::Create();
-	//ultralight::ViewConfig vConfig;
-	//vConfig.is_transparent = true;
-	//auto view = renderer->CreateView(Thera::WindowWidth, Thera::WindowHeight, vConfig, nullptr);
-	//
-	//std::ifstream htmlFile("./Resources/UI/Pong.html");
-	//std::stringstream html;
-	//html << htmlFile.rdbuf();
-	//auto htmlstr = html.str();
-
-	//view->LoadHTML(ultralight::String(htmlstr.c_str(), htmlstr.size()));
-	////view->LoadURL("https://calvin.soueid.io/");
-	//
-	//view->Focus();
-	//renderer->Update();
-	//renderer->Render();
-	//auto surface = view->surface();
-	//auto bitmap = static_cast<ultralight::BitmapSurface*>(surface)->bitmap();
-
-	//auto mem = bgfx::copy(bitmap->LockPixels(), bitmap->size());
-	//auto tex = bgfx::createTexture2D(bitmap->width(), bitmap->height(), false, 1, bgfx::TextureFormat::BGRA8, 0);
-	//bgfx::updateTexture2D(tex, 0, 0, 0, 0, bitmap->width(), bitmap->height(), mem);
-	//bitmap->UnlockPixels();
-
-	//Thera::Input::RawMouseInputReceived.Register([view](GLFWwindow* window, int button, int action, int mods) {
-	//	auto ulMouse = Thera::UI::Input::TheraToUL(Thera::Input::GLFWInputToMouse(button));
-	//	ultralight::MouseEvent mv{};
-	//	mv.type = action == GLFW_PRESS ? ultralight::MouseEvent::kType_MouseDown : ultralight::MouseEvent::kType_MouseUp;
-	//	mv.button = ulMouse;
-	//	mv.x = Thera::Input::mousePosition.x;
-	//	mv.y = Thera::Input::mousePosition.y;
-	//	view->FireMouseEvent(mv);
-	//});
-
-	//Thera::OnFinalValidate.Register([view]() { 
-	//	ultralight::MouseEvent mv{};
-	//	mv.type = ultralight::MouseEvent::kType_MouseMoved;
-	//	mv.x = Thera::Input::mousePosition.x;
-	//	mv.y = Thera::Input::mousePosition.y;
-	//	mv.button = ultralight::MouseEvent::Button::kButton_Left;
-	//	view->FireMouseEvent(mv);
-	//});
-
-	//Thera::OnFinalValidate.Register([renderer, bitmap, tex, view]()
-	//{
-	//	renderer->Update();
-	//	renderer->Render();
-	//	auto bitmapMem = bgfx::copy(bitmap->LockPixels(), bitmap->size());
-	//	bgfx::updateTexture2D(tex, 0, 0, 0, 0, bitmap->width(), bitmap->height(), bitmapMem);
-	//	bitmap->UnlockPixels();
-	//});
-
-	flecs::entity cam = Thera::GetWorld()->entity();
+	flecs::entity cam = world->entity();
 	cam.set<Thera::Rendering::Camera>({ Thera::Rendering::CameraView::Perspective, Thera::Core::MaskBehaviour::None, 0.1f, 100.0f, 1.0472f });
 
-	//flecs::entity texTest = Thera::GetWorld()->entity();
-	//texTest.set<Thera::UI::ScreenRenderer>({ tex });
+	world->system().kind(flecs::OnRender).iter([](flecs::iter& iter) {
+		ImGui::Begin("Win1");
+
+		ImGui::Text("Test Text");
+		ImGui::End();
+	});
 
 	Thera::Loop(0, nullptr);
 

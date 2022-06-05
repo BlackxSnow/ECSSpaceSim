@@ -22,3 +22,6 @@
 [submodule "lib/src/asio"]
 	path = lib/src/asio
 	url = git@github.com:chriskohlhoff/asio.git
+[submodule "lib/src/imgui"]
+	path = lib/src/imgui
+	url = git@github.com:ocornut/imgui.git

@@ -21,10 +21,8 @@ void Thera::Input::GLFWMouseButtonCallback(GLFWwindow* window, int glfwMouse, in
 
 void Thera::Input::Initialise()
 {
-	OnInit.Register([]() {
-		glfwSetKeyCallback(Thera::GetWindows()[0], Thera::Input::GLFWKeyCallback); 
-		glfwSetMouseButtonCallback(Thera::GetWindows()[0], Thera::Input::GLFWMouseButtonCallback);
-	});
+	glfwSetKeyCallback(Thera::GetWindows()[0], Thera::Input::GLFWKeyCallback);
+	glfwSetMouseButtonCallback(Thera::GetWindows()[0], Thera::Input::GLFWMouseButtonCallback);
 	UpdateMouse();
 	OnInputPoll.Register(UpdateMouse);
 

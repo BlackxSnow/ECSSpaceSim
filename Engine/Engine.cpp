@@ -23,6 +23,7 @@
 #include "Modules/Rendering/Rendering.h"
 #include "Modules/Input/Input.h"
 #include "Modules/UI/UI.h"
+#include "Modules/IMGUI/IMGUI.h"
 
 int Thera::WindowWidth = 1024;
 int Thera::WindowHeight = 768;
@@ -127,18 +128,9 @@ void Thera::Init()
 	World = new flecs::world();
 	GameRoot = World->entity("Game");
 
-	World->import<flecs::units>();
-	World->import<Thera::Core>();
-	World->import<Thera::Rendering>();
-	World->import<Thera::UI::Module>();
-
-	Input::Initialise();
-
 	flecs::PreRender = World->entity();
 	flecs::OnRender = World->entity();
 	flecs::PostRender = World->entity();
-
-	OnInit.Invoke();
 
 	auto pipeline = World->pipeline("ECSEPipeline");
 	pipeline.add(flecs::PreFrame);
@@ -147,6 +139,17 @@ void Thera::Init()
 	pipeline.add(flecs::OnRender);
 	pipeline.add(flecs::PostRender);
 	pipeline.add(flecs::PostFrame);
+
+	World->set_pipeline(pipeline);
+
+	World->import<flecs::units>();
+	World->import<Thera::Core>();
+	World->import<Thera::Rendering>();
+	World->import<Thera::UI::Module>();
+	World->import<Thera::IMGUI::Module>();
+
+	Input::Initialise();
+	OnInit.Invoke();
 
 	World->set<flecs::rest::Rest>({});
 }

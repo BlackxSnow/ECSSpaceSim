@@ -8,6 +8,7 @@ local GLM_DIR = path.join(libDir, "glm")
 local ASSIMP_DIR = path.join(libDir, "assimp")
 local FLECS_DIR = path.join(libDir, "flecs")
 local ASIO_DIR = path.join(libDir, "asio")
+local IMGUI_DIR = path.join(libDir, "imgui")
 
 solution "TheraEngine"
 	startproject "3D"
@@ -88,6 +89,7 @@ project "Engine"
         path.join(ASSIMP_DIR, "build/x64/include/assimp"),
 		path.join(FLECS_DIR, "include"),
 		path.join(ASIO_DIR, "asio/include"),
+		IMGUI_DIR,
 		"lib/include"
 	}
     libdirs { "lib" }
@@ -98,7 +100,7 @@ project "Engine"
         assimpLibName = "assimp-vc142-mt"
         links {assimpLibName}
     filter "*"
-    links { "bgfx", "bimg", "bx", "glfw", "flecs"}
+    links { "bgfx", "bimg", "bx", "glfw", "flecs", "imgui"}
 	filter "system:windows"
 		links { "iphlpapi.lib" }
 	linkSysLibs()
@@ -153,6 +155,7 @@ project "3D"
         path.join(ASSIMP_DIR, "build/x64/include/assimp"),
 		path.join(FLECS_DIR, "include"),
 		path.join(ASIO_DIR, "asio/include"),
+		IMGUI_DIR,
         "Engine",
 		"lib/include"
 	}
@@ -164,7 +167,7 @@ project "3D"
         assimpLibName = "assimp-vc142-mt"
         linkDLLs( {assimpLibName})
     filter "*"
-    links { "bgfx", "bimg", "bx", "glfw", "Engine", "flecs" }
+    links { "bgfx", "bimg", "bx", "glfw", "Engine", "flecs", "imgui" }
     postbuildcommands
     {
         "{COPYDIR} \"%{prj.location}/Resources\" \"%{cfg.buildtarget.directory}/Resources\""
@@ -194,6 +197,7 @@ project "PongServer"
         path.join(ASSIMP_DIR, "build/x64/include/assimp"),
 		path.join(FLECS_DIR, "include"),
 		path.join(ASIO_DIR, "asio/include"),
+		IMGUI_DIR,
         "Engine",
 		"lib/include"
 	}
@@ -205,7 +209,7 @@ project "PongServer"
         assimpLibName = "assimp-vc142-mt"
         linkDLLs( {assimpLibName})
     filter "*"
-    links { "bgfx", "bimg", "bx", "glfw", "Engine", "flecs" }
+    links { "bgfx", "bimg", "bx", "glfw", "Engine", "flecs", "imgui" }
     postbuildcommands
     {
         "{COPYDIR} \"%{prj.location}/Resources\" \"%{cfg.buildtarget.directory}/Resources\""
@@ -235,6 +239,7 @@ project "PongClient"
         path.join(ASSIMP_DIR, "build/x64/include/assimp"),
 		path.join(FLECS_DIR, "include"),
 		path.join(ASIO_DIR, "asio/include"),
+		IMGUI_DIR,
         "Engine",
 		"lib/include"
 	}
@@ -246,7 +251,7 @@ project "PongClient"
         assimpLibName = "assimp-vc142-mt"
         linkDLLs( {assimpLibName})
     filter "*"
-    links { "bgfx", "bimg", "bx", "glfw", "Engine", "flecs" }
+    links { "bgfx", "bimg", "bx", "glfw", "Engine", "flecs", "imgui" }
     postbuildcommands
     {
         "{COPYDIR} \"%{prj.location}/Resources\" \"%{cfg.buildtarget.directory}/Resources\""
@@ -430,3 +435,14 @@ project "flecs"
 		path.join(FLECS_DIR, "include/**.hpp")
 	}
 	includedirs { path.join(FLECS_DIR, "include") }
+
+project "imgui"
+	kind "StaticLib"
+	language "C++"
+	files 
+	{
+		path.join(IMGUI_DIR, "imgui*.h"),
+		path.join(IMGUI_DIR, "imgui*.cpp"),
+		path.join(IMGUI_DIR, "backends/imgui_impl_glfw.*")
+	}
+	includedirs { IMGUI_DIR, path.join(GLFW_DIR, "include")}
