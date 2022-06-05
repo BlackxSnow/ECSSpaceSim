@@ -25,6 +25,9 @@
 #include "Modules/UI/UI.h"
 #include "Modules/IMGUI/IMGUI.h"
 
+#include <flecs/addons/rest.h>
+#include <flecs/addons/monitor.h>
+
 int Thera::WindowWidth = 1024;
 int Thera::WindowHeight = 768;
 
@@ -151,7 +154,8 @@ void Thera::Init()
 	Input::Initialise();
 	OnInit.Invoke();
 
-	World->set<flecs::rest::Rest>({});
+	World->set<flecs::Rest>({});
+	World->import<flecs::monitor>();
 }
 
 void Thera::TestInit()
