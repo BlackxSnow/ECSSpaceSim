@@ -1,10 +1,10 @@
 **/bgfx_shader.sh linguist-vendored
 **/bgfx_compute.sh linguist-vendored
 
-lib/include/**/* linguist-vendored
+lib/include/** linguist-vendored
 
 EngineTests/pch.* linguist-generated
-Engine/Modules/IMGUI/Internal/* linguist-vendored
+Engine/src/modules/imgui/internal/* linguist-vendored
 
 *.sh linguist-language=GLSL
 
