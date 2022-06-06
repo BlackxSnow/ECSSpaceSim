@@ -65,15 +65,21 @@ namespace Thera::Net
 		void GetBuffer(OUT std::vector<asio::const_buffer>& addTo);
 
 		void Write(const void* data, size_t dataSize);
-		template<typename T>
+		template<typename T, CCX::if_not_t<std::is_standard_layout_v<T>> = 0>
 		void Write(const T data)
 		{
 			CCX::Serialise<T, Packet>(data, *this);
 		}
+		template<typename T, CCX::if_t<std::is_standard_layout_v<T>> = 0>
+		void Write(const T data)
+		{
+			*this << data;
+		}
+		
 		CCX::MemoryReader GetReader();
 
 		template<typename T>
-		friend Packet& operator<<(Packet& packet, T& data)
+		friend Packet& operator<<(Packet& packet, const T& data)
 		{
 			static_assert(std::is_standard_layout_v<T>, "Data is not trivial.");
 
