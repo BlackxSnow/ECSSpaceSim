@@ -27,15 +27,20 @@ namespace Thera::Net::tcp
 		void Send(Packet& packet);
 		void Flush();
 
-		Connection(const asio::ip::tcp::endpoint& local, const asio::ip::address& address, const asio::ip::port_type port) : _Socket(_Context), _ReceiveBuffer(1024)
+		Connection(const asio::ip::tcp::endpoint& local, const asio::ip::address& address, const asio::ip::port_type port, asio::error_code& error) 
+			: _Socket(_Context), _ReceiveBuffer(1024), _Thread(nullptr)
 		{
 			asio::ip::tcp::endpoint endpoint = *asio::ip::tcp::resolver(_Context).resolve(asio::ip::tcp::endpoint(address, port)).begin();
 			
-			_Socket.open(endpoint.protocol());
-			_Socket.bind(local);
-			_Socket.connect(endpoint);
+			_Socket.open(endpoint.protocol(), error);
+			if (error) return;
+			_Socket.bind(local, error);
+			if (error) return;
+			_Socket.connect(endpoint, error);
+			if (error) return;
 			
-			_Endpoint = _Socket.remote_endpoint();
+			_Endpoint = _Socket.remote_endpoint(error);
+			if (error) return;
 
 			Listen();
 			_Thread = new std::thread([&]() { _Context.run(); });
@@ -58,8 +63,11 @@ namespace Thera::Net::tcp
 			_Socket.cancel();
 			_Context.stop();
 			_Socket.close();
-			_Thread->join();
-			delete _Thread;
+			if (_Thread)
+			{
+				_Thread->join();
+				delete _Thread;
+			}
 		}
 	};
 
