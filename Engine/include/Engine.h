@@ -26,6 +26,7 @@ namespace Thera
 	inline CCX::Event<int, int> WindowResized;
 
 	const std::vector<GLFWwindow*>& GetWindows();
+	std::vector<GLFWwindow*>& GetWindowsMutable();
 	flecs::world* GetWorld();
 	flecs::entity* GetGameRoot();
 

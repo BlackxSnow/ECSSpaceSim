@@ -52,6 +52,10 @@ const std::vector<GLFWwindow*>& Thera::GetWindows()
 {
 	return Windows;
 }
+std::vector<GLFWwindow*>& Thera::GetWindowsMutable()
+{
+	return Windows;
+}
 flecs::world* Thera::GetWorld()
 {
 	return World;
