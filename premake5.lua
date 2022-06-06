@@ -74,7 +74,7 @@ project "Engine"
 	exceptionhandling "On"
 	rtti "On"
     targetname("%{prj.name}.%{cfg.buildcfg}")
-	files { "Engine/**.h", "Engine/**.cpp" }
+	files { "Engine/include/**.h", "Engine/src/**.cpp" }
 	staticruntime "off"
 	defines { "flecs_STATIC" }
 	buildoptions { "/permissive-"}
@@ -90,7 +90,8 @@ project "Engine"
 		path.join(FLECS_DIR, "include"),
 		path.join(ASIO_DIR, "asio/include"),
 		IMGUI_DIR,
-		"lib/include"
+		"lib/include",
+		"Engine/include"
 	}
     libdirs { "lib" }
     filter "configurations:Debug"
@@ -156,7 +157,7 @@ project "3D"
 		path.join(FLECS_DIR, "include"),
 		path.join(ASIO_DIR, "asio/include"),
 		IMGUI_DIR,
-        "Engine",
+        "Engine/include",
 		"lib/include"
 	}
     libdirs { "lib" }
@@ -198,7 +199,7 @@ project "PongServer"
 		path.join(FLECS_DIR, "include"),
 		path.join(ASIO_DIR, "asio/include"),
 		IMGUI_DIR,
-        "Engine",
+        "Engine/include",
 		"lib/include"
 	}
     libdirs { "lib" }
@@ -240,7 +241,7 @@ project "PongClient"
 		path.join(FLECS_DIR, "include"),
 		path.join(ASIO_DIR, "asio/include"),
 		IMGUI_DIR,
-        "Engine",
+        "Engine/include",
 		"lib/include"
 	}
     libdirs { "lib" }

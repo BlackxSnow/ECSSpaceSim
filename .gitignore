@@ -21,4 +21,5 @@ lib/assimps*.lib
 
 # Utilities
 .obsidian
+imgui.ini
 *.log
