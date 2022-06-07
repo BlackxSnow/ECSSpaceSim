@@ -22,12 +22,16 @@ namespace CCX
 
 		inline Handle AddCallback(Registree& callback)
 		{
-			auto registree = std::shared_ptr<Registree>(new Registree(callback));
+			auto registree = std::make_shared<Registree>(callback);
 			Registrees.push_back(registree);
 			return registree.get();
 		}
 
 	public:
+		size_t Count()
+		{
+			return Registrees.size();
+		}
 		/// <summary>
 		/// Register a new callback and return a handle to it.
 		/// </summary>
