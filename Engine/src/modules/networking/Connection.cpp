@@ -8,6 +8,12 @@ namespace Thera::Net
 	{
 		if (error)
 		{
+			if (error.value() == asio::error::operation_aborted)
+			{
+				LogInfo((std::ostringstream() << "Aborted receive from connection " << _Endpoint).str());
+				HandleDisconnect();
+				return;
+			}
 			LogError(error.message(), false);
 			Listen();
 			return;
@@ -45,6 +51,12 @@ namespace Thera::Net
 		Listen();
 	}
 	
+	void Connection::HandleDisconnect()
+	{
+		Close();
+		Disconnected.Invoke(shared_from_this());
+	}
+
 	void Connection::Listen()
 	{
 		_Socket.async_receive_from(asio::buffer(_ReceiveBuffer), _Endpoint,
@@ -91,7 +103,7 @@ namespace Thera::Net
 		}
 	}
 
-	Connection::Connection(const asio::ip::udp::endpoint& local, const asio::ip::address& address, const asio::ip::port_type port) : _Socket(_Context), _ReceiveBuffer(1024)
+	Connection::Connection(const asio::ip::udp::endpoint& local, const asio::ip::address& address, const asio::ip::port_type& port) : _Socket(_Context), _ReceiveBuffer(1024)
 	{
 		auto endpoints = asio::ip::udp::resolver(_Context).resolve(address.to_string(), std::to_string(port));
 		_Endpoint = *endpoints.begin();
@@ -100,7 +112,6 @@ namespace Thera::Net
 		_Socket.set_option(asio::ip::udp::socket::reuse_address(true));
 		_Socket.bind(local);
 		Listen();
-		_Thread = new std::thread([&]() { _Context.run(); });
 	}
 
 	Connection::Connection(const asio::ip::udp::endpoint& local, const asio::ip::udp::endpoint& endpoint) : _Socket(_Context), _Endpoint(endpoint), _ReceiveBuffer(1024)
@@ -109,21 +120,16 @@ namespace Thera::Net
 		_Socket.set_option(asio::ip::udp::socket::reuse_address(true));
 		_Socket.bind(local);
 		Listen();
-		_Thread = new std::thread([&]() { _Context.run(); });
 	}
 
-	Connection::Connection(const asio::ip::port_type& port) : _Socket(_Context, asio::ip::udp::endpoint(asio::ip::udp::v4(), port)), _ReceiveBuffer(1024), _Thread(nullptr)
+	Connection::Connection(const asio::ip::port_type& port) : _Socket(_Context, asio::ip::udp::endpoint(asio::ip::udp::v4(), port)), _ReceiveBuffer(1024)
 	{
 		Listen();
-		_Thread = new std::thread([&]() { _Context.run(); });
 	}
 
 	Connection::~Connection()
 	{
-		_Context.stop();
-		_Socket.close();
-		_Thread->join();
-		delete _Thread;
+		Close();
 	}
 
 #ifdef _WIN32
