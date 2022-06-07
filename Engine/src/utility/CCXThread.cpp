@@ -78,19 +78,22 @@ namespace CCX
 			for (auto& worker : Pool)
 			{
 				auto killTask = std::async(std::launch::async, &Worker::Kill, worker);
-				killTask.wait_for(std::chrono::seconds(2));
-				std::ostringstream killLog;
-				killLog << "Thread id " << worker->ThreadID() << " has taken longer than 2 seconds to join.";
-				if (worker->TryCancel())
+				auto status = killTask.wait_for(std::chrono::seconds(2));
+				if (status != std::future_status::ready)
 				{
-					killLog << " Thread's cancel function was available and called. It is recommended to handle this within the application.";
+					std::ostringstream killLog;
+					killLog << "Thread id " << worker->ThreadID() << " has taken longer than 2 seconds to join.";
+					if (worker->TryCancel())
+					{
+						killLog << " Thread's cancel function was available and called. It is recommended to handle this within the application.";
+					}
+					else
+					{
+						killLog << " No cancel availabe. Program may hang indefinitely.";
+					}
+					LogWarning(killLog.str());
+					killTask.wait();
 				}
-				else
-				{
-					killLog << " No cancel availabe. Program may hang indefinitely.";
-				}
-				LogWarning(killLog.str());
-				killTask.wait();
 				delete worker;
 			}
 		}
