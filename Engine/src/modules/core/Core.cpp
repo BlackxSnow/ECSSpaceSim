@@ -1,4 +1,4 @@
-#include "Core.h"
+#include <modules/core/Core.h>
 
 void Thera::Core::UpdateWorldTransforms(flecs::iter& it, const Transform* local, WorldTransform* world)
 {
