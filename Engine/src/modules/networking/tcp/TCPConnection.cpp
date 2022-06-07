@@ -15,16 +15,25 @@ namespace Thera::Net::tcp
 			if (error.value() == asio::error::operation_aborted)
 			{
 				LogInfo((std::ostringstream() << "Aborted receive from connection " << _Endpoint).str());
+				HandleDisconnect();
 				return;
 			}
 			if (error.value() == asio::error::eof)
 			{
 				LogWarning((std::ostringstream() << "Connection " << _Endpoint << " closed connection (EOF).").str());
+				HandleDisconnect();
 				return;
 			}
 			if (error.value() == asio::error::connection_reset)
 			{
 				LogWarning((std::ostringstream() << "Connection " << _Endpoint << " closed connection (Reset).").str());
+				HandleDisconnect();
+				return;
+			}
+			if (error.value() == asio::error::connection_aborted)
+			{
+				LogInfo((std::ostringstream() << "Connection " << _Endpoint << " aborted by host machine.").str());
+				HandleDisconnect();
 				return;
 			}
 			LogError(error.message(), false);
@@ -62,7 +71,23 @@ namespace Thera::Net::tcp
 		Listen();
 	}
 
+	void Connection::HandleDisconnect()
+	{
+		Close();
+		Disconnected.Invoke(shared_from_this());
+	}
+
 	const size_t MAX_PACKET_COUNT = (asio::detail::max_iov_len / 2) - 1;
+	void Connection::Activate()
+	{
+		if (!_IsActive)
+		{
+			_IsActive = true;
+			Listen();
+			CCX::RunTask([&]() { _Context.run(); }, shared_from_this(), [&]() { Close(); });
+			//LogInfo((std::ostringstream() << "Bytes available for read: " << _Socket.available()).str());
+		}
+	}
 	void Connection::Send(Packet& packet)
 	{
 		if (_SendQueue.empty())
@@ -101,4 +126,45 @@ namespace Thera::Net::tcp
 			_SendQueue.pop();
 		}
 	}
+
+	std::shared_ptr<Connection> Connection::Create(const asio::ip::tcp::endpoint& local, const asio::ip::address& address, const asio::ip::port_type port, asio::error_code& error)
+	{
+		auto connection = std::make_shared<Connection>(CreationKey{}, local, address, port, error);
+		connection->Activate();
+		return connection;
+	}
+	std::shared_ptr<Connection> Connection::Create(asio::ip::tcp::socket& socket, bool startActive)
+	{
+		auto connection = std::make_shared<Connection>(CreationKey{}, socket, startActive);
+		if (startActive)
+		{
+			connection->Activate();
+		}
+		return connection;
+	}
+
+	Connection::Connection(const asio::ip::tcp::endpoint& local, const asio::ip::address& address, const asio::ip::port_type port, asio::error_code& error)
+		: _Socket(_Context), _ReceiveBuffer(1024), _IsActive(false), _IsClosed(false)
+	{
+		asio::ip::tcp::endpoint endpoint = *asio::ip::tcp::resolver(_Context).resolve(asio::ip::tcp::endpoint(address, port)).begin();
+
+		_Socket.open(endpoint.protocol(), error);
+		if (error) return;
+		_Socket.bind(local, error);
+		if (error) return;
+		_Socket.connect(endpoint, error);
+		if (error) return;
+
+		_Endpoint = _Socket.remote_endpoint(error);
+		if (error) return;
+	}
+
+	Connection::Connection(asio::ip::tcp::socket& socket, bool startActive) : _Socket(_Context), _ReceiveBuffer(1024), _IsActive(false), _IsClosed(false)
+	{
+		auto native = socket.native_handle();
+		auto handle = socket.release();
+		_Socket.assign(asio::ip::tcp::v4(), native);
+
+		_Endpoint = _Socket.remote_endpoint();
+	};
 }
