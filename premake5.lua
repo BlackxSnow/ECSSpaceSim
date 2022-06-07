@@ -444,6 +444,7 @@ project "imgui"
 	{
 		path.join(IMGUI_DIR, "imgui*.h"),
 		path.join(IMGUI_DIR, "imgui*.cpp"),
-		path.join(IMGUI_DIR, "backends/imgui_impl_glfw.*")
+		path.join(IMGUI_DIR, "backends/imgui_impl_glfw.*"),
+		path.join(IMGUI_DIR, "misc/cpp/imgui_stdlib.*")
 	}
 	includedirs { IMGUI_DIR, path.join(GLFW_DIR, "include")}
