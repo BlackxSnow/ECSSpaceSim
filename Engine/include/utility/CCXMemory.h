@@ -1,9 +1,12 @@
 #pragma once
 
+#include <memory>
+
 #include "CCXType.h"
 #include "CCXDefs.h"
 #include "CCXSerialisation.h"
 #include "ConsoleLogging.h"
+
 
 namespace CCX
 {
@@ -45,5 +48,12 @@ namespace CCX
 			_Position += sizeof(T);
 			return value;
 		}
+	};
+
+	template<typename T>
+	class ManagedSharedResource : public std::enable_shared_from_this<T>
+	{
+	protected:
+		struct CreationKey {};
 	};
 }
