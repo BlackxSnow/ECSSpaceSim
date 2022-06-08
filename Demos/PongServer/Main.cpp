@@ -17,6 +17,8 @@ enum class PacketType
 	PlayerLeave,
 	Ready,
 	Start,
+	PlayerPosition,
+	BallPosition,
 	Score
 };
 
@@ -75,7 +77,7 @@ int main(int argc, char* argv[])
 	{
 		Thera::Net::tcp::RegisterPacket(Thera::Net::PacketType::Connect, HandleConnectTCP);
 		
-		Thera::Net::Connection udpListener(1337);
+		auto udpListener = Thera::Net::Connection::Create(1337);
 		auto tcpListener = Thera::Net::tcp::Listener::Create(1337, TCPOnAccept);
 
 		while (true)

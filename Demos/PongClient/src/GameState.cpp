@@ -15,7 +15,7 @@ void Connect(const asio::ip::address_v4& ip, const asio::ip::port_type port, con
 		return;
 	}
 	LogInfo((std::ostringstream() << "TCP connected from " << tcpConnection->LocalEndpoint()).str());
-	auto udpConnection = std::make_shared<Thera::Net::Connection>(localUDP, ip, port);
+	auto udpConnection = Thera::Net::Connection::Create(localUDP, ip, port);
 
 	Thera::Net::Packet connect(PacketType::Connect);
 	connect.Write(playerName);
@@ -53,13 +53,38 @@ void HandleStart(Thera::Net::tcp::Connection& source, Thera::Net::Packet* packet
 {
 	CurrentGame->OpponentReady = false;
 	CurrentGame->SelfReady = false;
-	CurrentGame->OpponentScore = 0;
-	CurrentGame->SelfScore = 0;
+	CurrentGame->LeftScore = 0;
+	CurrentGame->RightScore = 0;
 	CurrentState = GameState::Game;
+}
+
+void HandlePlayerPosition(Thera::Net::tcp::Connection& source, Thera::Net::Packet* packet)
+{
+	auto reader = packet->GetReader();
+	float y = reader.Read<float>();
+	CurrentGame->OpponentPosition = y;
+}
+
+void HandleBallPosition(Thera::Net::tcp::Connection& source, Thera::Net::Packet* packet)
+{
+	auto reader = packet->GetReader();
+	float x = reader.Read<float>();
+	float y = reader.Read<float>();
+	CurrentGame->BallPosition = { x, y };
 }
 
 void HandleScore(Thera::Net::tcp::Connection& source, Thera::Net::Packet* packet)
 {
+	auto reader = packet->GetReader();
+	byte side = reader.Read<byte>();
+	if (side == 0)
+	{
+		CurrentGame->LeftScore += 1;
+	}
+	else
+	{
+		CurrentGame->RightScore += 1;
+	}
 }
 
 void SetupLobby(std::string opponent = "")
@@ -71,7 +96,7 @@ void SetupLobby(std::string opponent = "")
 		LogWarning("Last game data was erroneously not cleaned up.");
 	}
 	byte side = opponent.empty() ? 0 : 1;
-	CurrentGame = new GameInfo{side, PlayerName, opponent, 0, 0, false, false };
+	CurrentGame = new GameInfo{ side, PlayerName, opponent, 0, 0, false, false, 0, { 0, 0 } };
 }
 
 void HandleConnect(Thera::Net::tcp::Connection& source, Thera::Net::Packet* packet)

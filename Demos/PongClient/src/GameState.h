@@ -1,6 +1,7 @@
 #pragma once
 #include <modules/networking/Networking.h>
 #include <modules/networking/tcp/TCPNetworking.h>
+#include <glm/vec2.hpp>
 
 enum class GameState
 {
@@ -19,6 +20,8 @@ enum class PacketType
 	PlayerLeave,
 	Ready,
 	Start,
+	PlayerPosition,
+	BallPosition,
 	Score
 };
 
@@ -27,10 +30,13 @@ struct GameInfo
 	byte SelfSide; // 0 = left, 1 = right
 	std::string SelfName;
 	std::string OpponentName;
-	byte SelfScore;
-	byte OpponentScore;
+	byte LeftScore;
+	byte RightScore;
 	bool SelfReady;
 	bool OpponentReady;
+	
+	float OpponentPosition;
+	glm::vec2 BallPosition;
 };
 
 struct ServerConnection
@@ -43,6 +49,10 @@ struct ServerConnection
 		if (TCP)
 		{
 			TCP->Close();
+		}
+		if (UDP)
+		{
+			UDP->Close();
 		}
 		TCP.reset();
 		UDP.reset();
@@ -61,4 +71,6 @@ void HandlePlayerJoin(Thera::Net::tcp::Connection& source, Thera::Net::Packet* p
 void HandlePlayerLeave(Thera::Net::tcp::Connection& source, Thera::Net::Packet* packet);
 void HandleReady(Thera::Net::tcp::Connection& source, Thera::Net::Packet* packet);
 void HandleStart(Thera::Net::tcp::Connection& source, Thera::Net::Packet* packet);
+void HandlePlayerPosition(Thera::Net::tcp::Connection& source, Thera::Net::Packet* packet);
+void HandleBallPosition(Thera::Net::tcp::Connection& source, Thera::Net::Packet* packet);
 void HandleScore(Thera::Net::tcp::Connection& source, Thera::Net::Packet* packet);

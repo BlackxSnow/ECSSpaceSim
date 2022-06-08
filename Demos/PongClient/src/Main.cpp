@@ -11,6 +11,36 @@
 #include "GameUI.h"
 #include "GameState.h"
 
+void CreateScene(flecs::world& world)
+{
+	auto defaultShader = CCX::LoadShaderProgram("default_vs", "default_fs");
+	auto paddleMesh = Thera::LoadMesh("Resources/Cube.obj");
+	
+	flecs::entity leftPaddle = world.entity("LeftPaddle");
+	auto leftRenderer = leftPaddle.get_mut<Thera::Rendering::Renderer>();
+	leftRenderer->meshes.push_back(paddleMesh);
+	leftRenderer->material = defaultShader;
+	leftPaddle.set<Thera::Core::Transform>({ glm::dvec3(-29, 0, 0), glm::identity<glm::quat>(), glm::vec3(1,4,1) });
+	
+	flecs::entity rightPaddle = world.entity("RightPaddle");
+	auto rightRenderer = rightPaddle.get_mut<Thera::Rendering::Renderer>();
+	rightRenderer->meshes.push_back(paddleMesh);
+	rightRenderer->material = defaultShader;
+	rightPaddle.set<Thera::Core::Transform>({ glm::dvec3(29, 0, 0), glm::identity<glm::quat>(), glm::vec3(1,4,1) });
+
+	flecs::entity ball = world.entity("Ball");
+	auto ballRenderer = ball.get_mut<Thera::Rendering::Renderer>();
+	ballRenderer->meshes.push_back(paddleMesh);
+	ballRenderer->material = defaultShader;
+	ball.set<Thera::Core::Transform>({ glm::dvec3(0, 0, 0), glm::identity<glm::quat>(), glm::vec3(1,1,1) });
+
+	float aspect = (float)Thera::WindowWidth / (float)Thera::WindowHeight;
+
+	flecs::entity cam = world.entity();
+	cam.set<Thera::Rendering::Camera>({ Thera::Rendering::CameraView::Orthographic, Thera::Core::MaskBehaviour::None, 0.1f, 100.0f, 1.0472f, glm::vec2(30, 30 / aspect)});
+	cam.set<Thera::Core::Transform>({ glm::dvec3(0, 0, 10), glm::identity<glm::quat>(), glm::vec3(1,1,1) });
+}
+
 int main()
 {
 	Thera::Net::tcp::RegisterPacket(PacketType::Connect, HandleConnect);
@@ -18,16 +48,16 @@ int main()
 	Thera::Net::tcp::RegisterPacket(PacketType::PlayerLeave, HandlePlayerLeave);
 	Thera::Net::tcp::RegisterPacket(PacketType::Ready, HandleReady);
 	Thera::Net::tcp::RegisterPacket(PacketType::Start, HandleStart);
+	Thera::Net::tcp::RegisterPacket(PacketType::PlayerPosition, HandlePlayerPosition);
+	Thera::Net::tcp::RegisterPacket(PacketType::BallPosition, HandleBallPosition);
 	Thera::Net::tcp::RegisterPacket(PacketType::Score, HandleScore);
 	
 	Thera::Init();
 
 	auto world = Thera::GetWorld();
+	CreateScene(*world);
 
 	ImGui::StyleColorsDark();
-
-	flecs::entity cam = world->entity();
-	cam.set<Thera::Rendering::Camera>({ Thera::Rendering::CameraView::Perspective, Thera::Core::MaskBehaviour::None, 0.1f, 100.0f, 1.0472f });
 
 	flecs::system buildUI = world->system().kind(flecs::OnRender).iter(BuildUI);
 

@@ -8,19 +8,25 @@ void Thera::Core::UpdateWorldTransforms(flecs::iter& it, const Transform* local,
 		return;
 	}
 
-	if (it.is_set(3))
+	for (auto i : it)
 	{
-		const WorldTransform& parent = it.term<const WorldTransform>(3)[0];
+		const Transform& currentLocal = local[i];
+		WorldTransform& currentWorld = world[i];
+		if (it.is_set(3))
+		{
+			const WorldTransform& parent = it.term<const WorldTransform>(3)[i];
 
-		world->Position = local->Position + parent.Position;
-		world->Rotation = local->Rotation * parent.Rotation;
-		world->Scale = local->Scale * parent.Scale;
-	}
-	else
-	{
-		world->Position = local->Position;
-		world->Rotation = local->Rotation;
-		world->Scale = local->Scale;
+
+			currentWorld.Position = currentLocal.Position + parent.Position;
+			currentWorld.Rotation = currentLocal.Rotation * parent.Rotation;
+			currentWorld.Scale = currentLocal.Scale * parent.Scale;
+		}
+		else
+		{
+			currentWorld.Position = currentLocal.Position;
+			currentWorld.Rotation = currentLocal.Rotation;
+			currentWorld.Scale = currentLocal.Scale;
+		}
 	}
 }
 
