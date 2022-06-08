@@ -5,11 +5,11 @@
 #include <bgfx/bgfx.h>
 #include <glm/gtc/type_ptr.hpp>
 
-flecs::query<const Thera::Rendering::Renderer, const Thera::Core::WorldTransform*> BuildQuery(flecs::entity camEntity, Thera::Core::MaskBehaviour mask)
+flecs::query<const Thera::Rendering::Renderer, const Thera::Core::WorldTransform> BuildQuery(flecs::entity camEntity, Thera::Core::MaskBehaviour mask)
 {
 	flecs::world* world = Thera::GetWorld();
 
-	flecs::query_builder query = world->query_builder<const Thera::Rendering::Renderer, const Thera::Core::WorldTransform*>();
+	flecs::query_builder query = world->query_builder<const Thera::Rendering::Renderer, const Thera::Core::WorldTransform>();
 
 	switch (mask)
 	{
@@ -26,39 +26,40 @@ flecs::query<const Thera::Rendering::Renderer, const Thera::Core::WorldTransform
 
 void Thera::Rendering::ValidateCameraQueries(flecs::iter& iter, const Camera* cam, CachedRendererMask* mask)
 {
-	if (mask->lastMask == cam->masking && mask->maskQuery)
+	for (auto i : iter)
 	{
-		iter.skip();
-		return;
+		CachedRendererMask& currentMask = mask[i];
+		const Camera& currentCam = cam[i];
+
+		if (currentMask.lastMask == currentCam.masking && currentMask.maskQuery)
+		{
+			continue;
+		}
+
+		if (currentMask.maskQuery) { currentMask.maskQuery.destruct(); }
+		currentMask.maskQuery = BuildQuery(iter.entity(i), currentCam.masking);
+		currentMask.lastMask = currentCam.masking;
 	}
-	if (mask->maskQuery) { mask->maskQuery.destruct(); }
-	mask->maskQuery = BuildQuery(iter.entity(0), cam->masking);
-	mask->lastMask = cam->masking;
 }
 
 
-void RenderSingleCamera(flecs::iter& iter, const Thera::Rendering::Renderer* renderer, const Thera::Core::WorldTransform* transform, const Thera::Core::WorldTransform* cam, const bgfx::ViewId target)
+void RenderSingleCamera(flecs::entity entity, const Thera::Rendering::Renderer& renderer, const Thera::Core::WorldTransform& transform, const Thera::Core::WorldTransform& cam, const bgfx::ViewId target)
 {
-	if (renderer->meshes.size() == 0)
+	if (renderer.meshes.size() == 0)
 	{
 		return;
 	}
 
 	glm::mat4 model = glm::identity<glm::mat4>();
 	
-	if (transform != nullptr)
-	{
-		glm::vec3 relativePosition = glm::vec3(transform->Position - cam->Position);
-		model = glm::scale(glm::translate(model, relativePosition) * glm::toMat4(transform->Rotation), transform->Scale);
-	}
-	else
-	{
-		model = glm::translate(model, glm::vec3(-cam->Position));
-	}
+
+	glm::vec3 relativePosition = glm::vec3(transform.Position - cam.Position);
+	model = glm::scale(glm::translate(model, relativePosition) * glm::toMat4(transform.Rotation), transform.Scale);
+
 
 	bgfx::setTransform(glm::value_ptr(model));
 
-	for (auto& mesh : renderer->meshes)
+	for (auto& mesh : renderer.meshes)
 	{
 		if (mesh->Vertices.size() > 0)
 		{
@@ -68,7 +69,7 @@ void RenderSingleCamera(flecs::iter& iter, const Thera::Rendering::Renderer* ren
 		{
 			bgfx::setIndexBuffer(mesh->indexBuffer);
 		}
-		bgfx::submit(target, renderer->material.shader);
+		bgfx::submit(target, renderer.material.shader);
 	}
 }
 
@@ -79,60 +80,69 @@ void Thera::Rendering::RenderCameraFinal(flecs::iter& iter, const Camera* cam, c
 		return;
 	}
 
-	glm::mat4 view = glm::identity<glm::mat4>() * glm::toMat4(camTransform->Rotation);
-	glm::mat4 proj;
-
-	if (cam->view == CameraView::Perspective)
+	for (auto i : iter)
 	{
-		proj = glm::perspective(cam->fovRad, (float)Thera::WindowWidth / (float)Thera::WindowHeight, cam->nearClip, cam->farClip);
-	}
-	else
-	{
-		proj = glm::ortho(-cam->size.x, cam->size.x, -cam->size.y, cam->size.y, cam->nearClip, cam->farClip);
-	}
+		const Camera& currentCam = cam[i];
+		const Thera::Core::WorldTransform& currentCamTransform = camTransform[i];
+		const CachedRendererMask& currentMask = mask[i];
+		
+		glm::mat4 view = glm::identity<glm::mat4>() * glm::toMat4(currentCamTransform.Rotation);
+		glm::mat4 proj;
 
-	// TODO: Move into camera components
-	uint64_t state = 0
-		| BGFX_STATE_WRITE_R
-		| BGFX_STATE_WRITE_G
-		| BGFX_STATE_WRITE_B
-		| BGFX_STATE_WRITE_A
-		| BGFX_STATE_WRITE_Z
-		| BGFX_STATE_DEPTH_TEST_LESS
-		| BGFX_STATE_CULL_CW
-		| BGFX_STATE_MSAA
-		;
-
-	auto target = cam->target;
-
-	bgfx::setViewTransform(target, glm::value_ptr(view), glm::value_ptr(proj));
-	bgfx::setViewRect(0, 0, 0, uint16_t(Thera::WindowWidth), uint16_t(Thera::WindowHeight));
-	bgfx::setState(state);
-
-	auto filter = iter.world().filter_builder<const Thera::Rendering::Renderer, const Thera::Core::WorldTransform*>();
-
-	switch (cam->masking)
-	{
-	case Thera::Core::MaskBehaviour::Whitelist:
-		filter.term<Thera::Core::WhitelistedBy>(iter.entity(0));
-		break;
-	case Thera::Core::MaskBehaviour::Blacklist:
-		filter.term<Thera::Core::BlacklistedBy>(iter.entity(0)).oper(flecs::Not);
-		break;
-	}
-
-	if (mask->lastMask == cam->masking)
-	{
-		mask->maskQuery.iter([camTransform, target](flecs::iter& iter, const Renderer* renderer, const Thera::Core::WorldTransform* rendererTransform)
+		if (currentCam.view == CameraView::Perspective)
 		{
-			RenderSingleCamera(iter, renderer, rendererTransform, camTransform, target);
-		});
-	}
-	else
-	{
-		filter.build().iter([camTransform, target](flecs::iter& iter, const Renderer* renderer, const Thera::Core::WorldTransform* rendererTransform)
+			proj = glm::perspective(currentCam.fovRad, (float)Thera::WindowWidth / (float)Thera::WindowHeight, currentCam.nearClip, currentCam.farClip);
+		}
+		else
 		{
-			RenderSingleCamera(iter, renderer, rendererTransform, camTransform, target);
-		});
+			//proj = glm::ortho(-currentCam.size.x, currentCam.size.x, -currentCam.size.y, currentCam.size.y, currentCam.nearClip, currentCam.farClip);
+			// TODO: change this based on rendering API. (ZO maps clip to 0->1 for DirectX, NO maps clip to -1->1 for OpenGL. Look up the others)
+			proj = glm::orthoRH_ZO(-currentCam.size.x, currentCam.size.x, -currentCam.size.y, currentCam.size.y, currentCam.nearClip, currentCam.farClip);
+		}
+
+		// TODO: Move into camera components
+		uint64_t state = 0
+			| BGFX_STATE_WRITE_R
+			| BGFX_STATE_WRITE_G
+			| BGFX_STATE_WRITE_B
+			| BGFX_STATE_WRITE_A
+			| BGFX_STATE_WRITE_Z
+			| BGFX_STATE_DEPTH_TEST_LESS
+			| BGFX_STATE_CULL_CW
+			| BGFX_STATE_MSAA
+			;
+
+		auto target = currentCam.target;
+
+		bgfx::setViewTransform(target, glm::value_ptr(view), glm::value_ptr(proj));
+		bgfx::setViewRect(0, 0, 0, uint16_t(Thera::WindowWidth), uint16_t(Thera::WindowHeight));
+		bgfx::setState(state);
+
+		auto filter = iter.world().filter_builder<const Thera::Rendering::Renderer, const Thera::Core::WorldTransform>();
+
+		switch (currentCam.masking)
+		{
+		case Thera::Core::MaskBehaviour::Whitelist:
+			filter.term<Thera::Core::WhitelistedBy>(iter.entity(i));
+			break;
+		case Thera::Core::MaskBehaviour::Blacklist:
+			filter.term<Thera::Core::BlacklistedBy>(iter.entity(i)).oper(flecs::Not);
+			break;
+		}
+
+		if (currentMask.lastMask == currentCam.masking)
+		{
+			currentMask.maskQuery.each([&currentCamTransform, target](flecs::entity entity, const Renderer& renderer, const Thera::Core::WorldTransform& rendererTransform)
+			{
+				RenderSingleCamera(entity, renderer, rendererTransform, currentCamTransform, target);
+			});
+		}
+		else
+		{
+			filter.build().each([&currentCamTransform, target](flecs::entity entity, const Renderer& renderer, const Thera::Core::WorldTransform& rendererTransform)
+			{
+				RenderSingleCamera(entity, renderer, rendererTransform, currentCamTransform, target);
+			});
+		}
 	}
 }

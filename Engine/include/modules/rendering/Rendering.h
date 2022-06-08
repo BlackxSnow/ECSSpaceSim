@@ -37,7 +37,7 @@ namespace Thera
 		struct CachedRendererMask
 		{
 			Thera::Core::MaskBehaviour lastMask = (Thera::Core::MaskBehaviour)-1;
-			flecs::query<const Thera::Rendering::Renderer, const Thera::Core::WorldTransform*> maskQuery;
+			flecs::query<const Thera::Rendering::Renderer, const Thera::Core::WorldTransform> maskQuery;
 		};
 
 		enum class CameraView
@@ -55,7 +55,7 @@ namespace Thera
 			float fovRad;
 			glm::vec2 size;
 			bool isEnabled = true;
-			bgfx::ViewId target;
+			bgfx::ViewId target = 0;
 		};
 
 		static void RenderCameraFinal(flecs::iter& iter, const Camera* cam, const Thera::Core::WorldTransform* camTransform, const CachedRendererMask* mask);
