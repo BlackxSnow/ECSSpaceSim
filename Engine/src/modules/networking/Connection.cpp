@@ -44,7 +44,7 @@ namespace Thera::Net
 				LogWarning("Received unhandled packet id '" + std::to_string(packet.ID()) + "' from " + (std::ostringstream() << _Endpoint).str(), false);
 				continue;
 			}
-			(*handler)(_Endpoint, &packet);
+			(*handler)(*this, &packet);
 		}
 
 		LogInfo((std::ostringstream() << "Received " << bytesTransferred << " bytes from " << _Endpoint).str());

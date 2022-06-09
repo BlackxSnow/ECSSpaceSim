@@ -135,7 +135,9 @@ namespace Thera::Net
 		std::vector<asio::const_buffer> GetBuffer();
 	};
 
-	using PacketHandler = std::function<void(const asio::ip::udp::endpoint&, Packet*)>;
+	class Connection;
+
+	using PacketHandler = std::function<void(Connection&, Packet*)>;
 
 	void RegisterPacket(PacketID id, PacketHandler handler);
 	template<typename Enum>
