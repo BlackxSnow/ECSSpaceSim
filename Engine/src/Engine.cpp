@@ -162,6 +162,28 @@ void Thera::Init()
 	World->import<flecs::monitor>();
 }
 
+void Thera::InitWindowless()
+{
+	World = new flecs::world();
+	GameRoot = World->entity("Game");
+
+	auto pipeline = World->pipeline("ECSEPipeline");
+	pipeline.add(flecs::PreFrame);
+	pipeline.add(flecs::OnUpdate);
+	pipeline.add(flecs::OnValidate);
+	pipeline.add(flecs::PostFrame);
+
+	World->set_pipeline(pipeline);
+
+	World->import<flecs::units>();
+	World->import<Thera::Core>();
+
+	OnInit.Invoke();
+
+	World->set<flecs::Rest>({});
+	World->import<flecs::monitor>();
+}
+
 void Thera::TestInit()
 {
 	std::function<void()> hints = []() { glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); };
@@ -200,6 +222,40 @@ int Thera::Loop(int argc, char** argv)
 		OnFinalValidate.Invoke();
 
 		bgfx::frame();
+		currentFrame++;
+	}
+
+	Shutdown();
+	return 0;
+}
+
+#include <csignal>
+
+#ifdef _WIN32
+int const _CloseSignal = SIGBREAK;
+#else
+int const _CloseSignal = SIGHUP;
+#endif
+
+volatile sig_atomic_t _IsWindowClosing = 0;
+
+void CloseSignalHandler(int)
+{
+	_IsWindowClosing = 1;
+}
+
+int Thera::LoopWindowless(int argc, char** argv)
+{
+	signal(_CloseSignal, CloseSignalHandler);
+	auto lastTime = std::chrono::system_clock::now();
+	double delta = 0;
+	while (!_IsWindowClosing)
+	{
+		delta = GetDelta(lastTime);
+		World->progress(delta);
+
+		OnFinalValidate.Invoke();
+
 		currentFrame++;
 	}
 

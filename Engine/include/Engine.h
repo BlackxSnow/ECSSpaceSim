@@ -37,6 +37,8 @@ namespace Thera
 	extern CCX::Event<> OnFinalValidate;
 
 	void Init();
+	void InitWindowless();
 	void TestInit();
 	int Loop(int argc, char** argv);
+	int LoopWindowless(int argc, char** argv);
 }
