@@ -85,11 +85,11 @@ namespace Thera::Net::tcp
 			_IsActive = true;
 			Listen();
 			CCX::RunTask([&]() { _Context.run(); }, shared_from_this(), [&]() { Close(); });
-			//LogInfo((std::ostringstream() << "Bytes available for read: " << _Socket.available()).str());
 		}
 	}
 	void Connection::Send(Packet& packet)
 	{
+		std::lock_guard lock(_Mutex);
 		if (_SendQueue.empty())
 		{
 			auto& aggregate = _SendQueue.emplace(std::make_shared<AggregatePacket>(4));
@@ -109,6 +109,7 @@ namespace Thera::Net::tcp
 
 	void Connection::Flush()
 	{
+		std::lock_guard lock(_Mutex);
 		if (_SendQueue.empty())
 			return;
 
@@ -144,7 +145,7 @@ namespace Thera::Net::tcp
 	}
 
 	Connection::Connection(const asio::ip::tcp::endpoint& local, const asio::ip::address& address, const asio::ip::port_type port, asio::error_code& error)
-		: _Socket(_Context), _ReceiveBuffer(1024), _IsActive(false), _IsClosed(false)
+		: _Socket(_Context), _ReceiveBuffer(1024), _SendQueue(), _IsActive(false), _IsClosed(false)
 	{
 		asio::ip::tcp::endpoint endpoint = *asio::ip::tcp::resolver(_Context).resolve(asio::ip::tcp::endpoint(address, port)).begin();
 
@@ -159,7 +160,7 @@ namespace Thera::Net::tcp
 		if (error) return;
 	}
 
-	Connection::Connection(asio::ip::tcp::socket& socket, bool startActive) : _Socket(_Context), _ReceiveBuffer(1024), _IsActive(false), _IsClosed(false)
+	Connection::Connection(asio::ip::tcp::socket& socket, bool startActive) : _Socket(_Context), _ReceiveBuffer(1024), _SendQueue(), _IsActive(false), _IsClosed(false)
 	{
 		auto native = socket.native_handle();
 		auto handle = socket.release();

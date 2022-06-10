@@ -13,6 +13,7 @@ namespace Thera::Net::tcp
 	public:
 		CCX::Event<std::shared_ptr<Connection>> Disconnected;
 	private:
+		std::mutex _Mutex;
 		asio::io_context _Context;
 		asio::ip::tcp::endpoint _Endpoint;
 		asio::ip::tcp::socket _Socket;
@@ -79,7 +80,8 @@ namespace Thera::Net::tcp
 			{
 				if (ec.value() == asio::error::operation_aborted)
 				{
-					LogInfo((std::ostringstream() << "Aborting listen on port " << _Acceptor.local_endpoint().port()).str());
+					LogInfo((std::ostringstream() << "Aborting TCP Listen").str());
+					//LogInfo((std::ostringstream() << "Aborting listen on port " << _Acceptor.local_endpoint().port()).str());
 					return;
 				}
 				LogError(ec.message(), false);
