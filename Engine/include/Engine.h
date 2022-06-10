@@ -36,6 +36,10 @@ namespace Thera
 	extern CCX::Event<> OnInputPoll;
 	extern CCX::Event<> OnFinalValidate;
 
+	void Defer(std::function<void()> operation);
+
+	double DeltaTime();
+
 	void Init();
 	void InitWindowless();
 	void TestInit();

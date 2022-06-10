@@ -27,6 +27,7 @@
 
 #include <flecs/addons/rest.h>
 #include <flecs/addons/monitor.h>
+#include <mutex>
 
 int Thera::WindowWidth = 1024;
 int Thera::WindowHeight = 768;
@@ -196,18 +197,45 @@ void Shutdown()
 	delete World;
 }
 
-double GetDelta(std::chrono::system_clock::time_point& last)
+double _DeltaTime = 0.16666;
+
+double Thera::DeltaTime()
+{
+	return _DeltaTime;
+}
+
+double CalculateDeltaTime(std::chrono::system_clock::time_point& last)
 {
 	auto now = std::chrono::system_clock::now();
 	double delta = std::chrono::duration_cast<std::chrono::duration<double, std::ratio<1,1>>>(now - last).count();
 	last = now;
 	return delta;
 }
+std::mutex _DeferredOpsMutex;
+std::vector<std::function<void()>> _DeferredOperations;
+
+void Thera::Defer(std::function<void()> operation)
+{
+	std::lock_guard lock(_DeferredOpsMutex);
+	_DeferredOperations.push_back(operation);
+}
+
+void RunDeferredOperations()
+{
+	_DeferredOpsMutex.lock();
+	std::vector<std::function<void()>> deferredCopy = _DeferredOperations;
+	_DeferredOperations.clear();
+	_DeferredOpsMutex.unlock();
+	
+	for (auto& op : deferredCopy)
+	{
+		op();
+	}
+}
 
 int Thera::Loop(int argc, char** argv)
 {
 	auto lastTime = std::chrono::system_clock::now();
-	double delta = 0;
 	while (!glfwWindowShouldClose(Windows[0])) 
 	{
 		glfwPollEvents();
@@ -216,9 +244,10 @@ int Thera::Loop(int argc, char** argv)
 
 		bgfx::touch(kClearView);
 
-		delta = GetDelta(lastTime);
-		World->progress(delta);
+		_DeltaTime = CalculateDeltaTime(lastTime);
+		World->progress(_DeltaTime);
 
+		RunDeferredOperations();
 		OnFinalValidate.Invoke();
 
 		bgfx::frame();
@@ -248,12 +277,12 @@ int Thera::LoopWindowless(int argc, char** argv)
 {
 	signal(_CloseSignal, CloseSignalHandler);
 	auto lastTime = std::chrono::system_clock::now();
-	double delta = 0;
 	while (!_IsWindowClosing)
 	{
-		delta = GetDelta(lastTime);
-		World->progress(delta);
+		_DeltaTime = CalculateDeltaTime(lastTime);
+		World->progress(_DeltaTime);
 
+		RunDeferredOperations();
 		OnFinalValidate.Invoke();
 
 		currentFrame++;
