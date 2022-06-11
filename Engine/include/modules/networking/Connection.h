@@ -42,6 +42,7 @@ namespace Thera::Net
 		void Flush();
 		size_t MTU() { return _MTU; }
 		void MTU(size_t value) { _MTU = value; }
+		const asio::ip::udp::endpoint& Endpoint() { return _Endpoint; }
 
 		void Close()
 		{
