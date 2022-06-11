@@ -47,27 +47,38 @@ namespace Thera::Net::tcp
 			return;
 		}
 		CCX::MemoryReader reader(_ReceiveBuffer.data(), bytesTransferred);
-		PacketSize packetCount = reader.Read<PacketSize>();
-		PacketSize packetSize = reader.Read<PacketSize>();
-		if (packetSize + AggregatePacket::HEADER_SIZE > bytesTransferred)
+		while (reader.Remaining() > 0)
 		{
-			LogError("Received partial aggregate packet of " + std::to_string(bytesTransferred) + " bytes. Expected " + std::to_string(packetSize + AggregatePacket::HEADER_SIZE), false);
-			Listen();
-			return;
+			if (reader.Remaining() < PacketHeader::HEADER_SIZE)
+			{
+				LogError("Received extra data too short for another packet. Remainder: " + std::to_string(reader.Remaining()), false);
+				Listen();
+				return;
+			}
+
+			PacketSize packetCount = reader.Read<PacketSize>();
+			PacketSize aggregatePacketSize = reader.Read<PacketSize>();
+
+			if (aggregatePacketSize > reader.Remaining())
+			{
+				LogError("Received partial aggregate packet of " + std::to_string(reader.Remaining()) + " bytes. Expected " + std::to_string(aggregatePacketSize), false);
+				Listen();
+				return;
+			}
+
+			PacketHandler* handler;
+			for (int i = 0; i < packetCount; i++)
+			{
+				Packet packet(reader);
+				if (!TryGetPacketHandler(packet.ID(), handler))
+				{
+					LogWarning((std::ostringstream() << "Received unhandled packet id '" << std::to_string(packet.ID()) << "' from " << _Endpoint).str(), false);
+					continue;
+				}
+				(*handler)(*this, &packet);
+			}
 		}
 
-		PacketHandler* handler;
-		for (int i = 0; i < packetCount; i++)
-		{
-			Packet packet(reader);
-			if (!TryGetPacketHandler(packet.ID(), handler))
-			{
-				LogWarning((std::ostringstream() << "Received unhandled packet id '" << std::to_string(packet.ID()) << "' from " << _Endpoint).str(), false);
-				continue;
-			}
-			(*handler)(*this, &packet);
-		}
-		LogInfo((std::ostringstream() << "Received " << bytesTransferred << " bytes from " << _Endpoint).str());
 		Listen();
 	}
 
@@ -118,7 +129,6 @@ namespace Thera::Net::tcp
 			auto& aggregate = _SendQueue.front();
 			auto buffer = aggregate->GetBuffer();
 			auto size = asio::buffer_size(buffer);
-			LogInfo((std::ostringstream() << "Sending packets to: " << _Socket.remote_endpoint()).str());
 			size_t sent = _Socket.send(buffer);
 			if (sent != size)
 			{
@@ -151,6 +161,7 @@ namespace Thera::Net::tcp
 
 		_Socket.open(endpoint.protocol(), error);
 		if (error) return;
+		_Socket.set_option(asio::ip::tcp::no_delay(true));
 		_Socket.bind(local, error);
 		if (error) return;
 		_Socket.connect(endpoint, error);
@@ -165,6 +176,7 @@ namespace Thera::Net::tcp
 		auto native = socket.native_handle();
 		auto handle = socket.release();
 		_Socket.assign(asio::ip::tcp::v4(), native);
+		_Socket.set_option(asio::ip::tcp::no_delay(true));
 
 		_Endpoint = _Socket.remote_endpoint();
 	};

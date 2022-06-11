@@ -123,6 +123,7 @@ namespace Thera::Net::tcp
 		{
 			asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), port);
 			_Acceptor.open(endpoint.protocol());
+			_Acceptor.set_option(asio::ip::tcp::no_delay(true));
 			_Acceptor.bind(endpoint);
 			_Acceptor.listen();
 			_Acceptor.async_accept(std::bind(&Listener::HandleAccept, this, std::placeholders::_1, std::placeholders::_2));
