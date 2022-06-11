@@ -134,7 +134,7 @@ void CheckForScore(flecs::entity entity, Thera::Core::Transform& ballTransform, 
 	if (abs(ballTransform.Position.x) > 29)
 	{
 		auto sign = std::copysign(1, ballTransform.Position.x);
-		byte scoringSide = 1 - (sign + 1);
+		byte scoringSide = sign < 0 ? 1 : 0;
 		ballTransform.Position = { 0,0,0 };
 		ball.Velocity = { sign * BallStartSpeed, 0, 0 };
 

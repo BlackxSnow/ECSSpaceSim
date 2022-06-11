@@ -85,12 +85,24 @@ void BuildLoad()
 
 void BuildLobby()
 {
-	imgui::SetNextWindowPos(ImVec2(0, 0));
+	imgui::SetNextWindowPos(ImVec2(0, 20));
 	imgui::Begin("Left Player Name", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoTitleBar);
 	imgui::Text(CurrentGame->SelfSide == 0 ? CurrentGame->SelfName.c_str() : CurrentGame->OpponentName.c_str());
 	imgui::End();
 
-	imgui::SetNextWindowPos(ImVec2(Thera::WindowWidth, 0), 0, ImVec2(1,0));
+	const float scoreOffset = 50;
+
+	imgui::SetNextWindowPos(ImVec2(Thera::WindowWidth / 2.0f - scoreOffset, 20), 0, ImVec2(1,0));
+	imgui::Begin("Left Player Score", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoTitleBar);
+	imgui::Text(std::to_string(CurrentGame->LeftScore).c_str());
+	imgui::End();
+
+	imgui::SetNextWindowPos(ImVec2(Thera::WindowWidth / 2.0f + scoreOffset, 20), 0, ImVec2(0, 0));
+	imgui::Begin("Right Player Score", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoTitleBar);
+	imgui::Text(std::to_string(CurrentGame->RightScore).c_str());
+	imgui::End();
+
+	imgui::SetNextWindowPos(ImVec2(Thera::WindowWidth, 20), 0, ImVec2(1,0));
 	imgui::Begin("Right Player Name", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoTitleBar);
 	imgui::Text(CurrentGame->SelfSide == 1 ? CurrentGame->SelfName.c_str() : CurrentGame->OpponentName.c_str());
 	imgui::End();

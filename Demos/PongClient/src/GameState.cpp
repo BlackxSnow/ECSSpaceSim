@@ -99,7 +99,6 @@ void SetupLobby(std::string opponent = "")
 	if (opponent.empty())
 	{
 		side = 0;
-		side = 1;
 		Thera::Defer([]() {
 			LeftPaddle.add<Player>();
 			RightPaddle.add<Opponent>();
