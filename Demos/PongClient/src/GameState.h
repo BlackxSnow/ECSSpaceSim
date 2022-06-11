@@ -57,6 +57,18 @@ struct ServerConnection
 		TCP.reset();
 		UDP.reset();
 	}
+
+	void Flush()
+	{
+		if (TCP)
+		{
+			TCP->Flush();
+		}
+		if (UDP)
+		{
+			UDP->Flush();
+		}
+	}
 };
 
 inline GameState CurrentState;

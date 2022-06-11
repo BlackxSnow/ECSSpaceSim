@@ -10,35 +10,46 @@
 
 #include "GameUI.h"
 #include "GameState.h"
+#include "GameScene.h"
 
-void CreateScene(flecs::world& world)
+
+void CreateInput()
 {
-	auto defaultShader = CCX::LoadShaderProgram("default_vs", "default_fs");
-	auto paddleMesh = Thera::LoadMesh("Resources/Cube.obj");
-	
-	flecs::entity leftPaddle = world.entity("LeftPaddle");
-	auto leftRenderer = leftPaddle.get_mut<Thera::Rendering::Renderer>();
-	leftRenderer->meshes.push_back(paddleMesh);
-	leftRenderer->material = defaultShader;
-	leftPaddle.set<Thera::Core::Transform>({ glm::dvec3(-29, 0, 0), glm::identity<glm::quat>(), glm::vec3(1,4,1) });
-	
-	flecs::entity rightPaddle = world.entity("RightPaddle");
-	auto rightRenderer = rightPaddle.get_mut<Thera::Rendering::Renderer>();
-	rightRenderer->meshes.push_back(paddleMesh);
-	rightRenderer->material = defaultShader;
-	rightPaddle.set<Thera::Core::Transform>({ glm::dvec3(29, 0, 0), glm::identity<glm::quat>(), glm::vec3(1,4,1) });
+	namespace inp = Thera::Input;
 
-	flecs::entity ball = world.entity("Ball");
-	auto ballRenderer = ball.get_mut<Thera::Rendering::Renderer>();
-	ballRenderer->meshes.push_back(paddleMesh);
-	ballRenderer->material = defaultShader;
-	ball.set<Thera::Core::Transform>({ glm::dvec3(0, 0, 0), glm::identity<glm::quat>(), glm::vec3(1,1,1) });
+	inp::SetBindContext(inp::CreateAction("Move", inp::Output::Scalar, inp::Precision::Single));
+	inp::CreateCompositeBinding(inp::Output::Scalar, inp::Precision::Single,
+		{
+			inp::CreateConstituent(inp::Key::Down, { inp::Component::NegX }),
+			inp::CreateConstituent(inp::Key::Up, { inp::Component::PosX })
+		});
+}
 
-	float aspect = (float)Thera::WindowWidth / (float)Thera::WindowHeight;
+const float PaddleSpeed = 20.0f;
 
-	flecs::entity cam = world.entity();
-	cam.set<Thera::Rendering::Camera>({ Thera::Rendering::CameraView::Orthographic, Thera::Core::MaskBehaviour::None, 0.1f, 100.0f, 1.0472f, glm::vec2(30, 30 / aspect)});
-	cam.set<Thera::Core::Transform>({ glm::dvec3(0, 0, 10), glm::identity<glm::quat>(), glm::vec3(1,1,1) });
+void PerformMovement(flecs::entity entity, const Player& player, Thera::Core::Transform& transform)
+{
+	float input = Thera::Input::GetAction("Move")->GetData<float>();
+	transform.Position.y += input * Thera::DeltaTime() * PaddleSpeed;
+	if (input != 0)
+	{
+		Thera::Net::Packet position(PacketType::PlayerPosition);
+		position.Write(static_cast<float>(transform.Position.y));
+		CurrentServer.TCP->Send(position);
+	}
+}
+
+void UpdateOpponentPosition(flecs::entity entity, Thera::Core::Transform& transform, const Opponent&)
+{
+	if (!CurrentGame) return;
+	transform.Position.y = CurrentGame->OpponentPosition;
+}
+
+void UpdateBallPosition(flecs::entity entity, Thera::Core::Transform& transform, const PongBall&)
+{
+	if (!CurrentGame) return;
+	glm::vec2& ballPos = CurrentGame->BallPosition;
+	transform.Position = glm::dvec3(ballPos.x, ballPos.y, 0);
 }
 
 int main()
@@ -56,34 +67,21 @@ int main()
 
 	auto world = Thera::GetWorld();
 	CreateScene(*world);
+	CreateInput();
+
+	world->system<const Player, Thera::Core::Transform>("PlayerMovement").kind(flecs::OnUpdate).each(PerformMovement);
 
 	ImGui::StyleColorsDark();
 
-	flecs::system buildUI = world->system().kind(flecs::OnRender).iter(BuildUI);
+	flecs::system buildUI = world->system("BuildUI").kind(flecs::OnRender).iter(BuildUI);
+	world->system("FlushConnections").kind(flecs::PostFrame).iter([](flecs::iter& iter) { CurrentServer.Flush(); });
+
+	world->system<Thera::Core::Transform, const Opponent>("UpdateOpponentPosition").kind(flecs::OnUpdate).each(UpdateOpponentPosition);
+	world->system<Thera::Core::Transform, const PongBall>("UpdateBallPosition").kind(flecs::OnUpdate).each(UpdateBallPosition);
 
 	Thera::Loop(0, nullptr);
 
 	CurrentServer.Close();
-	
-	//STARTUPINFO startupInfo;
-	//PROCESS_INFORMATION processInfo;
-
-	//std::memset(&startupInfo, 0, sizeof(startupInfo));
-	//startupInfo.cb = sizeof(startupInfo);
-	//std::memset(&processInfo, 0, sizeof(processInfo));
-
-	//const LPCWSTR serverPath = L"../PongServer/bin/Win64/Debug/PongServer.exe";
-	//bool server = CreateProcess(serverPath, NULL, NULL, NULL, FALSE, 0, NULL, NULL, &startupInfo, &processInfo);
-
-	//if (!server)
-	//{
-	//	LogError((std::ostringstream() << "Startup failed: " << GetLastError()).str(), false);
-	//}
-
-	//WaitForSingleObject(processInfo.hProcess, INFINITE);
-
-	//CloseHandle(processInfo.hProcess);
-	//CloseHandle(processInfo.hThread);
 
 	return 0;
 }

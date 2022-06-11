@@ -1,5 +1,6 @@
 #include "GameState.h"
 #include "GameUI.h"
+#include "GameScene.h"
 
 
 void Connect(const asio::ip::address_v4& ip, const asio::ip::port_type port, const std::string& playerName)
@@ -89,14 +90,31 @@ void HandleScore(Thera::Net::tcp::Connection& source, Thera::Net::Packet* packet
 
 void SetupLobby(std::string opponent = "")
 {
-	CurrentState = GameState::Lobby;
 	if (CurrentGame)
 	{
 		delete CurrentGame;
 		LogWarning("Last game data was erroneously not cleaned up.");
 	}
-	byte side = opponent.empty() ? 0 : 1;
+	byte side;
+	if (opponent.empty())
+	{
+		side = 0;
+		side = 1;
+		Thera::Defer([]() {
+			LeftPaddle.add<Player>();
+			RightPaddle.add<Opponent>();
+		});
+	}
+	else
+	{
+		side = 1;
+		Thera::Defer([]() {
+			RightPaddle.add<Player>();
+			LeftPaddle.add<Opponent>();
+		});
+	}
 	CurrentGame = new GameInfo{ side, PlayerName, opponent, 0, 0, false, false, 0, { 0, 0 } };
+	CurrentState = GameState::Lobby;
 }
 
 void HandleConnect(Thera::Net::tcp::Connection& source, Thera::Net::Packet* packet)
