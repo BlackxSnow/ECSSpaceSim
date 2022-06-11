@@ -95,7 +95,6 @@ void Thera::Rendering::RenderCameraFinal(flecs::iter& iter, const Camera* cam, c
 		}
 		else
 		{
-			//proj = glm::ortho(-currentCam.size.x, currentCam.size.x, -currentCam.size.y, currentCam.size.y, currentCam.nearClip, currentCam.farClip);
 			// TODO: change this based on rendering API. (ZO maps clip to 0->1 for DirectX, NO maps clip to -1->1 for OpenGL. Look up the others)
 			proj = glm::orthoRH_ZO(-currentCam.size.x, currentCam.size.x, -currentCam.size.y, currentCam.size.y, currentCam.nearClip, currentCam.farClip);
 		}
