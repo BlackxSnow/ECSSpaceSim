@@ -5,6 +5,10 @@
 
 namespace CCX
 {
+	/// <summary>
+	/// Typesafe queue.
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
 	template<typename T>
 	class ConcurrentQueue
 	{

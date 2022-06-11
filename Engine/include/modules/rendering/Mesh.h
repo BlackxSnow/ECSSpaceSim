@@ -52,5 +52,10 @@ namespace Thera
 		bgfx::IndexBufferHandle indexBuffer;
 	};
 
+	/// <summary>
+	/// Create meshdata from a file.
+	/// </summary>
+	/// <param name="path"></param>
+	/// <returns></returns>
 	std::shared_ptr<MeshData> LoadMesh(const std::string& path);
 }

@@ -28,11 +28,18 @@ namespace Thera
 {
 	namespace Input
 	{
-		
-
+		/// <summary>
+		/// Current mouse position relative to the window's bottom left corner.
+		/// </summary>
 		inline glm::dvec2 mousePosition;
+		/// <summary>
+		/// Distance between last mousePosition and current mousePosition.
+		/// </summary>
 		inline glm::dvec2 mouseDelta;
 
+		/// <summary>
+		/// Updates mousePosition and mouseDelta.
+		/// </summary>
 		static void UpdateMouse()
 		{
 			double x, y;
@@ -41,7 +48,22 @@ namespace Thera
 			mousePosition = glm::dvec2(x, y);
 		}
 
+		/// <summary>
+		/// Key callback for registration with GLFW.
+		/// </summary>
+		/// <param name="window"></param>
+		/// <param name="key"></param>
+		/// <param name="scanCode"></param>
+		/// <param name="action"></param>
+		/// <param name="mods"></param>
 		void GLFWKeyCallback(GLFWwindow* window, int key, int scanCode, int action, int mods);
+		/// <summary>
+		/// Mouse button callback for registration with GLFW.
+		/// </summary>
+		/// <param name="window"></param>
+		/// <param name="button"></param>
+		/// <param name="action"></param>
+		/// <param name="mods"></param>
 		void GLFWMouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 
 		/// <summary>
@@ -63,28 +85,75 @@ namespace Thera
 		/// </summary>
 		inline CCX::Event<GLFWwindow*, int, int, int> RawMouseInputReceived;
 
+		/// <summary>
+		/// Initialise the input system and register the GLFW callbacks.
+		/// </summary>
 		void Initialise();
+		/// <summary>
+		/// Reset the input system to a freshly initialised state.
+		/// </summary>
+		/// <param name="iterateBindings"></param>
 		void Reset(bool iterateBindings = false);
 
+		/// <summary>
+		/// Create a new BindingInstance bound to the specified action.
+		/// </summary>
+		/// <param name="bindTo"></param>
+		/// <param name="key"></param>
+		/// <returns></returns>
 		BindingInstance* CreateBinding(Action* bindTo, Key key);
 		BindingInstance* CreateBinding(Action* bindTo, Mouse mouse);
 		BindingInstance* CreateBinding(Key key);
 		BindingInstance* CreateBinding(Mouse mouse);
 
+		/// <summary>
+		/// Create a new constituent binding for use in a CompositeBinding.
+		/// </summary>
+		/// <param name="key"></param>
+		/// <param name="components">How the constituent contributes to its CompositeBinding. Component order is respective to the data's primitive index (eg. Vec2 is [float, float])</param>
+		/// <returns></returns>
 		Constituent CreateConstituent(Key key, std::initializer_list<Component> components);
 		Constituent CreateConstituent(Mouse mouse, std::initializer_list<Component> components);
 		Constituent CreateConstituent(Key mouse, std::initializer_list<int> components);
 		Constituent CreateConstituent(Mouse mouse, std::initializer_list<int> components);
+		/// <summary>
+		/// Create a composite binding bound to the specified action and comprised of the specified constituents.
+		/// </summary>
+		/// <param name="bindTo"></param>
+		/// <param name="_dataType"></param>
+		/// <param name="dataPrecision"></param>
+		/// <param name="constituents"></param>
+		/// <returns></returns>
 		CompositeBinding* CreateCompositeBinding(Action* bindTo, Output _dataType, Precision dataPrecision, std::vector<Constituent>&& constituents);
 		CompositeBinding* CreateCompositeBinding(Output _dataType, Precision dataPrecision, std::vector<Constituent>&& constituents);
 
+		/// <summary>
+		/// Create a new empty input action.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="dataType"></param>
+		/// <param name="precision"></param>
+		/// <returns></returns>
 		Action* CreateAction(std::string& name, Output dataType, Precision precision = Precision::Double);
 		Action* CreateAction(std::string&& name, Output dataType, Precision precision = Precision::Double);
 
+		/// <summary>
+		/// Retrieve an existing action.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
 		Action* GetAction(std::string&& name);
 
+		/// <summary>
+		/// Set the action bind context. Allows calls to create bindings without specifying target action.
+		/// </summary>
+		/// <param name="context"></param>
 		void SetBindContext(Action* context);
 
+		/// <summary>
+		/// Retrieve the current bind context.
+		/// </summary>
+		/// <returns></returns>
 		Action* Context();
 	};
 }

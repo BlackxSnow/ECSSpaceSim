@@ -14,6 +14,11 @@ namespace CCX
 	template<bool V>
 	using if_not_t = if_t <false == V>;
 
+    /// <summary>
+    /// Whether 'From' can be explicitly cast to 'To'
+    /// </summary>
+    /// <typeparam name="From"></typeparam>
+    /// <typeparam name="To"></typeparam>
     template<typename From, typename To>
     struct is_explicitly_convertible
     {
@@ -37,6 +42,10 @@ namespace CCX
 	template<typename, typename = void>
     struct has_write : std::false_type {};
 
+	/// <summary>
+	/// Whether 'T' has a 'Write' method taking void* and size_t parameters.
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
 	template<typename T> 
     struct has_write<T, decltype(std::declval<T>().Write(std::declval<void*>(), std::declval<size_t>()))> : std::true_type {};
 

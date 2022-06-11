@@ -16,6 +16,9 @@ namespace Thera::Input
 	class Action;
 	class BindingInstance;
 
+	/// <summary>
+	/// Base class for input classes that manage their own data internally.
+	/// </summary>
 	class DataHandler
 	{
 	protected:
@@ -102,6 +105,9 @@ namespace Thera::Input
 		}
 	};
 
+	/// <summary>
+	/// Primary handler for in-built input types such as keys and buttons.
+	/// </summary>
 	class MasterBinding : public DataHandler
 	{
 	public:
@@ -124,6 +130,9 @@ namespace Thera::Input
 			: DataHandler(_output, _precision), poller(_poller) {}
 	};
 
+	/// <summary>
+	/// Individual instance derived from a specified MasterBinding through CreateBinding().
+	/// </summary>
 	class BindingInstance
 	{
 	public:
@@ -142,6 +151,9 @@ namespace Thera::Input
 		BindingInstance(MasterBinding& _master) : master(_master) { boundAction = nullptr; }
 	};
 
+	/// <summary>
+	/// Single constituent binding wrapper for CompositeBindings.
+	/// </summary>
 	struct Constituent
 	{
 		BindingInstance* const binding;
@@ -158,6 +170,9 @@ namespace Thera::Input
 		}
 	};
 
+	/// <summary>
+	/// A composition of one or more bindings to form a larger data type with an API identical to a single binding.
+	/// </summary>
 	class CompositeBinding : public DataHandler
 	{
 	private:
@@ -181,6 +196,9 @@ namespace Thera::Input
 		}
 	};
 	
+	/// <summary>
+	/// Data describing a single input event.
+	/// </summary>
 	class InputEventData
 	{
 	private:
@@ -204,7 +222,9 @@ namespace Thera::Input
 	};
 	
 
-
+	/// <summary>
+	/// High level binding aggregate class. Allows easy polling and event registration for an arbitrary number of BindingInstances and/or CompositeBindings.
+	/// </summary>
 	class Action
 	{
 	private:

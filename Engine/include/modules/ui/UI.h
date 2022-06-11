@@ -9,11 +9,17 @@
 
 namespace Thera::UI
 {
+	/// <summary>
+	/// Renders a texture in screen space.
+	/// </summary>
 	struct ScreenRenderer
 	{
 		bgfx::TextureHandle Texture;
 	};
 
+	/// <summary>
+	/// cached Query of ScreenRenderers.
+	/// </summary>
 	struct CachedUIMask
 	{
 		Thera::Core::MaskBehaviour lastMask = (Thera::Core::MaskBehaviour)-1;

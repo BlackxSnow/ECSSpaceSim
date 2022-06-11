@@ -14,6 +14,9 @@ namespace Thera::Net
 	typedef uint16_t PacketID;
 	typedef uint16_t PacketSize;
 
+	/// <summary>
+	/// Deprecated. To be removed when all references to it are replaced.
+	/// </summary>
 	enum class PacketType : PacketID
 	{
 		Connect = 0,
@@ -23,6 +26,9 @@ namespace Thera::Net
 
 	inline PacketID FirstUserID = static_cast<PacketID>(PacketType::Heartbeat) + 1;
 
+	/// <summary>
+	/// Packet defining data found before all packet data.
+	/// </summary>
 	class PacketHeader
 	{
 	public:
@@ -41,7 +47,15 @@ namespace Thera::Net
 		
 	public:
 		PacketID ID();
+		/// <summary>
+		/// Get the data size within this packet.
+		/// </summary>
+		/// <returns></returns>
 		PacketSize Size();
+		/// <summary>
+		/// Get the size of this packet including the header.
+		/// </summary>
+		/// <returns></returns>
 		size_t FullSize();
 
 		Packet(PacketID id) : _Header(id) {}
@@ -61,9 +75,18 @@ namespace Thera::Net
 		/// </summary>
 		Packet(CCX::MemoryReader& reader);
 
+		/// <summary>
+		/// Get the buffer sequence for this packet.
+		/// </summary>
+		/// <returns></returns>
 		std::array<asio::const_buffer, 2> GetBuffer();
 		void GetBuffer(OUT std::vector<asio::const_buffer>& addTo);
 
+		/// <summary>
+		/// Write to this packet's internal data.
+		/// </summary>
+		/// <param name="data"></param>
+		/// <param name="dataSize"></param>
 		void Write(const void* data, size_t dataSize);
 		template<typename T, CCX::if_not_t<std::is_standard_layout_v<T>> = 0>
 		void Write(const T data)
@@ -75,7 +98,10 @@ namespace Thera::Net
 		{
 			*this << data;
 		}
-		
+		/// <summary>
+		/// Get a reader for this packet's data.
+		/// </summary>
+		/// <returns></returns>
 		CCX::MemoryReader GetReader();
 
 		template<typename T>
@@ -105,7 +131,9 @@ namespace Thera::Net
 		}
 
 	};
-
+	/// <summary>
+	/// A group of unique packets bundled together.
+	/// </summary>
 	class AggregatePacket
 	{
 	public:
@@ -114,6 +142,10 @@ namespace Thera::Net
 		PacketSize Size;
 		std::vector<Packet> Packets;
 
+		/// <summary>
+		/// Create a new aggregate with a reserved size.
+		/// </summary>
+		/// <param name="expected"></param>
 		AggregatePacket(size_t expected) : Count(0), Size(0)
 		{
 			Packets.reserve(expected);
@@ -132,6 +164,10 @@ namespace Thera::Net
 		/// <param name="reader"></param>
 		void AddPacket(CCX::MemoryReader& reader);
 
+		/// <summary>
+		/// Get the buffer sequence for this aggregate, including all its contained packets.
+		/// </summary>
+		/// <returns></returns>
 		std::vector<asio::const_buffer> GetBuffer();
 	};
 
@@ -139,6 +175,11 @@ namespace Thera::Net
 
 	using PacketHandler = std::function<void(Connection&, Packet*)>;
 
+	/// <summary>
+	/// Register a packet handler for the specified ID.
+	/// </summary>
+	/// <param name="id"></param>
+	/// <param name="handler"></param>
 	void RegisterPacket(PacketID id, PacketHandler handler);
 	template<typename Enum>
 	void RegisterPacket(Enum idEnum, PacketHandler handler)
@@ -147,5 +188,11 @@ namespace Thera::Net
 		RegisterPacket(static_cast<PacketID>(idEnum), handler);
 	}
 
+	/// <summary>
+	/// Attempt to retrieve an existing packet handler.
+	/// </summary>
+	/// <param name="id"></param>
+	/// <param name="handler"></param>
+	/// <returns></returns>
 	bool TryGetPacketHandler(PacketID id, PacketHandler*& handler);
 }

@@ -8,9 +8,15 @@
 
 namespace Thera::Net::tcp
 {
+	/// <summary>
+	/// Established two way TCP connection.
+	/// </summary>
 	class Connection : public CCX::ManagedSharedResource<Connection>
 	{
 	public:
+		/// <summary>
+		/// Disconnect callback event.
+		/// </summary>
 		CCX::Event<std::shared_ptr<Connection>> Disconnected;
 	private:
 		std::mutex _Mutex;
@@ -33,13 +39,30 @@ namespace Thera::Net::tcp
 		const asio::ip::tcp::endpoint& LocalEndpoint() { return _Socket.local_endpoint(); }
 
 		/// <summary>
-		/// If the connection was created with isListening = false, this function will cause the connection to go 'live'.
+		/// If the connection was created with startActive = false, this function will cause the connection to go 'live'.
 		/// </summary>
 		void Activate();
 
+		/// <summary>
+		/// Queue a packet for send on this connection.
+		/// </summary>
+		/// <param name="packet"></param>
 		void Send(Packet& packet);
+		/// <summary>
+		/// Send all queued packets through the connection.
+		/// </summary>
+		/// <param name="local"></param>
+		/// <param name="remote"></param>
+		/// <returns></returns>
 		void Flush();
 		
+		/// <summary>
+		/// Close this connection and its underlying socket.
+		/// </summary>
+		/// <param name="local"></param>
+		/// <param name="address"></param>
+		/// <param name="port"></param>
+		/// <param name="error"></param>
 		void Close()
 		{
 			if (_IsClosed) return;
@@ -49,9 +72,18 @@ namespace Thera::Net::tcp
 			_IsClosed = true;
 		}
 
+		/// <summary>
+		/// Create a new connection from the local to the target address and port. On failure modifies provided error_code.
+		/// </summary>
 		static std::shared_ptr<Connection> Create(const asio::ip::tcp::endpoint& local, const asio::ip::address& address, const asio::ip::port_type port, asio::error_code& error);
+		/// <summary>
+		/// Create a new connection from an existing native socket.
+		/// </summary>
 		static std::shared_ptr<Connection> Create(asio::ip::tcp::socket& socket, bool startActive);
 
+		/// <summary>
+		/// Exposed constructor for internal usage. You probably want to use Connection::Create instead.
+		/// </summary>
 		template<typename ...Args>
 		explicit Connection(CreationKey, Args&&... args) : Connection(std::forward<Args>(args)...) {}
 	private:
@@ -66,6 +98,9 @@ namespace Thera::Net::tcp
 		}
 	};
 
+	/// <summary>
+	/// TCP Listener for accepting incoming socket requests.
+	/// </summary>
 	class Listener : public CCX::ManagedSharedResource<Listener>
 	{		
 	private:
@@ -99,6 +134,11 @@ namespace Thera::Net::tcp
 		}
 
 	public:
+		/// <summary>
+		/// Close the listener and the underlying socket.
+		/// </summary>
+		/// <param name="port"></param>
+		/// <param name="onAccept"></param>
 		void Close()
 		{
 			if (_IsClosed) return;
@@ -108,6 +148,9 @@ namespace Thera::Net::tcp
 			_IsClosed = true;
 		}
 
+		/// <summary>
+		/// Create a new listener on the specified port. Calls onAccept on each new connection.
+		/// </summary>
 		inline static std::shared_ptr<Listener> Create(const asio::ip::port_type& port, const std::function<void(std::shared_ptr<Connection>)>& onAccept)
 		{
 			auto listener = std::make_shared<Listener>(CreationKey{}, port, onAccept);

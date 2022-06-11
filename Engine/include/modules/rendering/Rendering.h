@@ -13,7 +13,7 @@
 namespace Thera
 {
 	/// <summary>
-	/// FLECS rendering module for ECSE
+	/// Flecs rendering module
 	/// </summary>
 	struct Rendering
 	{
@@ -28,18 +28,27 @@ namespace Thera
 			Material() {}
 		};
 
+		/// <summary>
+		/// Provides capability for an entity to be rendered as a 3D mesh.
+		/// </summary>
 		struct Renderer
 		{
 			std::vector<std::shared_ptr<MeshData>> meshes;
 			Material material;
 		};
 
+		/// <summary>
+		/// Cached query for renderers based on a MaskBehaviour.
+		/// </summary>
 		struct CachedRendererMask
 		{
 			Thera::Core::MaskBehaviour lastMask = (Thera::Core::MaskBehaviour)-1;
 			flecs::query<const Thera::Rendering::Renderer, const Thera::Core::WorldTransform> maskQuery;
 		};
 
+		/// <summary>
+		/// Camera projection matrix type.
+		/// </summary>
 		enum class CameraView
 		{
 			Perspective,
@@ -58,9 +67,22 @@ namespace Thera
 			bgfx::ViewId target = 0;
 		};
 
+		/// <summary>
+		/// Render a camera's view based on its mask.
+		/// </summary>
+		/// <param name="iter"></param>
+		/// <param name="cam"></param>
+		/// <param name="camTransform"></param>
+		/// <param name="mask"></param>
 		static void RenderCameraFinal(flecs::iter& iter, const Camera* cam, const Thera::Core::WorldTransform* camTransform, const CachedRendererMask* mask);
 		
 		inline static flecs::query<const Camera, CachedRendererMask> _MaskValidationQuery;
+		/// <summary>
+		/// Ensure the validity of all CachedRendererMasks and rebuild if invalid.
+		/// </summary>
+		/// <param name="iter"></param>
+		/// <param name="cam"></param>
+		/// <param name="mask"></param>
 		static void ValidateCameraQueries(flecs::iter& iter, const Camera* cam, CachedRendererMask* mask);
 
 		Rendering(flecs::world& world)

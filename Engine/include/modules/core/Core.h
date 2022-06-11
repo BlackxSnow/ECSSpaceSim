@@ -8,6 +8,7 @@ namespace Thera
 {
 	struct Core
 	{
+	public:
 		/// <summary>
 		/// Defines masking behaviour for some components (eg. camera).
 		/// Whitelist and blacklist are defined by flecs relationships.
@@ -46,6 +47,9 @@ namespace Thera
 			}
 		};
 
+		/// <summary>
+		/// Component representing a cached world-space transform.
+		/// </summary>
 		struct WorldTransform
 		{
 			glm::dvec3 Position;
@@ -73,9 +77,10 @@ namespace Thera
 		{
 			glm::mat4 Model;
 		};
-
+	private:
 		static void UpdateWorldTransforms(flecs::iter& it, const Transform* local, WorldTransform* world);
 
+	public:
 		Core(flecs::world& world)
 		{
 			world.module<Core>();

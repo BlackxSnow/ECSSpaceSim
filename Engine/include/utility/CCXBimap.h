@@ -6,6 +6,12 @@ namespace CCX
 {
 	// TODO Consider automatic pointer based optimisations for large types.
 	// Make mutable?
+	
+	/// <summary>
+	/// A bi-directional unordered hash map for two-way lookup.
+	/// </summary>
+	/// <typeparam name="T1"></typeparam>
+	/// <typeparam name="T2"></typeparam>
 	template<typename T1, typename T2>
 	class UnorderedBimap
 	{

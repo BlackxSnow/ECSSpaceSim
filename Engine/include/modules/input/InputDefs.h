@@ -13,19 +13,26 @@
 
 namespace Thera::Input
 {
+	/// <summary>
+	/// Component count for output.
+	/// </summary>
 	enum class Output
 	{
 		Scalar = 1,
 		Vector2,
 		Vector3
 	};
-
+	/// <summary>
+	/// Component size for output.
+	/// </summary>
 	enum class Precision
 	{
 		Single = 4,
 		Double = 8
 	};
-
+	/// <summary>
+	/// Atomic components of output data for composites.
+	/// </summary>
 	enum class Component
 	{
 		NegX = 0,
@@ -36,13 +43,18 @@ namespace Thera::Input
 		PosZ = 5
 	};
 
+	/// <summary>
+	/// Converts underlying value of Output enum to string.
+	/// </summary>
 	inline std::unordered_map<int, std::string> outputToString
 	{
 		{ 1, "Scalar" },
 		{ 2, "Vector2" },
 		{ 3, "Vector3" }
 	};
-
+	/// <summary>
+	/// Converts underlying value of Precision enum to string.
+	/// </summary>
 	inline std::unordered_map<int, std::string> precisionToString
 	{
 		{ 4, "Single" },
@@ -50,6 +62,9 @@ namespace Thera::Input
 	};
 
 	const int FirstKey = 0;
+	/// <summary>
+	/// Input key IDs.
+	/// </summary>
 	enum class Key
 	{
 		Escape = 0,
@@ -172,7 +187,9 @@ namespace Thera::Input
 	};
 
 	const int FirstMouse = (int)Key::KeypadPeriod+1;
-
+	/// <summary>
+	/// Mouse input IDs.
+	/// </summary>
 	enum class Mouse
 	{
 		ButtonLeft = FirstMouse,
@@ -187,8 +204,21 @@ namespace Thera::Input
 		Delta
 	};
 
+	/// <summary>
+	/// Last inbuilt input ID.
+	/// </summary>
 	const int LastBinding = (int)Mouse::Delta;
 
+	/// <summary>
+	/// Convert GLFW input ID to Key.
+	/// </summary>
+	/// <param name="glfwInput"></param>
+	/// <returns></returns>
 	Key GLFWInputToKey(int glfwInput);
+	/// <summary>
+	/// Convert GLFW input ID to Mouse.
+	/// </summary>
+	/// <param name="glfwInput"></param>
+	/// <returns></returns>
 	Mouse GLFWInputToMouse(const int glfwInput);
 }
