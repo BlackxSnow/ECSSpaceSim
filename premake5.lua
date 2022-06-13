@@ -211,10 +211,6 @@ project "PongServer"
         linkDLLs( {assimpLibName})
     filter "*"
     links { "bgfx", "bimg", "bx", "glfw", "Engine", "flecs", "imgui" }
-    postbuildcommands
-    {
-        "{COPYDIR} \"%{prj.location}/Resources\" \"%{cfg.buildtarget.directory}/Resources\""
-    }
     linkSysLibs()
     setBxCompat()
 
