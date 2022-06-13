@@ -1,4 +1,4 @@
-The ECSE Input System follows an action mapping design pattern, allowing for versatile functionality and trivial support for multiple forms of input. The system is built to be versatile and modifiable before and at runtime while still maintaining a clean and easy to understand API.
+The Thera Input System follows an action mapping design pattern, allowing for versatile functionality and trivial support for multiple forms of input. The system is built to be versatile and modifiable before and at runtime while still maintaining a clean and easy to understand API.
 
 The input system's API is entirely accessible through the include `modules/input/input.h`.
 
@@ -33,8 +33,8 @@ A Master Binding contains information about the underlying input's output data t
 
 Binding Instances are typically created through the following functions:^[Note: the bound action must be of the same type as the instance.]
 ```cpp
-BindingInstance* ecse::input::CreateBinding(Action* bindTo, Key key);
-BindingInstance* ecse::input::CreateBinding(Action* bindTo, Mouse mouse);
+BindingInstance* Thera::input::CreateBinding(Action* bindTo, Key key);
+BindingInstance* Thera::input::CreateBinding(Action* bindTo, Mouse mouse);
 ```
 
 ---
@@ -44,7 +44,7 @@ BindingInstance* ecse::input::CreateBinding(Action* bindTo, Mouse mouse);
 ### Creating Actions
 Actions should be created via the following:^[Note: both r-value reference and l-value reference strings are accepted via overload.]
 ```cpp
-Action* ecse::input::CreateAction(std::string& name, Output dataType, Precision precision = Precision::Double);
+Action* Thera::input::CreateAction(std::string& name, Output dataType, Precision precision = Precision::Double);
 ```
 The parameter `name` defines a unique (not shared by any other action) identifier, `dataType` describes the component count of the Action (Scalar, Vector2, or Vector3), and `precision` describes the stride of each component (Single, or Double).
 
@@ -58,7 +58,7 @@ All three events provide an [[InputEventData|Input Event Data]] object, providin
 #### Example
 ```cpp
 // Initialise somewhere
-ecse::input::GetAction("Jump").OnStart.Register(OnJump);
+Thera::input::GetAction("Jump").OnStart.Register(OnJump);
 
 void OnJump(InputEventData& eventData)
 {
@@ -70,7 +70,7 @@ void OnJump(InputEventData& eventData)
 Actions can also be manually polled through their GetData method. This method returns a copy of the input's value at the time of polling with processing applied.^[Note: while the poll is guaranteed to be accurate within the frame, due to caching it is technically possible to obtain a false negative or false positive result if the input was respectively actuated or released after the first poll in a frame.]
 #### Example
 ```cpp
-bool isSprinting = ecse::input::GetAction("Sprint").GetData<float>() > 0;
+bool isSprinting = Thera::input::GetAction("Sprint").GetData<float>() > 0;
 ```
 
 ## Composite Bindings
@@ -85,12 +85,12 @@ Creating composites is necessarily somewhat more verbose than simple binding ins
 
 Here's an example of the aforementioned WASD binding using an action context:
 ```cpp
-ecse::Input::CreateCompositeBinding(ecse::Input::Output::Vector2, ecse::Input::Precision::Single,
+Thera::Input::CreateCompositeBinding(Thera::Input::Output::Vector2, Thera::Input::Precision::Single,
 {
-	ecse::Input::CreateConstituent(ecse::Input::Key::A, { ecse::Input::Component::NegX }),
-	ecse::Input::CreateConstituent(ecse::Input::Key::D, { ecse::Input::Component::PosX }),
-	ecse::Input::CreateConstituent(ecse::Input::Key::S, { ecse::Input::Component::NegY }),
-	ecse::Input::CreateConstituent(ecse::Input::Key::W, { ecse::Input::Component::PosY })
+	Thera::Input::CreateConstituent(Thera::Input::Key::A, { Thera::Input::Component::NegX }),
+	Thera::Input::CreateConstituent(Thera::Input::Key::D, { Thera::Input::Component::PosX }),
+	Thera::Input::CreateConstituent(Thera::Input::Key::S, { Thera::Input::Component::NegY }),
+	Thera::Input::CreateConstituent(Thera::Input::Key::W, { Thera::Input::Component::PosY })
 });
 ```
 
