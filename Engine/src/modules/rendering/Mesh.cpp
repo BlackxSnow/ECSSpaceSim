@@ -27,7 +27,7 @@ std::shared_ptr<Thera::MeshData> Thera::LoadMesh(const std::string& path)
 
 	aiMesh* mesh = scene->mMeshes[0];
 
-
+	// TODO URGENT: ToGLM expects doubles and outputs a double vector. This is unnecessary and causes issues with mesh rendering when assimp is not set to use doubles.
 	std::shared_ptr<MeshData> data = std::make_shared<MeshData>();
 	data->Vertices.reserve(mesh->mNumVertices);
 	for (int i = 0; i < mesh->mNumVertices; i++)
