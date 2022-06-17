@@ -1,7 +1,5 @@
 #include "Engine.h"
 
-#define flecs_STATIC
-
 #include "bgfx/bgfx.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -11,8 +9,8 @@
 #include "Controls.h"
 
 #include <filesystem>
-#include <Modules/Rendering/Rendering.h>
-#include <Modules/UI/UI.h>
+#include <modules/rendering/Rendering.h>
+#include <modules/ui/UI.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>

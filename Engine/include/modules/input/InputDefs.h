@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 #include <typeinfo>
 #include <stdexcept>
+#include <unordered_map>
 
 #include "../../utility/CCXDefs.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Modules/Input/Input.h"
-#include "Modules/Core/Core.h"
+#include "modules/input/Input.h"
+#include "modules/core/Core.h"
 
 namespace sim
 {

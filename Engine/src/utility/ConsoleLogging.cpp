@@ -8,7 +8,7 @@
 HANDLE console;
 bool isInitialised = false;
 
-clog::LogFlags clog::LogSettings = clog::LogFlags::Time | clog::LogFlags::SourceInfo;
+CCX::LogFlags CCX::LogSettings = CCX::LogFlags::Time | CCX::LogFlags::SourceInfo;
 
 void Init()
 {
@@ -21,9 +21,9 @@ void Init()
 
 void LayoutPrefix(int line, const std::string& func, const std::string& file, std::string& output)
 {
-	if ((int)clog::LogSettings != 0)
+	if ((int)CCX::LogSettings != 0)
 	{
-		if (clog::LogSettings & clog::LogFlags::Time)
+		if (CCX::LogSettings & CCX::LogFlags::Time)
 		{
 			std::time_t t = std::time(nullptr);
 
@@ -43,7 +43,7 @@ void LayoutPrefix(int line, const std::string& func, const std::string& file, st
 
 			output += "[" + buffer +"]";
 		}
-		if (clog::LogSettings & clog::LogFlags::SourceInfo)
+		if (CCX::LogSettings & CCX::LogFlags::SourceInfo)
 		{
 			output += "(Line " + std::to_string(line) + " @ " + func + " @ " + file + ")";
 		}
@@ -51,7 +51,7 @@ void LayoutPrefix(int line, const std::string& func, const std::string& file, st
 	}
 }
 
-void clog::Assert(int line, std::string sourceFunc, std::string sourceFile, bool assertion, std::string message = "")
+void CCX::Assert(int line, std::string sourceFunc, std::string sourceFile, bool assertion, std::string message = "")
 {
 	if (!assertion)
 	{
@@ -59,7 +59,7 @@ void clog::Assert(int line, std::string sourceFunc, std::string sourceFile, bool
 	}
 }
 
-void clog::Error(int line, std::string sourceFunc, std::string sourceFile, std::string message, bool throwException)
+void CCX::Error(int line, std::string sourceFunc, std::string sourceFile, std::string message, bool throwException)
 {
 	Init();
 	SetConsoleTextAttribute(console, FOREGROUND_RED);
@@ -73,7 +73,7 @@ void clog::Error(int line, std::string sourceFunc, std::string sourceFile, std::
 	}
 }
 
-void clog::Warning(int line, std::string sourceFunc, std::string sourceFile, std::string message)
+void CCX::Warning(int line, std::string sourceFunc, std::string sourceFile, std::string message)
 {
 	Init();
 	SetConsoleTextAttribute(console, FOREGROUND_RED | FOREGROUND_GREEN);
@@ -82,7 +82,7 @@ void clog::Warning(int line, std::string sourceFunc, std::string sourceFile, std
 	std::cout << output << message << "\n";
 }
 
-void clog::Info(int line, std::string sourceFunc, std::string sourceFile, std::string message)
+void CCX::Info(int line, std::string sourceFunc, std::string sourceFile, std::string message)
 {
 	Init();
 	SetConsoleTextAttribute(console, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);

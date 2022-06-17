@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include <Vector>
+#include <vector>
 #include <memory>
 #include <string>
 #include "bgfx/bgfx.h"

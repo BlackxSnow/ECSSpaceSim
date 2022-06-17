@@ -36,7 +36,7 @@ namespace Thera::Input
 		T GetData(bool truncate = false) 
 		{ 
 			static_assert(std::is_same<T, void*>::value, "Direct data access is only supported by 'const void*' type.");
-			static_assert(CCX::false_type<T>, "Unhandled output type"); 
+			static_assert(CCX::false_type<T>(), "Unhandled output type");
 		}
 		template<>
 		const void* GetData<const void*>(bool truncate) { return data; }

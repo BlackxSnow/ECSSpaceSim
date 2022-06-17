@@ -3,6 +3,9 @@
 *.sln
 *.vcxproj*
 
+# CLion files
+.idea
+
 # Intermediaries
 **/obj
 **/bin

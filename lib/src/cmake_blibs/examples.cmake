@@ -210,7 +210,7 @@ if( BGFX_CUSTOM_TARGETS AND BGFX_BUILD_EXAMPLES)
 	set_target_properties( examples PROPERTIES FOLDER "bgfx/examples" )
 endif()
 
-if (BGFX_BUILD_EXAMPLE OR BGFX_BUILD_EXAMPLES_COMMON)
+if (BGFX_BUILD_EXAMPLE OR BGFX_BUILD_EXAMPLES_COMMON OR BGFX_BUILD_TOOLS)
 	# Add common library for examples
 	add_example(
 		common

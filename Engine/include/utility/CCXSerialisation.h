@@ -9,7 +9,7 @@ namespace CCX
 	template<typename T>
 	T Deserialise(void* data, OUT size_t* size)
 	{
-		static_assert(CCX::false_type<T>, "Deserialisation of type is unhandled.");
+		static_assert(CCX::false_type<T>(), "Deserialisation of type is unhandled.");
 	}
 	
 	template<>

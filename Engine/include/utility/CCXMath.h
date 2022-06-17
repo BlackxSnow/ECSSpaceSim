@@ -11,7 +11,7 @@
 namespace CCX
 {
 	template<class T>
-	T Max(const T& a, const T& b) { static_assert(false_type<T>, "Unsupported type"); }
+	T Max(const T& a, const T& b) { static_assert(false_type<T>(), "Unsupported type"); }
 	template<>
 	inline float Max<float>(const float& a, const float& b)
 	{

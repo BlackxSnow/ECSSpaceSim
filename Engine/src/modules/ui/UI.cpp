@@ -18,6 +18,8 @@ namespace Thera::UI
 		case Thera::Core::MaskBehaviour::Blacklist:
 			query.term<Thera::Core::BlacklistedBy>(camEntity).oper(flecs::Not);
 			break;
+        default:
+            break;
 		}
 
 		return query.build();
@@ -74,6 +76,8 @@ namespace Thera::UI
 		case Thera::Core::MaskBehaviour::Blacklist:
 			filter.term<Thera::Core::BlacklistedBy>(iter.entity(0)).oper(flecs::Not);
 			break;
+        default:
+            break;
 		}
 
 		bgfx::setVertexBuffer(0, _ScreenVertexBuffer);

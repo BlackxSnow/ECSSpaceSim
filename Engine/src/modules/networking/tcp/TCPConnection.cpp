@@ -72,7 +72,7 @@ namespace Thera::Net::tcp
 				Packet packet(reader);
 				if (!TryGetPacketHandler(packet.ID(), handler))
 				{
-					LogWarning((std::ostringstream() << "Received unhandled packet id '" << std::to_string(packet.ID()) << "' from " << _Endpoint).str(), false);
+					LogWarning((std::ostringstream() << "Received unhandled packet id '" << std::to_string(packet.ID()) << "' from " << _Endpoint).str());
 					continue;
 				}
 				(*handler)(*this, &packet);

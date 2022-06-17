@@ -1,19 +1,18 @@
 #pragma once
 
+#include <cstring>
+
 #define __FILENAME__ strrchr("\\" __FILE__, '\\') + 1
 #define CLOGINFO __LINE__, __func__, __FILENAME__
-#define LogInfo(x) clog::Info(CLOGINFO, x);
-#define LogWarning(x) clog::Warning(CLOGINFO, x);
-#define LogError(x, t) clog::Error(CLOGINFO, x, t);
-#define CCXAssert(assertion, message) clog::Assert(CLOGINFO, assertion, message);
+#define LogInfo(x) CCX::Info(CLOGINFO, x);
+#define LogWarning(x) CCX::Warning(CLOGINFO, x);
+#define LogError(x, t) CCX::Error(CLOGINFO, x, t);
+#define CCXAssert(assertion, message) CCX::Assert(CLOGINFO, assertion, message);
 
 #include <string>
 #include <cassert>
 
-/// <summary>
-/// Standardised logging format and colouring scheme.
-/// </summary>
-namespace clog
+namespace CCX
 {
 	enum class LogFlags
 	{

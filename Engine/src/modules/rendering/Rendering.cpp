@@ -1,6 +1,6 @@
 #include <modules/rendering/Rendering.h>
 
-#include <modules/UI/UI.h>
+#include <modules/ui/UI.h>
 
 #include <bgfx/bgfx.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -19,6 +19,8 @@ flecs::query<const Thera::Rendering::Renderer, const Thera::Core::WorldTransform
 	case Thera::Core::MaskBehaviour::Blacklist:
 		query.term<Thera::Core::BlacklistedBy>(camEntity).oper(flecs::Not);
 		break;
+    default:
+        break;
 	}
 
 	return query.build();
@@ -127,6 +129,8 @@ void Thera::Rendering::RenderCameraFinal(flecs::iter& iter, const Camera* cam, c
 		case Thera::Core::MaskBehaviour::Blacklist:
 			filter.term<Thera::Core::BlacklistedBy>(iter.entity(i)).oper(flecs::Not);
 			break;
+        default:
+            break;
 		}
 
 		if (currentMask.lastMask == currentCam.masking)

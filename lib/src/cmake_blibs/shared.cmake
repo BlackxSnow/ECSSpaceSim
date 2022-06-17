@@ -11,7 +11,7 @@
 add_library( bgfx-vertexlayout INTERFACE )
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/cmake_blibs/generated/vertexlayout.cpp.in
                 ${CMAKE_CURRENT_BINARY_DIR}/cmake_blibs/generated/vertexlayout.cpp )
-target_sources( bgfx-vertexlayout INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/generated/vertexlayout.cpp )
+target_sources( bgfx-vertexlayout INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/cmake_blibs/generated/vertexlayout.cpp )
 target_include_directories( bgfx-vertexlayout INTERFACE ${BGFX_DIR}/include )
 
 add_library( bgfx-shader INTERFACE )

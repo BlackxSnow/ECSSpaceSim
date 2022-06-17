@@ -18,11 +18,11 @@
 #include <utility/ConsoleLogging.h>
 #include <modules/rendering/Mesh.h>
 #include <utility/Conversion.h>
-#include <Modules/Core/Core.h>
-#include <Modules/Rendering/Rendering.h>
-#include <Modules/Input/Input.h>
-#include <Modules/UI/UI.h>
-#include <Modules/IMGUI/IMGUI.h>
+#include <modules/core/Core.h>
+#include <modules/rendering/Rendering.h>
+#include <modules/input/Input.h>
+#include <modules/ui/UI.h>
+#include <modules/imgui/IMGUI.h>
 
 #include <flecs/addons/rest.h>
 #include <flecs/addons/monitor.h>

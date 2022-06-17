@@ -3,8 +3,8 @@
 #include <bgfx/bgfx.h>
 #include <array>
 
-#include "../Core/Core.h"
-#include "../Rendering/Rendering.h"
+#include "../core/Core.h"
+#include "../rendering/Rendering.h"
 #include "../../utility/CCXShader.h"
 
 namespace Thera::UI
