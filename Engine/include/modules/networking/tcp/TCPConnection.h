@@ -35,8 +35,8 @@ namespace Thera::Net::tcp
 		void HandleReceive(const asio::error_code& error, size_t bytesTransferred);
 		void HandleDisconnect();
 	public:
-		const asio::ip::tcp::endpoint& Endpoint() { return _Endpoint; }
-		const asio::ip::tcp::endpoint& LocalEndpoint() { return _Socket.local_endpoint(); }
+		asio::ip::tcp::endpoint Endpoint() const { return _Endpoint; }
+        asio::ip::tcp::endpoint LocalEndpoint() const { return _Socket.local_endpoint(); }
 
 		/// <summary>
 		/// If the connection was created with startActive = false, this function will cause the connection to go 'live'.

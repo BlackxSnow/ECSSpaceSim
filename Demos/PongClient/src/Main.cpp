@@ -1,8 +1,8 @@
 #include <Engine.h>
-#include <Modules/Networking/Networking.h>
-#include <Modules/Networking/TCP/TCPNetworking.h>
-#include <Modules/UI/UI.h>
-#include <Modules/Input/Input.h>
+#include <modules/networking/Networking.h>
+#include <modules/networking/tcp/TCPNetworking.h>
+#include <modules/ui/UI.h>
+#include <modules/input/Input.h>
 
 #include <iostream>
 #include <fstream>

@@ -32,7 +32,7 @@ namespace Thera::Net
 	class PacketHeader
 	{
 	public:
-		static const size_t HEADER_SIZE = sizeof(PacketID) + sizeof(PacketSize);
+		inline static const size_t HEADER_SIZE = sizeof(PacketID) + sizeof(PacketSize);
 		PacketID ID;
 		PacketSize Size;
 
@@ -46,17 +46,17 @@ namespace Thera::Net
 		std::vector<unsigned char> _Data;
 		
 	public:
-		PacketID ID();
+		PacketID ID() const;
 		/// <summary>
 		/// Get the data size within this packet.
 		/// </summary>
 		/// <returns></returns>
-		PacketSize Size();
+		PacketSize Size() const;
 		/// <summary>
 		/// Get the size of this packet including the header.
 		/// </summary>
 		/// <returns></returns>
-		size_t FullSize();
+		size_t FullSize() const;
 
 		Packet(PacketID id) : _Header(id) {}
 		template<typename Enum>

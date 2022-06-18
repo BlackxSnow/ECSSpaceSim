@@ -1,21 +1,23 @@
 #include <modules/networking/Packet.h>
 #include <utility/ConsoleLogging.h>
 
+#include <utility>
+
 namespace Thera::Net
 {
 	std::unordered_map<PacketID, PacketHandler> _PacketHandlers;
 
-	PacketID Packet::ID()
+	PacketID Packet::ID() const
 	{
 		return _Header.ID;
 	}
 
-	PacketSize Packet::Size()
+	PacketSize Packet::Size() const
 	{
 		return _Header.Size;
 	}
 
-	size_t Packet::FullSize()
+	size_t Packet::FullSize() const
 	{
 		return static_cast<size_t>(Size()) + PacketHeader::HEADER_SIZE;
 	}
@@ -39,7 +41,7 @@ namespace Thera::Net
 	}
 	Packet::Packet(CCX::MemoryReader& reader) : _Header(reader.Read<PacketID>())
 	{
-		PacketSize dataSize = reader.Read<PacketSize>();
+		auto dataSize = reader.Read<PacketSize>();
 		size_t remaining = reader.Remaining();
 		if (dataSize > remaining)
 		{
@@ -60,7 +62,7 @@ namespace Thera::Net
 	void Packet::GetBuffer(OUT std::vector<asio::const_buffer>& addTo)
 	{
 		addTo.emplace_back(this, PacketHeader::HEADER_SIZE);
-		if (_Data.size() > 0)
+		if (!_Data.empty())
 		{
 			addTo.emplace_back(_Data.data(), _Data.size());
 		}
@@ -87,7 +89,7 @@ namespace Thera::Net
 			LogWarning("Packet ID " + std::to_string(id) + " re-registered and overwritten.");
 		}
 
-		_PacketHandlers[id] = handler;
+		_PacketHandlers[id] = std::move(handler);
 	}
 
 	bool TryGetPacketHandler(PacketID id, PacketHandler*& handler)
@@ -126,7 +128,7 @@ namespace Thera::Net
 	{
 		std::vector<asio::const_buffer> buffer;
 		buffer.reserve(Count * 2 + 1);
-		buffer.emplace_back(this, HEADER_SIZE);
+		buffer.emplace_back(this, PacketHeader::HEADER_SIZE);
 		for (int i = 0; i < Count; i++)
 		{
 			Packets[i].GetBuffer(buffer);

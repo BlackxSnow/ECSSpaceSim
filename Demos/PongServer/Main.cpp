@@ -1,6 +1,6 @@
 #include <Engine.h>
-#include <Modules/Networking/Networking.h>
-#include <Modules/Networking/TCP/TCPNetworking.h>
+#include <modules/networking/Networking.h>
+#include <modules/networking/tcp/TCPNetworking.h>
 #include <modules/core/Core.h>
 
 #include <vector>

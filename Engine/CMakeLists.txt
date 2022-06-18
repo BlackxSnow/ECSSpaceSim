@@ -37,3 +37,7 @@ target_link_libraries(${PROJECT_NAME}
     PUBLIC flecs_static
     PUBLIC asio
     PUBLIC imgui)
+
+if (WIN32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE iphlpapi)
+endif()
