@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <functional>
 #include <forward_list>
 #include <unordered_map>

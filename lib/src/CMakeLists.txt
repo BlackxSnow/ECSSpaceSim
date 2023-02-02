@@ -11,12 +11,6 @@ set(ASSIMP_BUILD_ASSIMP_VIEW OFF CACHE BOOL "Build assimp view tool (DirectX)" F
 add_subdirectory(assimp)
 subdir_to_folder(assimp assimp)
 
-# Configure b-libs
-set(BGFX_BUILD_EXAMPLES OFF CACHE BOOL "Build bgfx examples" FORCE)
-set(BGFX_BUILD_EXAMPLES_COMMON OFF CACHE BOOL "Build bgfx examples common" FORCE)
-
-include(blibs.cmake)
-
 # Configure flecs
 set(FLECS_SHARED_LIBS OFF CACHE BOOL "Build flecs shared lib" FORCE)
 

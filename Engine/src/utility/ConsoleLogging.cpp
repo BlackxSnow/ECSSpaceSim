@@ -1,23 +1,10 @@
 #include <utility/ConsoleLogging.h>
+#include <utility/CCXConsoleColour.h>
 #include <iostream>
-#include <Windows.h>
 
 #include <ctime>
-#include <time.h>
-
-HANDLE console;
-bool isInitialised = false;
 
 CCX::LogFlags CCX::LogSettings = CCX::LogFlags::Time | CCX::LogFlags::SourceInfo;
-
-void Init()
-{
-	if (!isInitialised)
-	{
-		console = GetStdHandle(STD_OUTPUT_HANDLE);
-		isInitialised = true;
-	}
-}
 
 void LayoutPrefix(int line, const std::string& func, const std::string& file, std::string& output)
 {
@@ -26,22 +13,28 @@ void LayoutPrefix(int line, const std::string& func, const std::string& file, st
 		if (CCX::LogSettings & CCX::LogFlags::Time)
 		{
 			std::time_t t = std::time(nullptr);
+            char* buffer = new char[8];
+            std::strftime(buffer, 8, "%T", std::gmtime(&t));
 
-			struct tm timeInfo;
-			localtime_s(&timeInfo, &t);
+//            std::asctime(std::localtime(&t));
 
-			std::string buffer;
-			buffer.resize(32);
-			int len = strftime(&buffer[0], buffer.size(), "%X", &timeInfo);
-			while (len == 0) {
-				buffer.resize(buffer.size() * 2);
-				len = strftime(&buffer[0], buffer.size(), "%X", &timeInfo);
-			}
-			
-			size_t lastNonSpace = buffer.find_last_not_of(" \0", buffer.length(), 2);
-			buffer.erase(buffer.begin() + lastNonSpace + 1, buffer.end());
+//			struct tm timeInfo;
+//			localtime_s(&timeInfo, &t);
 
-			output += "[" + buffer +"]";
+//			std::string buffer;
+//			buffer.resize(32);
+//			int len = strftime(&buffer[0], buffer.size(), "%X", &timeInfo);
+//			while (len == 0) {
+//				buffer.resize(buffer.size() * 2);
+//				len = strftime(&buffer[0], buffer.size(), "%X", &timeInfo);
+//			}
+//
+//			size_t lastNonSpace = buffer.find_last_not_of(" \0", buffer.length(), 2);
+//			buffer.erase(buffer.begin() + lastNonSpace + 1, buffer.end());
+
+            output += "[";
+			output.append(buffer);
+            output += "]";
 		}
 		if (CCX::LogSettings & CCX::LogFlags::SourceInfo)
 		{
@@ -61,8 +54,7 @@ void CCX::Assert(int line, std::string sourceFunc, std::string sourceFile, bool 
 
 void CCX::Error(int line, std::string sourceFunc, std::string sourceFile, std::string message, bool throwException)
 {
-	Init();
-	SetConsoleTextAttribute(console, FOREGROUND_RED);
+	CCX::SetConsoleColour(CCX::ConsoleColour::Red, CCX::ConsoleColour::Default);
 	std::string output = "[ERROR] ";
 	LayoutPrefix(line, sourceFunc, sourceFile, output);
 	std::cout << output << message << "\n";
@@ -75,8 +67,7 @@ void CCX::Error(int line, std::string sourceFunc, std::string sourceFile, std::s
 
 void CCX::Warning(int line, std::string sourceFunc, std::string sourceFile, std::string message)
 {
-	Init();
-	SetConsoleTextAttribute(console, FOREGROUND_RED | FOREGROUND_GREEN);
+    CCX::SetConsoleColour(CCX::ConsoleColour::Yellow, CCX::ConsoleColour::Default);
 	std::string output = "[WARN] ";
 	LayoutPrefix(line, sourceFunc, sourceFile, output);
 	std::cout << output << message << "\n";
@@ -84,8 +75,7 @@ void CCX::Warning(int line, std::string sourceFunc, std::string sourceFile, std:
 
 void CCX::Info(int line, std::string sourceFunc, std::string sourceFile, std::string message)
 {
-	Init();
-	SetConsoleTextAttribute(console, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+    CCX::SetConsoleColour(CCX::ConsoleColour::Default, CCX::ConsoleColour::Default);
 	std::string output = "[INFO] ";
 	LayoutPrefix(line, sourceFunc, sourceFile, output);
 	std::cout << output << message << "\n";

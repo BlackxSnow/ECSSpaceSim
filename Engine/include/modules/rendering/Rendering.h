@@ -6,6 +6,7 @@
 #include <bgfx/bgfx.h>
 #include <glm/mat4x4.hpp>
 
+#include <modules/rendering/BgfxInit.h>
 #include <modules/rendering/Mesh.h>
 #include <modules/core/Core.h>
 #include <Engine.h>

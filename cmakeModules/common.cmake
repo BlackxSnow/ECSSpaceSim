@@ -16,6 +16,7 @@ endfunction()
 
 function(subdir_to_folder_prepend _dir _prependFolder)
     get_all_targets(_allTargets ${_dir})
+    message(${_allTargets})
     foreach (_target IN LISTS _allTargets)
         get_target_property(_folder ${_target} FOLDER)
         if (NOT _folder)

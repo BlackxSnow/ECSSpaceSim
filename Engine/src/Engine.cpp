@@ -1,18 +1,8 @@
 #include <Engine.h>
 
 #include <bgfx/bgfx.h>
-#include <bgfx/platform.h>
 #include <GLFW/glfw3.h>
 
-#if BX_PLATFORM_LINUX
-#define GLFW_EXPOSE_NATIVE_X11
-#elif BX_PLATFORM_WINDOWS
-#define GLFW_EXPOSE_NATIVE_WIN32
-#elif BX_PLATFORM_OSX
-#define GLFW_EXPOSE_NATIVE_COCOA
-#endif
-
-#include <GLFW/glfw3native.h>
 #include <chrono>
 
 #include <utility/ConsoleLogging.h>
@@ -89,28 +79,6 @@ static GLFWwindow* InitialiseGLFW(std::function<void()>* setHints = nullptr)
 	return window;
 }
 
-static void InitialiseBGFX(GLFWwindow* window)
-{
-	bgfx::Init init;
-
-#if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
-	init.platformData.ndt = glfwGetX11Display();
-	init.platformData.nwh = (void*)(uintptr_t)glfwGetX11Window(window);
-#elif BX_PLATFORM_OSX
-	init.platformData.nwh = glfwGetCocoaWindow(window);
-#elif BX_PLATFORM_WINDOWS
-	init.platformData.nwh = glfwGetWin32Window(window);
-#endif
-
-	init.resolution.width = (uint32_t)Thera::WindowWidth;
-	init.resolution.height = (uint32_t)Thera::WindowHeight;
-	init.resolution.reset = BGFX_RESET_VSYNC;
-	if (!bgfx::init(init))
-	{
-		LogError("Unable to intiialise BGFX", true);
-	}
-}
-
 static void HandleWindowResize(GLFWwindow* window, const bgfx::ViewId& clearView)
 {
 	int oldWidth = Thera::WindowWidth, oldHeight = Thera::WindowHeight;
@@ -127,7 +95,7 @@ static void HandleWindowResize(GLFWwindow* window, const bgfx::ViewId& clearView
 void Thera::Init()
 {
 	Windows.push_back(InitialiseGLFW());
-	InitialiseBGFX(Windows[0]);
+	InitialiseBgfx(Windows[0], Thera::WindowWidth, Thera::WindowHeight);
 	Vertex::Init();
 	
 	bgfx::setViewClear(kClearView, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH);

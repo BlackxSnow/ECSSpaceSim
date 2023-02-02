@@ -9,7 +9,7 @@ project("Engine"
 file(GLOB_RECURSE engineInclude CONFIGURE_DEPENDS "include/*.h")
 file(GLOB_RECURSE engineSource CONFIGURE_DEPENDS "src/*.cpp" "src/*.h")
 
-add_library(${PROJECT_NAME} STATIC ${engineSource} ${engineInclude})
+add_library(${PROJECT_NAME} STATIC ${engineSource} ${engineInclude} include/utility/CCXConsoleColour.h src/utility/CCXConsoleColour.cpp src/modules/rendering/BgfxInit.cpp include/modules/rendering/BgfxInit.h)
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 
