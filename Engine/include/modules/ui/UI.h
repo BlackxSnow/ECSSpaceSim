@@ -1,6 +1,5 @@
 #pragma once
 #include <flecs.h>
-#include <bgfx/bgfx.h>
 #include <array>
 
 #include "../core/Core.h"
@@ -14,7 +13,7 @@ namespace Thera::UI
 	/// </summary>
 	struct ScreenRenderer
 	{
-		bgfx::TextureHandle Texture;
+//		bgfx::TextureHandle Texture;
 	};
 
 	/// <summary>
@@ -51,11 +50,11 @@ namespace Thera::UI
 
 		inline static std::array<glm::vec3, 4> _ScreenVertices { glm::vec3(-1,-1,0), glm::vec3(1,-1,0), glm::vec3(1,1,0), glm::vec3(-1,1,0) };
 		inline static std::array<uint16_t, 6> _ScreenIndices { 0, 1, 2, 2, 3, 0 };
-		inline static bgfx::VertexLayout _PositionVertex;
-		inline static bgfx::VertexBufferHandle _ScreenVertexBuffer;
-		inline static bgfx::IndexBufferHandle _ScreenIndexBuffer;
-		inline static bgfx::UniformHandle _UITextureUniform;
-		inline static bgfx::ProgramHandle _ScreenShader;
+//		inline static bgfx::VertexLayout _PositionVertex;
+//		inline static bgfx::VertexBufferHandle _ScreenVertexBuffer;
+//		inline static bgfx::IndexBufferHandle _ScreenIndexBuffer;
+//		inline static bgfx::UniformHandle _UITextureUniform;
+//		inline static bgfx::ProgramHandle _ScreenShader;
 	public:
 
 		Module(flecs::world& world)
@@ -68,18 +67,18 @@ namespace Thera::UI
 			// Ensure all cameras are added with a CachedUIMask. (Thanks Flecs!)
 			world.component<Thera::Rendering::Rendering::Camera>().add(flecs::With, world.id<CachedUIMask>());
 
-			world.system< const Thera::Rendering::Camera, const Thera::Core::WorldTransform, const CachedUIMask>("RenderCameraUI").iter(_RenderCameraUI);
+//			world.system< const Thera::Rendering::Camera, const Thera::Core::WorldTransform, const CachedUIMask>("RenderCameraUI").iter(_RenderCameraUI);
 
 			// Validate queries post-frame (World is ephemeral during system runs and can't be used to make queries)
 			_MaskValidationQuery = world.query_builder<const Thera::Rendering::Camera, CachedUIMask>().build();
-			Thera::OnFinalValidate.Register([]() { _MaskValidationQuery.iter(_ValidateUIMasks); });
+//			Thera::OnFinalValidate.Register([]() { _MaskValidationQuery.iter(_ValidateUIMasks); });
 
 			// bgfx resource iniitalisation
-			_PositionVertex.begin().add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float).end();
-			_ScreenVertexBuffer = bgfx::createVertexBuffer(bgfx::makeRef(&_ScreenVertices, sizeof(glm::vec3) * 4), _PositionVertex);
-			_ScreenIndexBuffer = bgfx::createIndexBuffer(bgfx::makeRef(&_ScreenIndices, sizeof(uint16_t) * 6));
-			_UITextureUniform = bgfx::createUniform("texColour", bgfx::UniformType::Sampler);
-			_ScreenShader = CCX::LoadShaderProgram("screen_vs", "screen_fs");
+//			_PositionVertex.begin().add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float).end();
+//			_ScreenVertexBuffer = bgfx::createVertexBuffer(bgfx::makeRef(&_ScreenVertices, sizeof(glm::vec3) * 4), _PositionVertex);
+//			_ScreenIndexBuffer = bgfx::createIndexBuffer(bgfx::makeRef(&_ScreenIndices, sizeof(uint16_t) * 6));
+//			_UITextureUniform = bgfx::createUniform("texColour", bgfx::UniformType::Sampler);
+//			_ScreenShader = CCX::LoadShaderProgram("screen_vs", "screen_fs");
 		}
 	};
 }

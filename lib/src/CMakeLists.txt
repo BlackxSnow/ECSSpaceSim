@@ -30,5 +30,8 @@ subdir_to_folder(glm glm)
 
 include(imgui.cmake)
 
+add_subdirectory(DiligentCore)
+subdir_to_folder(DiligentCore Diligent)
+
 # Place all targets into Dependencies/ while preserving their internal structure
 subdir_to_folder_prepend(${CMAKE_CURRENT_SOURCE_DIR} "Dependencies")

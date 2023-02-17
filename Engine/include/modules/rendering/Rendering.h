@@ -3,10 +3,9 @@
 #include <vector>
 #include <memory>
 #include <flecs.h>
-#include <bgfx/bgfx.h>
 #include <glm/mat4x4.hpp>
 
-#include <modules/rendering/BgfxInit.h>
+#include <modules/rendering/DiligentInit.h>
 #include <modules/rendering/Mesh.h>
 #include <modules/core/Core.h>
 #include <Engine.h>
@@ -20,13 +19,13 @@ namespace Thera
 	{
 		struct Material
 		{
-			bgfx::ProgramHandle shader;
-
-			Material(bgfx::ProgramHandle shader)
-			{
-				this->shader = shader;
-			}
-			Material() {}
+//			bgfx::ProgramHandle shader;
+//
+//			Material(bgfx::ProgramHandle shader)
+//			{
+//				this->shader = shader;
+//			}
+//			Material() {}
 		};
 
 		/// <summary>
@@ -65,7 +64,7 @@ namespace Thera
 			float fovRad;
 			glm::vec2 size;
 			bool isEnabled = true;
-			bgfx::ViewId target = 0;
+//			bgfx::ViewId target = 0;
 		};
 
 		/// <summary>
@@ -75,7 +74,7 @@ namespace Thera
 		/// <param name="cam"></param>
 		/// <param name="camTransform"></param>
 		/// <param name="mask"></param>
-		static void RenderCameraFinal(flecs::iter& iter, const Camera* cam, const Thera::Core::WorldTransform* camTransform, const CachedRendererMask* mask);
+//		static void RenderCameraFinal(flecs::iter& iter, const Camera* cam, const Thera::Core::WorldTransform* camTransform, const CachedRendererMask* mask);
 		
 		inline static flecs::query<const Camera, CachedRendererMask> _MaskValidationQuery;
 		/// <summary>
@@ -84,7 +83,7 @@ namespace Thera
 		/// <param name="iter"></param>
 		/// <param name="cam"></param>
 		/// <param name="mask"></param>
-		static void ValidateCameraQueries(flecs::iter& iter, const Camera* cam, CachedRendererMask* mask);
+//		static void ValidateCameraQueries(flecs::iter& iter, const Camera* cam, CachedRendererMask* mask);
 
 		Rendering(flecs::world& world)
 		{
@@ -101,11 +100,11 @@ namespace Thera
 				.add(flecs::With, world.id<Thera::Core::Transform>())
 				.add(flecs::With, world.id<CachedRendererMask>());
 
-			world.system<const Camera, const Thera::Core::WorldTransform, const CachedRendererMask>("RenderCameraFinal")
-				.iter(RenderCameraFinal);
-
-			_MaskValidationQuery = world.query_builder<const Camera, CachedRendererMask>().build();
-			OnFinalValidate.Register([]() {_MaskValidationQuery.iter(ValidateCameraQueries); });
+//			world.system<const Camera, const Thera::Core::WorldTransform, const CachedRendererMask>("RenderCameraFinal")
+//				.iter(RenderCameraFinal);
+//
+//			_MaskValidationQuery = world.query_builder<const Camera, CachedRendererMask>().build();
+//			OnFinalValidate.Register([]() {_MaskValidationQuery.iter(ValidateCameraQueries); });
 		}
 	};
 	

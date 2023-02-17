@@ -5,7 +5,6 @@
 
 #include <imgui.h>
 #include <backends/imgui_impl_glfw.h>
-#include "internal/imgui_impl_bgfx.h"
 
 namespace Thera::IMGUI
 {
@@ -14,14 +13,14 @@ namespace Thera::IMGUI
 		world.module<Module>();
 
 		world.system("IMGUI Initialiser").kind(flecs::PreFrame).iter([](flecs::iter& iter) {
-			ImGui_Implbgfx_NewFrame();
-			ImGui_ImplGlfw_NewFrame();
-			ImGui::NewFrame();
+//			ImGui_Implbgfx_NewFrame();
+//			ImGui_ImplGlfw_NewFrame();
+//			ImGui::NewFrame();
 		});
 
 		world.system("IMGUI Render").kind(flecs::PostRender).iter([](flecs::iter& iter) {
-			ImGui::Render();
-			ImGui_Implbgfx_RenderDrawLists(ImGui::GetDrawData());
+//			ImGui::Render();
+//			ImGui_Implbgfx_RenderDrawLists(ImGui::GetDrawData());
 		});
 
 		Thera::OnInit.Register([]() {
@@ -35,13 +34,13 @@ namespace Thera::IMGUI
 			{
 				LogError("Failed to initialise IMGUI for GLFW.", true);
 			}
-			ImGui_Implbgfx_Init(1);
+//			ImGui_Implbgfx_Init(1);
 		});
 	}
 	Module::~Module()
 	{
-		ImGui_Implbgfx_Shutdown();
-		ImGui_ImplGlfw_Shutdown();
+//		ImGui_Implbgfx_Shutdown();
+//		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
 	}
 }

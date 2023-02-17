@@ -1,7 +1,7 @@
 #include <Engine.h>
 
-#include <bgfx/bgfx.h>
 #include <GLFW/glfw3.h>
+#include <Graphics/GraphicsEngine/interface/RenderDevice.h>
 
 #include <chrono>
 
@@ -31,8 +31,6 @@ flecs::entity GameRoot;
 
 size_t currentFrame = 1;
 
-const bgfx::ViewId kClearView = 0;
-
 static void glfw_error(int error, const char* description)
 {
 	LogError(description, false);
@@ -60,13 +58,19 @@ size_t Thera::FrameCount()
 	return currentFrame;
 }
 
-static GLFWwindow* InitialiseGLFW(std::function<void()>* setHints = nullptr)
+static GLFWwindow* InitialiseGLFW(int glfwAPI, std::function<void()>* setHints = nullptr)
 {
 	glfwSetErrorCallback(glfw_error);
 	if (!glfwInit())
 	{
 		LogError("Unable to initialise GLFW", true);
 	}
+    glfwWindowHint(GLFW_CLIENT_API, glfwAPI);
+    if (glfwAPI == GLFW_OPENGL_API)
+    {
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    }
 	if (setHints != nullptr)
 	{
 		(*setHints)();
@@ -79,26 +83,32 @@ static GLFWwindow* InitialiseGLFW(std::function<void()>* setHints = nullptr)
 	return window;
 }
 
-static void HandleWindowResize(GLFWwindow* window, const bgfx::ViewId& clearView)
-{
-	int oldWidth = Thera::WindowWidth, oldHeight = Thera::WindowHeight;
-	glfwGetWindowSize(window, &Thera::WindowWidth, &Thera::WindowHeight);
-
-	if (oldWidth != Thera::WindowWidth || oldHeight != Thera::WindowHeight)
-	{
-		bgfx::reset((uint32_t)Thera::WindowWidth, (uint32_t)Thera::WindowHeight, BGFX_RESET_VSYNC);
-		bgfx::setViewRect(clearView, 0, 0, bgfx::BackbufferRatio::Equal);
-		Thera::WindowResized.Invoke(Thera::WindowWidth, Thera::WindowHeight);
-	}
-}
+//static void HandleWindowResize(GLFWwindow* window, const bgfx::ViewId& clearView)
+//{
+//	int oldWidth = Thera::WindowWidth, oldHeight = Thera::WindowHeight;
+//	glfwGetWindowSize(window, &Thera::WindowWidth, &Thera::WindowHeight);
+//
+//	if (oldWidth != Thera::WindowWidth || oldHeight != Thera::WindowHeight)
+//	{
+//		bgfx::reset((uint32_t)Thera::WindowWidth, (uint32_t)Thera::WindowHeight, BGFX_RESET_VSYNC);
+//		bgfx::setViewRect(clearView, 0, 0, bgfx::BackbufferRatio::Equal);
+//		Thera::WindowResized.Invoke(Thera::WindowWidth, Thera::WindowHeight);
+//	}
+//}
 
 void Thera::Init()
 {
-	Windows.push_back(InitialiseGLFW());
-	InitialiseBgfx(Windows[0], Thera::WindowWidth, Thera::WindowHeight);
+    int glfwApi = GLFW_NO_API;
+    Diligent::RENDER_DEVICE_TYPE renderDeviceType = Diligent::RENDER_DEVICE_TYPE_GL;
+#if !PLATFORM_WIN32
+    if (renderDeviceType == Diligent::RENDER_DEVICE_TYPE_GL)
+    {
+        glfwApi = GLFW_OPENGL_API;
+    }
+#endif
+	Windows.push_back(InitialiseGLFW(glfwApi));
+    InitialiseDiligent(Windows[0], Thera::WindowWidth, Thera::WindowHeight, renderDeviceType);
 	Vertex::Init();
-	
-	bgfx::setViewClear(kClearView, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH);
 
 	World = new flecs::world();
 	GameRoot = World->entity("Game");
@@ -155,7 +165,7 @@ void Thera::InitWindowless()
 void Thera::TestInit()
 {
 	std::function<void()> hints = []() { glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); };
-	Windows.push_back(InitialiseGLFW(&hints));
+	Windows.push_back(InitialiseGLFW(GLFW_NO_API, &hints));
 	Input::Initialise();
 }
 
@@ -207,9 +217,7 @@ int Thera::Loop(int argc, char** argv)
 	{
 		glfwPollEvents();
 		OnInputPoll.Invoke();
-		HandleWindowResize(Windows[0], kClearView);
-
-		bgfx::touch(kClearView);
+        
 
 		_DeltaTime = CalculateDeltaTime(lastTime);
 		World->progress(_DeltaTime);
@@ -217,7 +225,6 @@ int Thera::Loop(int argc, char** argv)
 		RunDeferredOperations();
 		OnFinalValidate.Invoke();
 
-		bgfx::frame();
 		currentFrame++;
 	}
 

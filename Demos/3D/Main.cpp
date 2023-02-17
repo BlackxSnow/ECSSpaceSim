@@ -1,6 +1,5 @@
 #include "Engine.h"
 
-#include "bgfx/bgfx.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -10,7 +9,6 @@
 
 #include <filesystem>
 #include <modules/rendering/Rendering.h>
-#include <modules/ui/UI.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -27,11 +25,11 @@ int main()
 	auto img = stbi_load("./Resources/test.png", &width, &height, &channels, 0);
 
 	flecs::entity texTest = Thera::GetWorld()->entity();
-	texTest.set<Thera::UI::ScreenRenderer>({ bgfx::createTexture2D(width, height, false, 1, bgfx::TextureFormat::RGB8, 0, bgfx::makeRef(img, width * height * channels))});
+//	texTest.set<Thera::UI::ScreenRenderer>({ bgfx::createTexture2D(width, height, false, 1, bgfx::TextureFormat::RGB8, 0, bgfx::makeRef(img, width * height * channels))});
 
 	auto prev = Thera::GetWorld()->set_scope(*Thera::GetGameRoot());
 
-	auto defaultShader = CCX::LoadShaderProgram("default_vs", "default_fs");
+//	auto defaultShader = CCX::LoadShaderProgram("default_vs", "default_fs");
 
 	auto cubeMesh = Thera::LoadMesh("Resources/Cube.obj");
 
@@ -50,13 +48,13 @@ int main()
 	flecs::entity cube = Thera::GetWorld()->entity();
 	auto cubeRenderer = cube.get_mut<Thera::Rendering::Renderer>();
 	cubeRenderer->meshes.push_back(cubeMesh);
-	cubeRenderer->material.shader = defaultShader;
+//	cubeRenderer->material.shader = defaultShader;
 
 	cube.set<Thera::Core::Transform>({ glm::dvec3(3, 3, -10), glm::identity<glm::quat>(), glm::vec3(1, 1, 1) });
 
 	
 
-	bgfx::setDebug(BGFX_DEBUG_NONE);
+//	bgfx::setDebug(BGFX_DEBUG_NONE);
 
 	Thera::GetWorld()->set_scope(prev);
 

@@ -161,19 +161,19 @@ namespace Thera::Input
 
 		Constituent(BindingInstance* binding, std::initializer_list<Component> _indices) : binding(binding) 
 		{
-			CCXAssert(_indices.size() <= (int)binding->master.dataType, "Too many indices for binding output type.");
+			CCXAssert(_indices.size() <= (ulong)binding->master.dataType, "Too many indices for binding output type.");
 			std::transform(_indices.begin(), _indices.end(), std::back_inserter(indices), [](Component c) { return (int)c; });
 		}
 		Constituent(BindingInstance* binding, std::vector<int> indices) : binding(binding), indices(indices)
 		{
-			CCXAssert(indices.size() <= (int)binding->master.dataType, "Too many indices for binding output type.");
+			CCXAssert(indices.size() <= (ulong)binding->master.dataType, "Too many indices for binding output type.");
 		}
 	};
 
 	/// <summary>
 	/// A composition of one or more bindings to form a larger data type with an API identical to a single binding.
 	/// </summary>
-	class CompositeBinding : public DataHandler
+	class CompositeBinding final : public DataHandler
 	{
 	private:
 		std::vector<Constituent> constituents;
@@ -189,7 +189,7 @@ namespace Thera::Input
 		void ForcePoll() override;
 
 		CompositeBinding(Action* bindTo, Output _dataType, Precision _dataPrecision, std::vector<Constituent>&& _constituents)
-			: DataHandler(_dataType, _dataPrecision), boundAction(bindTo), constituents(_constituents) 
+			: DataHandler(_dataType, _dataPrecision), constituents(_constituents), boundAction(bindTo)
 		{
 			CCXAssert(bindTo != nullptr, "bindTo cannot be nullptr.");
 			ValidateConstituents();

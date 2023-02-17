@@ -4,7 +4,6 @@
 #include <vector>
 #include <memory>
 #include <string>
-#include "bgfx/bgfx.h"
 
 
 
@@ -34,22 +33,22 @@ namespace Thera
 
 		static void Init()
 		{
-			Layout.begin()
-				.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-				.add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float)
-				.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
-				.end();
+//			Layout.begin()
+//				.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+//				.add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float)
+//				.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+//				.end();
 		}
 
-		static bgfx::VertexLayout Layout;
+//		static bgfx::VertexLayout Layout;
 	};
 
 	struct MeshData
 	{
 		std::vector<Vertex> Vertices;
 		std::vector<uint16_t> Indices;
-		bgfx::VertexBufferHandle vertexBuffer;
-		bgfx::IndexBufferHandle indexBuffer;
+//		bgfx::VertexBufferHandle vertexBuffer;
+//		bgfx::IndexBufferHandle indexBuffer;
 	};
 
 	/// <summary>

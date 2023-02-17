@@ -7,7 +7,7 @@
 #include <utility/Conversion.h>
 
 
-bgfx::VertexLayout Thera::Vertex::Layout;
+//bgfx::VertexLayout Thera::Vertex::Layout;
 
 /// <summary>
 /// Placeholder. Loads the first mesh in a scene from a given file.
@@ -56,7 +56,7 @@ std::shared_ptr<Thera::MeshData> Thera::LoadMesh(const std::string& path)
 		}
 	}
 
-	data->vertexBuffer = bgfx::createVertexBuffer(bgfx::makeRef(data->Vertices.data(), sizeof(Thera::Vertex) * data->Vertices.size()), Thera::Vertex::Layout);
-	data->indexBuffer = bgfx::createIndexBuffer(bgfx::makeRef(data->Indices.data(), sizeof(uint16_t) * data->Indices.size()));
+//	data->vertexBuffer = bgfx::createVertexBuffer(bgfx::makeRef(data->Vertices.data(), sizeof(Thera::Vertex) * data->Vertices.size()), Thera::Vertex::Layout);
+//	data->indexBuffer = bgfx::createIndexBuffer(bgfx::makeRef(data->Indices.data(), sizeof(uint16_t) * data->Indices.size()));
 	return data;
 }
